@@ -7,4 +7,5 @@ fn main() {
     if (env::args().len())>=3 {
         panic!("Error: too many argument")
     };
+
 }
