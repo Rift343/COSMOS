@@ -17,6 +17,22 @@ struct CSVFile{
 
 #[allow(unused)]
 impl CSVFile {
+
+    fn to_string(&self) -> String{
+        let mut result_string : String="".to_string();
+        for ligne in 0..self.descriptor.len(){
+            result_string = result_string+ &self.descriptor[ligne].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
+            if (std::env::consts::OS == "windows" ){
+                result_string = result_string+"\r\n";
+            }
+            else{
+                result_string = result_string+"\n";
+            }
+        }
+        return result_string; 
+    }
+
+
     fn print_csv_file(&self){
         println!("{}",&self.name);
     }
@@ -109,6 +125,8 @@ mod tests {
         a1.projection(["id".to_string(),"prenom".to_string()].to_vec());
         let time_passed = now.elapsed();
         println!("The the projection with personnetest.csv took {} seconde", time_passed.as_secs());
+        print!("{}",a1.to_string());
+        
         //println!("{:?}",a1.descriptor);
         
     }
