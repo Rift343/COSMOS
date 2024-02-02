@@ -1,13 +1,15 @@
-use std::{fs::File, io::{Read, Seek}};
+use std::{collections::HashMap, fs::File, io::{Read, Seek}};
+
+use crate::operator::CSVFile;
 mod operator;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
 
-pub fn scheduler (mut json_file:&File){
+pub fn scheduler (mut json_file:&File)->File{
     json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");
-    println!("You passed the rewind");
+    //println!("You passed the rewind");
     let mut buffer = Vec::new();
     json_file.read_to_end(&mut buffer).expect("Read to end error");
     let mut str_json :String = String::new();
@@ -16,7 +18,31 @@ pub fn scheduler (mut json_file:&File){
     }
     let parse_json=json::parse(&str_json.to_string()).unwrap();
     parse_json.dump();
-    println!("{}",parse_json["table"][0]["columns"]);
+    //println!("{}",parse_json["table"][0]["columns"]);
+    let mut key:Vec<String>=Vec::new();
+    let mut final_proj:Vec<String>= Vec::new();
+    let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
+    for i in 0..parse_json["table"].len(){
+        let mut intermediary_vector:Vec<String>=Vec::new();
+        for y in 0..parse_json["table"][i]["columns"].len(){
+            let mut my_str:String = parse_json["table"][i]["columns"][y][0].to_string();
+            my_str.push('.');
+            my_str.push_str(&parse_json["table"][i]["columns"][y][1].to_string());
+            intermediary_vector.push(my_str.clone());
+            final_proj.push(my_str); 
+        }
+        key.push(parse_json["table"][i]["table_name"].to_string());
+        println!("{:?}",intermediary_vector);
+        println!("{}",parse_json["table"][i]["table_name"]);
+        let mut open_file:CSVFile = operator::open_relation(parse_json["table"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string());
+        open_file.projection(intermediary_vector);
+        dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);
+    }
+    if key.len() != 1{
+        // TO DO for the cartesian product
+    }
+    else{}
+    return dictionnary[&key[0]].to_file() ;
 }
 
 #[cfg(test)]
