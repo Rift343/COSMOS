@@ -4,7 +4,7 @@ use csv::Reader;
 fn main() {
     println!("Hello, world!");
 
-    let filename = "TestCosmosFichierResultat.csv";
+    let filename = "engine/TestCosmosFichierResultat.csv";
     let result = csv_to_string(filename);
     println!("Result {}",result);
 }

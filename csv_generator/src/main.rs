@@ -21,7 +21,7 @@ fn main() {
     let nb_line : i32 = res_input.parse().expect("Error nbline");
 
     //ouverture du reader
-    let mut wtr = Writer::from_path("data_set.csv").expect("Error : writer");
+    let mut wtr = Writer::from_path("csv_generator/data_set.csv").expect("Error : writer");
     //definition random name
     let rng_s = RNG::try_from(&Language::Elven).unwrap();
 
