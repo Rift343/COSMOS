@@ -1,4 +1,5 @@
-use std::{file, fs::File, io::{Read, Seek}};
+use std::{fs::File, io::{Read, Seek}};
+mod operator;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
@@ -15,7 +16,7 @@ pub fn scheduler (mut json_file:&File){
     }
     let parse_json=json::parse(&str_json.to_string()).unwrap();
     parse_json.dump();
-    println!("{}",parse_json["table"]);
+    println!("{}",parse_json["table"][0]["columns"]);
 }
 
 #[cfg(test)]
@@ -30,6 +31,7 @@ mod tests {
         assert_eq!(result, 4);
     }
     #[test]
+    #[should_panic]
     fn test_on_create_file(){
         {
             let mut fichier_test:std::fs::File = File::create("test.txt").expect("Can't create a file");
