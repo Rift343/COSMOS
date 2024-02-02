@@ -138,18 +138,18 @@ fn open_relation(pathcsv:String,name1:String)->CSVFile{
 
 #[cfg(test)]
 mod tests {
-    use std::time::Instant;
+    use std::{env, time::Instant};
 
     use super::*;
     #[test]
     fn test1(){
-        let mut a1 = open_relation("personnetest".to_string(), "R1".to_string());
+        let mut a1 = open_relation("personneTest".to_string(), "R1".to_string());
         a1.print_csv_file();
         let now = Instant::now();
         println!("{:?}",a1.descriptor[0]);
-        a1.projection(["personnetest.id".to_string(),"personnetest.prenom".to_string()].to_vec());
+        a1.projection(["personneTest.id".to_string(),"personneTest.prenom".to_string()].to_vec());
         let time_passed = now.elapsed();
-        println!("The projection with personnetest.csv took {} seconde", time_passed.as_secs());
+        println!("The projection with personneTest.csv took {} seconde", time_passed.as_secs());
         a1.to_file();
         //print!("{}",a1.to_string());
         
@@ -158,8 +158,9 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
     fn test_csv_read_ligne(){
-        let a1 = "../data/CSV/personnetest.csv".to_string();
+        let a1 = "../data/CSV/personneTest.csv".to_string();
         csv_read_by_ligne(a1);
 
     }
