@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+	"engine",
+	"runner_scheduler",
+	"csv_generator",
+	"view",
+]

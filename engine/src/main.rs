@@ -2,7 +2,6 @@ use std::result;
 use csv::Reader;
 
 fn main() {
-
     println!("Hello, world!");
 
     let filename = "TestCosmosFichierResultat.csv";
