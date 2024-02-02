@@ -14,9 +14,10 @@ Cargo.lock
 *.pdb
 
 #Idea
-.idea
+*/.idea/
+*/.vscode/
 
-#test CSV file 
+#test CSV file
 *test.csv
 *Test.csv
 test.csv
