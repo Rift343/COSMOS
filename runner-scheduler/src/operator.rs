@@ -1,5 +1,7 @@
 use std::{fs::File, io::Read};
-use std::io::BufReader;
+use std::io::{BufReader, Seek, Write};
+use std::path::PathBuf;
+
 #[allow(unused_variables)]
 #[allow(unused_must_use)]
 
@@ -18,9 +20,16 @@ struct CSVFile{
 #[allow(unused)]
 impl CSVFile {
 
+    fn to_file(&self)->File{
+        let mut file:File = File::create("../data/transferFile/result.csv").expect("Error : Can't create the resultFile");
+        file.write_all(self.to_string().as_bytes());
+        file.rewind();
+        return file;
+    }
+
     fn to_string(&self) -> String{
         let mut result_string : String="".to_string();
-        for ligne in 0..self.descriptor.len(){
+        for ligne in 0..self.descriptor.len()-1{
             result_string = result_string+ &self.descriptor[ligne].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
             if (std::env::consts::OS == "windows" ){
                 result_string = result_string+"\r\n";
@@ -29,6 +38,7 @@ impl CSVFile {
                 result_string = result_string+"\n";
             }
         }
+        result_string = result_string+ &self.descriptor[self.descriptor.len()-1].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
         return result_string; 
     }
 
@@ -77,11 +87,14 @@ impl CSVFile {
 
 #[allow(unused)]
 fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
-    let reader = File::open(path_file).expect("Error there is no file here");
+    let mut path:String = "../data/CSV/".to_string();
+    path.push_str(&path_file);
+    path.push_str(".csv");
+    let reader = File::open(path).expect("Error there is no file here");
     let mut buffer = BufReader::new(reader);
     let mut csv_string = String::new();
     buffer.read_to_string(&mut csv_string).expect("Can't read this file");
-    println!("{}",std::env::consts::OS);
+    //println!("{}",std::env::consts::OS);
     let separator_ligne:String;
     if (std::env::consts::OS == "windows"){
         separator_ligne = "\r\n".to_string();
@@ -91,9 +104,13 @@ fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
     }
     let first_vec :Vec<&str>=csv_string.split(&separator_ligne).collect::<Vec<_>>();
     let mut final_vec: Vec<Vec<_>> = [first_vec[0].split(';').map(|x| x.to_string()).collect()].to_vec();
+    for i in 0..final_vec[0].len(){
+        final_vec[0][i]= (path_file.clone()+"."+&final_vec[0][i]).to_string();
+    }
     for ligne in 1..first_vec.len(){
         final_vec.push(first_vec[ligne].split(';').map(|x| x.to_string()).collect());
-    }
+    } 
+    
     return final_vec;
 }
 /*
@@ -119,13 +136,15 @@ mod tests {
     use super::*;
     #[test]
     fn test1(){
-        let mut a1 = open_relation("../data/CSV/personnetest.csv".to_string(), "R1".to_string());
+        let mut a1 = open_relation("personnetest".to_string(), "R1".to_string());
         a1.print_csv_file();
         let now = Instant::now();
-        a1.projection(["id".to_string(),"prenom".to_string()].to_vec());
+        println!("{:?}",a1.descriptor[0]);
+        a1.projection(["personnetest.id".to_string(),"personnetest.prenom".to_string()].to_vec());
         let time_passed = now.elapsed();
-        println!("The the projection with personnetest.csv took {} seconde", time_passed.as_secs());
-        print!("{}",a1.to_string());
+        println!("The projection with personnetest.csv took {} seconde", time_passed.as_secs());
+        a1.to_file();
+        //print!("{}",a1.to_string());
         
         //println!("{:?}",a1.descriptor);
         

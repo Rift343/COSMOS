@@ -15,3 +15,7 @@ Cargo.lock
 
 #Idea
 .idea
+
+#test CSV file 
+*test.csv
+*Test.csv
