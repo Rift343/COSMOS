@@ -13,7 +13,7 @@ struct Attribute {
 #[allow(unused)]
 #[doc = r" Structur with a name and a 'descriptor' value. The descriptor is a Vec of Vec of String and represent the CSV file ligne by ligne.
 Use the open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
-struct CSVFile{
+pub(crate) struct CSVFile{
     name:String,
     descriptor:Vec<Vec<String>>
 }
@@ -22,7 +22,7 @@ struct CSVFile{
 impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
-    fn to_file(&self)->File{
+pub(crate)fn to_file(&self)->File{
         let mut file:File = File::create("../data/transferFile/result.csv").expect("Error : Can't create the resultFile");
         file.write_all(self.to_string().as_bytes());
         file.rewind();
@@ -30,7 +30,7 @@ impl CSVFile {
     }
 
 #[doc = r"To string of the descriptor who separate the attribute with ',' and the ligne with '\\r\\n' if you use a Windows or '\\n' if you use Linux or Max OS."]
-    fn to_string(&self) -> String{
+pub(crate)fn to_string(&self) -> String{
         let mut result_string : String="".to_string();
         for ligne in 0..self.descriptor.len()-1{
             result_string = result_string+ &self.descriptor[ligne].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
@@ -51,7 +51,7 @@ impl CSVFile {
     }
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
-    fn projection(&mut self,list_attribute:Vec<String>){
+pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){
             transpose.push(Vec::new());
@@ -92,7 +92,7 @@ impl CSVFile {
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
-fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
+pub(crate)fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
     let mut path:String = "../data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
@@ -131,7 +131,7 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 
 #[allow(unused)]
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
-fn open_relation(pathcsv:String,name1:String)->CSVFile{
+pub(crate)fn open_relation(pathcsv:String,name1:String)->CSVFile{
     let file:CSVFile = CSVFile { name:name1, descriptor: csv_read_by_ligne(pathcsv) };/*  = CSVFile { name: name1, descriptor:  } */;
     return file;
 }
