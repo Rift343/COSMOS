@@ -138,7 +138,7 @@ fn open_relation(pathcsv:String,name1:String)->CSVFile{
 
 #[cfg(test)]
 mod tests {
-    use std::{env, time::Instant};
+    use std::time::Instant;
 
     use super::*;
     #[test]
