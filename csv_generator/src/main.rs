@@ -14,8 +14,7 @@ fn main() {
         .expect("Error : Failed to read line");
 
     //on enlève le \n
-    let len = res_input.len();
-    res_input.truncate(len - 1);
+    res_input = res_input.trim().to_string();
 
     //conversion int
     let nb_line : i32 = res_input.parse().expect("Error nbline");
