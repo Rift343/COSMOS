@@ -88,7 +88,25 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         //println!("{:?}",transpose);
         self.descriptor = transpose.to_vec();
     }
+pub(crate)fn cartesian_product(mut self,mut another_csv: CSVFile){
+    let mut operation_result : Vec<Vec<String>>=Vec::new();
+    let mut transition: Vec<String>;
+    for i in 0..self.descriptor.len(){
+        transition = self.descriptor[i].clone();
+        for y in 0..another_csv.descriptor.len(){
+            let mut transition2 = transition.clone();
+            transition2.append(&mut another_csv.descriptor[y]);
+            operation_result.push(transition2);
+           }
+        
+        }
+        self.descriptor = operation_result;
+    }
+
+
+
 }
+
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
