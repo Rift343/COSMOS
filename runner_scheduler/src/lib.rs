@@ -7,7 +7,7 @@ pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
 
-pub fn scheduler (mut json_file:&File)->File{
+pub fn scheduler (mut json_file:&File)->&str{
     json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");
     //println!("You passed the rewind");
     let mut buffer = Vec::new();
@@ -42,7 +42,8 @@ pub fn scheduler (mut json_file:&File)->File{
         // TO DO for the cartesian product
     }
     else{}
-    return dictionnary[&key[0]].to_file() ;
+    dictionnary[&key[0]].to_file();
+    return "../data/transferFile/result.csv" ;
 }
 
 #[cfg(test)]
