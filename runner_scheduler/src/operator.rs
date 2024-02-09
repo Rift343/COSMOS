@@ -13,12 +13,15 @@ struct Attribute {
 #[allow(unused)]
 #[doc = r" Structur with a name and a 'descriptor' value. The descriptor is a Vec of Vec of String and represent the CSV file ligne by ligne.
 Use the open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
+#[derive(Clone)]
+
 pub(crate) struct CSVFile{
     name:String,
     descriptor:Vec<Vec<String>>
 }
 
 #[allow(unused)]
+
 impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
@@ -88,7 +91,7 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         //println!("{:?}",transpose);
         self.descriptor = transpose.to_vec();
     }
-pub(crate)fn cartesian_product(&mut self,another_csv:&mut CSVFile){
+pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
     let mut operation_result : Vec<Vec<String>>=Vec::new();
     let mut transition: Vec<String>;
     transition = self.descriptor[0].clone();
@@ -191,8 +194,8 @@ mod tests {
     #[test]
     fn test_cartesian(){
         let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
-        let mut a2 = open_relation("Personne".to_string(), "R1".to_string());
-        a1.cartesian_product(&mut a2);
+        let a2 = open_relation("Personne".to_string(), "R1".to_string());
+        a1.cartesian_product( &a2);
         a1.to_file();
     }
 }

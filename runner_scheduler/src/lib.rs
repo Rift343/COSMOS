@@ -32,16 +32,18 @@ pub fn scheduler (mut json_file:&File)->&str{
             final_proj.push(my_str); 
         }
         key.push(parse_json["table"][i]["table_name"].to_string());
-        println!("{:?}",intermediary_vector);
-        println!("{}",parse_json["table"][i]["table_name"]);
+        //println!("{:?}",intermediary_vector);
+        //println!("{}",parse_json["table"][i]["table_name"]);
         let mut open_file:CSVFile = operator::open_relation(parse_json["table"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string());
         open_file.projection(intermediary_vector);
         dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);
     }
-    if key.len() != 1{
-        // TO DO for the cartesian product
+    for i in 1..key.len(){
+        let mut test =dictionnary.get_mut(&key[0]).expect("Get error ").clone();
+        let test2 =dictionnary.get(&key[i]).expect("Get error");
+        test.cartesian_product(test2);
+        dictionnary.insert(key[0].to_string(), test);
     }
-    else{}
     dictionnary[&key[0]].to_file();
     return "../data/transferFile/result.csv" ;
 }
