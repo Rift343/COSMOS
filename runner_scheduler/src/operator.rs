@@ -13,12 +13,15 @@ struct Attribute {
 #[allow(unused)]
 #[doc = r" Structur with a name and a 'descriptor' value. The descriptor is a Vec of Vec of String and represent the CSV file ligne by ligne.
 Use the open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
+#[derive(Clone)]
+
 pub(crate) struct CSVFile{
     name:String,
     descriptor:Vec<Vec<String>>
 }
 
 #[allow(unused)]
+
 impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
@@ -88,7 +91,30 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         //println!("{:?}",transpose);
         self.descriptor = transpose.to_vec();
     }
+pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
+    let mut operation_result : Vec<Vec<String>>=Vec::new();
+    let mut transition: Vec<String>;
+    transition = self.descriptor[0].clone();
+    transition.append(&mut another_csv.descriptor[0].clone());
+    operation_result.push(transition);
+    for i in 1..self.descriptor.len(){
+        transition = self.descriptor[i].clone();
+        //println!("{:?}",transition);
+        for y in 1..another_csv.descriptor.len(){
+            let mut transition2 = transition.clone();
+            //println!("{:?}{:?}",transition2,&mut another_csv.descriptor[y]);
+            transition2.append(&mut another_csv.descriptor[y].clone());
+            operation_result.push(transition2);
+           }
+        
+        }
+        self.descriptor = operation_result;
+    }
+
+
+
 }
+
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
@@ -163,5 +189,13 @@ mod tests {
         let a1 = "../data/CSV/personneTest.csv".to_string();
         csv_read_by_ligne(a1);
 
+    }
+
+    #[test]
+    fn test_cartesian(){
+        let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
+        let a2 = open_relation("Personne".to_string(), "R1".to_string());
+        a1.cartesian_product( &a2);
+        a1.to_file();
     }
 }
