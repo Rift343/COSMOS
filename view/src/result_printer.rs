@@ -1,3 +1,3 @@
-pub fn result_printer(result: &str){
+pub fn result_printer(result: String){
     println!("{}",result);
 }
