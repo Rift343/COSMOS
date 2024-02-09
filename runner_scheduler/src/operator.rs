@@ -12,7 +12,7 @@ struct Attribute {
 
 #[allow(unused)]
 #[doc = r" Structur with a name and a 'descriptor' value. The descriptor is a Vec of Vec of String and represent the CSV file ligne by ligne.
-Use the open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
+Use the function open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
 #[derive(Clone)]
 
 pub(crate) struct CSVFile{

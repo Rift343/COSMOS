@@ -19,8 +19,8 @@ pub fn scheduler (mut json_file:&File)->&str{
     let parse_json=json::parse(&str_json.to_string()).unwrap();
     parse_json.dump();
     //println!("{}",parse_json["table"][0]["columns"]);
-    let mut key:Vec<String>=Vec::new();
-    let mut final_proj:Vec<String>= Vec::new();
+    let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
+    let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
     for i in 0..parse_json["table"].len(){
         let mut intermediary_vector:Vec<String>=Vec::new();
@@ -38,13 +38,18 @@ pub fn scheduler (mut json_file:&File)->&str{
         open_file.projection(intermediary_vector);
         dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);
     }
+    // Now we need to do the cartesian product on all the relation use in the request. For this we made the cartesian product on the first open file.
+
     for i in 1..key.len(){
         let mut test =dictionnary.get_mut(&key[0]).expect("Get error ").clone();
         let test2 =dictionnary.get(&key[i]).expect("Get error");
         test.cartesian_product(test2);
         dictionnary.insert(key[0].to_string(), test);
     }
-    dictionnary[&key[0]].to_file();
+    //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
+    let mut a1 = dictionnary[&key[0]].clone();
+    a1.projection(final_proj);
+    a1.to_file();
     return "../data/transferFile/result.csv" ;
 }
 
