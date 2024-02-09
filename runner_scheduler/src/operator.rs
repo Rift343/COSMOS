@@ -88,14 +88,19 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         //println!("{:?}",transpose);
         self.descriptor = transpose.to_vec();
     }
-pub(crate)fn cartesian_product(mut self,mut another_csv: CSVFile){
+pub(crate)fn cartesian_product(&mut self,another_csv:&mut CSVFile){
     let mut operation_result : Vec<Vec<String>>=Vec::new();
     let mut transition: Vec<String>;
-    for i in 0..self.descriptor.len(){
+    transition = self.descriptor[0].clone();
+    transition.append(&mut another_csv.descriptor[0].clone());
+    operation_result.push(transition);
+    for i in 1..self.descriptor.len(){
         transition = self.descriptor[i].clone();
-        for y in 0..another_csv.descriptor.len(){
+        //println!("{:?}",transition);
+        for y in 1..another_csv.descriptor.len(){
             let mut transition2 = transition.clone();
-            transition2.append(&mut another_csv.descriptor[y]);
+            //println!("{:?}{:?}",transition2,&mut another_csv.descriptor[y]);
+            transition2.append(&mut another_csv.descriptor[y].clone());
             operation_result.push(transition2);
            }
         
@@ -181,5 +186,13 @@ mod tests {
         let a1 = "../data/CSV/personneTest.csv".to_string();
         csv_read_by_ligne(a1);
 
+    }
+
+    #[test]
+    fn test_cartesian(){
+        let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
+        let mut a2 = open_relation("Personne".to_string(), "R1".to_string());
+        a1.cartesian_product(&mut a2);
+        a1.to_file();
     }
 }
