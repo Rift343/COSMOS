@@ -6,9 +6,10 @@ mod operator;
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
-
+#[doc = "This fonction need the file descriptor of the Json returned by the semantic parsor. Return a file
+TODO==> Add the Where, Group by, Having and intermediary request"]
 pub fn scheduler (mut json_file:&File)->&str{
-    json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");
+    json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");// We reset de file descriptor
     //println!("You passed the rewind");
     let mut buffer = Vec::new();
     json_file.read_to_end(&mut buffer).expect("Read to end error");
@@ -22,6 +23,7 @@ pub fn scheduler (mut json_file:&File)->&str{
     let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
+
     for i in 0..parse_json["table"].len(){
         let mut intermediary_vector:Vec<String>=Vec::new();
         for y in 0..parse_json["table"][i]["columns"].len(){
