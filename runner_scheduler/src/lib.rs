@@ -19,26 +19,26 @@ pub fn scheduler (mut json_file:&File)->&str{
     }
     let parse_json=json::parse(&str_json.to_string()).unwrap();
     parse_json.dump();
-    //println!("{}",parse_json["table"][0]["columns"]);
+    //println!("{}",parse_json["tables"][0]["columns"]);
     let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
 
-    for i in 0..parse_json["table"].len(){
+    for i in 0..parse_json["tables"].len(){
         let mut intermediary_vector:Vec<String>=Vec::new();
-        for y in 0..parse_json["table"][i]["columns"].len(){
-            let mut my_str:String = parse_json["table"][i]["columns"][y][0].to_string();//We rename immediatly the columns for more simplicity in the next operation (for the future we need to search a methode to apply the rename of the user ( key word 'as'))
+        for y in 0..parse_json["tables"][i]["columns"].len(){
+            let mut my_str:String = parse_json["tables"][i]["columns"][y][0].to_string();//We rename immediatly the columns for more simplicity in the next operation (for the future we need to search a methode to apply the rename of the user ( key word 'as'))
             my_str.push('.');
-            my_str.push_str(&parse_json["table"][i]["columns"][y][1].to_string());
+            my_str.push_str(&parse_json["tables"][i]["columns"][y][1].to_string());
             intermediary_vector.push(my_str.clone());
             final_proj.push(my_str); 
         }
-        key.push(parse_json["table"][i]["table_name"].to_string());
+        key.push(parse_json["tables"][i]["table_name"].to_string());
         //println!("{:?}",intermediary_vector);
-        //println!("{}",parse_json["table"][i]["table_name"]);
-        let mut open_file:CSVFile = operator::open_relation(parse_json["table"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string());//We open each relation
+        //println!("{}",parse_json["tables"][i]["table_name"]);
+        let mut open_file:CSVFile = operator::open_relation(parse_json["tables"][i]["table_name"].to_string(), parse_json["tables"][i]["table_name"].to_string());//We open each relation
         open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
-        dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);//We insert the projected file in a dictionnary
+        dictionnary.insert(parse_json["tables"][i]["table_name"].to_string(),open_file);//We insert the projected file in a dictionnary
     }
     // Now we need to do the cartesian product on all the relation use in the request. For this we made the cartesian product on the first open file.
     for i in 1..key.len(){
