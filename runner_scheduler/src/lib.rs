@@ -8,7 +8,7 @@ pub fn add(left: usize, right: usize) -> usize {
 }
 #[doc = "This fonction need the file descriptor of the Json returned by the semantic parsor. Return a file
 TODO==> Add the Where, Group by, Having and intermediary request"]
-pub fn scheduler (mut json_file:&File)->&str{
+pub fn scheduler (mut json_file:&File)->File{
     json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");// We reset de file descriptor
     //println!("You passed the rewind");
     let mut buffer = Vec::new();
@@ -51,7 +51,7 @@ pub fn scheduler (mut json_file:&File)->&str{
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
     a1.to_file();
-    return "../data/transferFile/result.csv" ;
+    return a1.to_file(); ;
 }
 
 #[cfg(test)]
