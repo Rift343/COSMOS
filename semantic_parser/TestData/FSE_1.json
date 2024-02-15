@@ -1,0 +1,25 @@
+{
+  "tables": [
+    {
+      "table_name": "Personne",
+      "columns": [
+        {
+          "nom_table": "Personne",
+          "nom_variable": "ID"
+        }
+      ]
+    },
+    {
+      "table_name": "PersonneClonee",
+      "columns": [
+        {
+          "nom_table": "PersonneClonee",
+          "nom_variable": "ID2"
+        }
+      ]
+    }
+  ],
+  "conditions": null,
+  "status": true,
+  "error": ""
+}
