@@ -6,4 +6,5 @@ members = [
 	"runner_scheduler",
 	"csv_generator",
 	"view",
+	"syntaxic_parser",
 ]
