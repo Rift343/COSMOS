@@ -1,4 +1,3 @@
-use std::result;
 use csv::Reader;
 
 fn main() {
@@ -6,17 +5,20 @@ fn main() {
 
     let filename = "engine/TestCosmosFichierResultat.csv";
     let result = csv_to_string(filename);
-    println!("Result {}",result);
+    match result{
+        Ok(s) => println!("Fichier cree : {}",s),
+        Err(e) => println!("Erreur : {:?}",e)
+        }
 }
 
 
 
 
-fn csv_to_string(file_name : &str) -> String {
+fn csv_to_string(file_name : &str) -> Result<String, Box<dyn std::error::Error>> {
     //string resultat
     let mut res = String::new();
     //ouverture du reader
-    let mut rdr = Reader::from_path(file_name).expect("Error Main ");
+    let mut rdr = Reader::from_path(file_name)?;
 
     //recuperation du header
     let hd = rdr.headers();
@@ -50,50 +52,5 @@ fn csv_to_string(file_name : &str) -> String {
         //fin de ligne donc on rajoute \n
         res += "\n";
     }
-    return res;
+    Ok(res)
 }
-
-
-
-
-/*
-fn csv_to_string(file : &str) -> Result<(), Box<dyn Error>> {
-    //string resultat
-    let mut res = String::new();
-    //ouverture du reader
-    let mut rdr = Reader::from_path("TestCosmosFichierResultat.csv")?;
-    //recuperation du header
-    let mut hd_print = rdr.headers();
-    println!("{:?}", hd_print);
-
-    //passage du header en string
-    let hd_print_string = hd_print.unwrap();
-    println!("hd_print_string {:?}", hd_print_string);
-    let hd_print_string_index = &hd_print_string[0];
-    println!("{:?}", hd_print_string_index);
-
-    //longueur du header
-    let nb_colonne = hd_print_string.len();
-    println!("{:?}", nb_colonne);
-
-
-
-
-    let data = rdr.records();
-    let  mut nb_ligne = 0;
-
-
-    for result in data {
-        let record = result?;
-        println!("{:?}", record);
-        nb_ligne += 1;
-    }
-    println!("{}",nb_ligne);
-
-
-
-    Ok(())
-}
-
-
-*/

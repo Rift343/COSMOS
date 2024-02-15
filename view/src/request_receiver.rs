@@ -1,13 +1,12 @@
 use std::io;
 
-pub fn request_receiver() -> String {
+pub fn request_receiver() -> Result<String,io::Error> {
     println!("Enter a SQL request :");
 
     let mut request = String::new();
 
     io::stdin()
-        .read_line(&mut request)
-        .expect("Error : Failed to read line");
+        .read_line(&mut request)?;
 
-    return request;
+    Ok(request)
 }
