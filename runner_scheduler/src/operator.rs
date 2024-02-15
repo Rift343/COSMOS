@@ -12,7 +12,7 @@ struct Attribute {
 
 #[allow(unused)]
 #[doc = r" Structur with a name and a 'descriptor' value. The descriptor is a Vec of Vec of String and represent the CSV file ligne by ligne.
-Use the open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
+Use the function open_relation(pathcsv:String,name1:String) to create a CSVFile object."]
 #[derive(Clone)]
 
 pub(crate) struct CSVFile{
@@ -60,14 +60,14 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
             transpose.push(Vec::new());
         }
         //println!("{:?}",transpose);
-        for i in 0..self.descriptor.len(){
+        for i in 0..self.descriptor.len(){//We transpose the matrix to simplify the operation (we change columns and ligne)
             for y in 0..self.descriptor[i].len(){
                 let a =&self.descriptor[i][y];
                 transpose[y].push(a.to_string());
             }
         }
         //println!("{:?}",transpose);
-        let mut pre_result:Vec<Vec<String>>=Vec::new();
+        let mut pre_result:Vec<Vec<String>>=Vec::new();//we keep the ligne we want
         for i in transpose{
             for y in &list_attribute{
                 if i[0]==y.to_string(){
@@ -77,7 +77,7 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
             }
         }
         //println!("{:?}",pre_result);
-        let mut transpose: Vec<Vec<String>> = Vec::new();
+        let mut transpose: Vec<Vec<String>> = Vec::new();//we made anoter transpose to have the ligne a view by ligne
         for i in 0..pre_result[0].len(){
             transpose.push(Vec::new());
         }
