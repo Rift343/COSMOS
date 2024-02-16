@@ -1,12 +1,8 @@
-mod request_receiver;
-mod error_printer;
-mod result_printer;
+mod utils;
+use utils::error_printer::error_printer;
+use utils::result_printer::result_printer;
+use utils::request_receiver::request_receiver;
 
-use crate::request_receiver::request_receiver;
-
-use crate::error_printer::error_printer;
-
-use crate::result_printer::result_printer;
 fn main() {
 
     let res_receiver = request_receiver();
