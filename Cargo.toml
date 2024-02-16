@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+
+members = [
+	"engine",
+	"runner_scheduler",
+	"csv_generator",
+	"view",
+]
