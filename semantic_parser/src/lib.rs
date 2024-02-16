@@ -1,9 +1,9 @@
 mod structures;
+mod error_creator;
 
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
-use serde_json::Result;
 
 use structures::fichier_parsage_syntaxique::FichierParsageSyntaxique;
 
@@ -14,21 +14,19 @@ use structures::table_metadonnee::TableMetadonnes;
 
 use structures::couple_nom_colonne::CoupleNomColonne;
 
-pub fn test() -> File {
-    let fs1_filename = String::from("semantic_parser/TestData/FS_1.json");
+use error_creator::create_semantic_error;
 
+pub fn semantic_parser(mut syntaxic_file: File) -> File {
     let fs1_fichier_str = {
-        match fs::read_to_string(fs1_filename) {
-            Ok(contenu) => {
-                contenu
-            }
-            Err(erreur) => {
-                panic!("Erreur : {}", erreur)
-            }
-        }
-    };
+        let mut contenu_fichier_syntaxique = String::new();
 
-    // println!("Contenu du fichier :\n{}\n---", fs1_fichier_str);
+        match syntaxic_file.read_to_string(& mut contenu_fichier_syntaxique) {
+            Ok(_) => (),
+            Err(erreur) => panic!("Erreur : {}", erreur)
+        }
+
+        contenu_fichier_syntaxique
+    };
 
     let fps1_as_fps: FichierParsageSyntaxique = {
         match serde_json::from_str(fs1_fichier_str.as_str()) {
@@ -43,10 +41,8 @@ pub fn test() -> File {
 
     // ------------------------------------------------
 
-    let fm1_filename = String::from("semantic_parser/TestData/FM_1.json");
-
     let fm1_fichier_str = {
-        match fs::read_to_string(fm1_filename) {
+        match fs::read_to_string("semantic_parser/TestData/FM_1.json") {
             Ok(contenu) => {
                 contenu
             }
@@ -58,10 +54,8 @@ pub fn test() -> File {
 
     // println!("Contenu du fichier :\n{}\n---", fm1_fichier_str);
 
-    let fm1: Result<Vec<TableMetadonnes>> = serde_json::from_str(fm1_fichier_str.as_str());
-
     let fm1_as_vec: Vec<TableMetadonnes> = {
-        match fm1 {
+        match serde_json::from_str(fm1_fichier_str.as_str()) {
             Ok(contenu) => {
                 println!("{:?}", contenu);
                 contenu
@@ -114,7 +108,9 @@ pub fn test() -> File {
 
         print!("Colonne demandée : {}.{}\t", colonne_demandee.nom_table, colonne_demandee.nom_variable);
         match nb_found{
-            0 => println!("Non trouvée"),
+            0 => {
+                return create_semantic_error("".to_string())
+            },
             1 => {
                 println!("Trouvée dans la table : {}", table_correspondante);
 
@@ -145,18 +141,10 @@ pub fn test() -> File {
 
     let mut out_file = File::options().read(true).write(true).create(true).open("semantic_parser/TestData/FSE_1.json").expect("Erreur lors de création de out_file");
 
+
+    out_file.set_len(0).expect("Erreur lors de la réinitialisation du fichier");
     out_file.write_all(ress.as_bytes()).expect("Erreur lors de l'écriture dans le fichier");
     out_file.seek(SeekFrom::Start(0)).expect("Erreur lors du seek");
-
-    /*
-    let mut temp: String = String::new();
-
-    let nb_read = out_file.read_to_string(&mut temp).expect("Erreur lors de lecture du fichier");
-
-    out_file.seek(SeekFrom::Start(0)).expect("Erreur lors du seek");
-
-    println!("Nb read : {}", nb_read);
-    */
 
     out_file
 
