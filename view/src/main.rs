@@ -2,32 +2,28 @@ mod utils;
 use utils::error_printer::error_printer;
 use utils::result_printer::result_printer;
 use utils::request_receiver::request_receiver;
-
+use engine;
 fn main() {
+    let req_receiver = request_receiver();
 
-    let res_receiver = request_receiver();
-    match res_receiver {
-        Ok(req) => result_printer(req),
+
+    //match resultat de request receiver
+    match req_receiver {
+        //Si on arrive a lire la requete dans l'entrée standart
+        //On envoie la requete a l'engine
+        Ok(req) => match engine::engine_main(req){
+            Ok(res) => result_printer(res),
+            Err(err) => error_printer(err)
+        }
         Err(e) => error_printer(e)
+
     }
+
+
     println!("Main View : fini");
 
-
-
-
-
-
-
-
     /*
-println!("Hello, world!");
-let req = request_receiver();
-println!("res {req}");
-error_printer(req);
-*/
-
-    /*
-        let res_test = "res final ID;Nom ;Prenom;Date de naissance;
+    let res_test = "res final ID;Nom ;Prenom;Date de naissance;
     1;Ali;Jean;01/01/2001;
     2;Baba;Paul;02/02/2002;
     3;Coucou;Pierre;03/03/2003;

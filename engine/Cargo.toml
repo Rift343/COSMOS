@@ -2,12 +2,17 @@
 name = "engine"
 version = "0.1.0"
 edition = "2021"
-authors = ["Conrath Matthieu"]
+authors = ["Conrath Matthieu + Callendret Clément"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 csv = "1.3.0"
 runner-scheduler={path= "../runner_scheduler" }
+
+
+[lib]
+name = "engine"
+path = "src/csv_to_string.rs"
 
 
