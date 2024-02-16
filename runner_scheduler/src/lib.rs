@@ -1,4 +1,9 @@
+use std::string::String;
 use std::{collections::HashMap, fs::File, io::{Read, Seek}};
+use std::error::Error;
+//use json::JsonValue::String; J'espère que les String json sont les
+//même ques les trings classique car j'arrive pas a compiler avec
+//les json string
 
 use crate::operator::CSVFile;
 mod operator;
@@ -6,13 +11,15 @@ mod operator;
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
-
-pub fn scheduler (mut json_file:&File)->&str{
-    json_file.rewind().expect("Rewind error==> Can't reset de cursor of the File");
+//Hey Matthieu j'ai changé un peu ta fonction afin de gérer les erreurs
+//Je n'ai rien delete, j'ai juste mis en commentaire les parties qui
+//ne sont plus utiles
+pub fn scheduler(mut json_file:&File)->Result<&str,Box<dyn Error>>{
+    json_file.rewind()?; //.expect("Rewind error==> Can't reset de cursor of the File");
     //println!("You passed the rewind");
     let mut buffer = Vec::new();
-    json_file.read_to_end(&mut buffer).expect("Read to end error");
-    let mut str_json :String = String::new();
+    json_file.read_to_end(&mut buffer)?; //.expect("Read to end error");
+    let mut str_json  : String = String::new();
     for i in buffer{
         str_json.push(i as char);
     }
@@ -39,13 +46,28 @@ pub fn scheduler (mut json_file:&File)->&str{
         dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);
     }
     for i in 1..key.len(){
-        let mut test =dictionnary.get_mut(&key[0]).expect("Get error ").clone();
-        let test2 =dictionnary.get(&key[i]).expect("Get error");
-        test.cartesian_product(test2);
+        //gestion erreur avec le clone
+        //let mut test =dictionnary.get_mut(&key[0]).ok_or_else(); //.expect("Get error ").clone();
+
+        let mut test : CSVFile;
+        match dictionnary.get_mut(&key[0]){
+            Some(res) => test = res.clone(),
+            _ => return Err(Box::from("Error : Runner : Key 0 doesn't exist"))
+        };
+
+        //let test2 =dictionnary.get(&key[i]).expect("Get error");
+        let test2 : CSVFile;
+        match dictionnary.get_mut(&key[i]){
+            Some(res) => test2 = res.clone(),
+            _ => return Err(Box::from("Error : Runner : Key i doesn't exist"))
+        };
+
+        test.cartesian_product(&test2);
         dictionnary.insert(key[0].to_string(), test);
     }
     dictionnary[&key[0]].to_file();
-    return "../data/transferFile/result.csv" ;
+    //return "../data/transferFile/result.csv" ;
+    Ok("../data/transferFile/result.csv")
 }
 
 #[cfg(test)]
@@ -82,3 +104,7 @@ mod tests {
         scheduler(&fichier_json_test);
     }
 }
+
+
+
+
