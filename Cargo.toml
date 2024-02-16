@@ -7,4 +7,6 @@ members = [
 	"csv_generator",
 	"view",
 	"semantic_parser",
+	"syntaxic_parser",
+
 ]
