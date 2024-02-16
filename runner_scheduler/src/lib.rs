@@ -86,22 +86,22 @@ mod tests {
     fn test_on_create_file(){
         {
             let mut fichier_test:std::fs::File = File::create("test.txt").expect("Can't create a file");
-            scheduler(&fichier_test);
+            let _ =scheduler(&fichier_test);
             let data = b"hello world";
             fichier_test.write_all(data).expect("Can't write in this file");
-            scheduler(&fichier_test);
+            let _ =scheduler(&fichier_test);
         }
         let mut fichier_test:std::fs::File = File::open("test.txt").expect("Can't open the file");
-        scheduler(&fichier_test);
+        let _ =scheduler(&fichier_test);
         let mut buf = [1];
         let mut _a = fichier_test.read(&mut buf).expect("Can't read a file");
-        scheduler(&fichier_test);
+        let _ =scheduler(&fichier_test);
     }
 
     #[test]
     fn test_on_json(){
         let fichier_json_test:std::fs::File = File::open("semantique.json").expect("Error ==> Can't read the JSON file");
-        scheduler(&fichier_json_test);
+        let _ =scheduler(&fichier_json_test);
     }
 }
 
