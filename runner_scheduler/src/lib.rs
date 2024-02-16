@@ -41,7 +41,7 @@ pub fn scheduler(mut json_file:&File)->Result<&str,Box<dyn Error>>{
         key.push(parse_json["table"][i]["table_name"].to_string());
         //println!("{:?}",intermediary_vector);
         //println!("{}",parse_json["table"][i]["table_name"]);
-        let mut open_file:CSVFile = operator::open_relation(parse_json["table"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string());
+        let mut open_file:CSVFile = operator::open_relation(parse_json["table"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string())?;
         open_file.projection(intermediary_vector);
         dictionnary.insert(parse_json["table"][i]["table_name"].to_string(),open_file);
     }

@@ -1,4 +1,5 @@
 use std::{fs::File, io::Read};
+use std::error::Error;
 use std::io::{BufReader, Seek, Write};
 
 #[allow(unused_variables)]
@@ -118,14 +119,14 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
-pub(crate)fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
+pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
     let mut path:String = "../data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
-    let reader = File::open(path).expect("Error there is no file here");
+    let reader = File::open(path)?; //.expect("Error there is no file here");
     let mut buffer = BufReader::new(reader);
     let mut csv_string = String::new();
-    buffer.read_to_string(&mut csv_string).expect("Can't read this file");
+    buffer.read_to_string(&mut csv_string)?; //.expect("Can't read this file");
     //println!("{}",std::env::consts::OS);
     let separator_ligne:String;
     if (std::env::consts::OS == "windows"){
@@ -143,7 +144,7 @@ pub(crate)fn csv_read_by_ligne(path_file:String)->Vec<Vec<String>>{
         final_vec.push(first_vec[ligne].split(';').map(|x| x.to_string()).collect());
     } 
     
-    return final_vec;
+    return Ok(final_vec);
 }
 /*
 fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
@@ -157,9 +158,13 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 
 #[allow(unused)]
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
-pub(crate)fn open_relation(pathcsv:String,name1:String)->CSVFile{
-    let file:CSVFile = CSVFile { name:name1, descriptor: csv_read_by_ligne(pathcsv) };/*  = CSVFile { name: name1, descriptor:  } */;
-    return file;
+pub(crate)fn open_relation(pathcsv:String,name1:String)->Result<CSVFile,Box<dyn Error>>{
+    match csv_read_by_ligne(pathcsv){
+        Ok(res) => return Ok(CSVFile { name:name1, descriptor: res }),
+        Err(e) => return Err(e)
+    }
+    //let file:CSVFile = CSVFile { name:name1, descriptor:   };/*  = CSVFile { name: name1, descriptor:  } */;
+    //return file;
 }
 
 #[cfg(test)]
@@ -169,7 +174,12 @@ mod tests {
     use super::*;
     #[test]
     fn test1(){
-        let mut a1 = open_relation("personneTest".to_string(), "R1".to_string());
+        let res = open_relation("personneTest".to_string(), "R1".to_string());
+        let mut a1 : CSVFile;
+        match res {
+            Ok(o) => a1 = o,
+            Err(..) => panic!("Error")
+        };
         a1.print_csv_file();
         let now = Instant::now();
         println!("{:?}",a1.descriptor[0]);
@@ -187,15 +197,24 @@ mod tests {
     #[should_panic]
     fn test_csv_read_ligne(){
         let a1 = "../data/CSV/personneTest.csv".to_string();
-        csv_read_by_ligne(a1);
+        csv_read_by_ligne(a1).expect("TODO: panic message");
 
     }
 
     #[test]
-    fn test_cartesian(){
+    fn test_cartesian() {
         let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
         let a2 = open_relation("Personne".to_string(), "R1".to_string());
-        a1.cartesian_product( &a2);
-        a1.to_file();
+        match a1{
+            Ok(ref mut res1) =>         match a2{
+                Ok(res2) => res1.cartesian_product(&res2),
+                Err(..) => panic!("Error")
+            }
+            Err(..) => panic!("Error")
+
+        }
+
+        //a1.expect("REASON").cartesian_product( &a2);
+        a1.expect("REASON").to_file();
     }
 }
