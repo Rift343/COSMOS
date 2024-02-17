@@ -1,8 +1,13 @@
+use std::fs::File;
 use std::io::Read;
-use semantic_parser::test;
+use semantic_parser::semantic_parser;
 
 fn main() {
-    let mut out_file = test();
+    let fs1_filename = String::from("semantic_parser/TestData/FS_1.json");
+    let in_file = File::options().read(true).write(true).create(true).open(fs1_filename).expect("Erreur lors de création de out_file");
+
+
+    let mut out_file = semantic_parser(in_file);
 
     let mut temp: String = String::new();
 
