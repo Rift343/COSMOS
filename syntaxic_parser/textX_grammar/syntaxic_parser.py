@@ -48,7 +48,7 @@ def is_valid_sql(query):
         # En cas d'erreur de syntaxe, retourner une réponse d'erreur au format JSON
         result = {
             "status": False,
-            "error": f"Erreur de syntaxe a la ligne {e.line}, colonne {e.col}: {e.message}"
+            "error": f"Syntax Error line {e.line}, row {e.col}: {e.message}"
         }
 
         # Convertissez le dictionnaire en une chaîne JSON
