@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use super::couple_nom_colonne::CoupleNomColonne;
+use super::column_table_name_couple::ColumnTableNameCouple;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DicTable{
+pub struct TableDictionnary {
     pub table_name: String,
-    pub columns: Vec<CoupleNomColonne>
+    pub columns: Vec<ColumnTableNameCouple>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct FichierParsageSemantique{
-    pub tables: Vec<DicTable>,
+pub struct SemanticParserFile {
+    pub tables: Vec<TableDictionnary>,
     pub conditions: Option<String>,
     pub status: bool,
     pub error: String
