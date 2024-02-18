@@ -4,7 +4,7 @@ use semantic_parser::semantic_parser;
 
 /// Main function of the semantic parser, allows testing of the library as a binary
 fn main() {
-    let fs1_filename = String::from("semantic_parser/TestData/FS_1.json");
+    let fs1_filename = String::from("data/SemanticTestData/FS_1.json");
     let in_file = File::options().read(true).write(true).create(true).open(fs1_filename).expect("Erreur lors de création de out_file");
 
 

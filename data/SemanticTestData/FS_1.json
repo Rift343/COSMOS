@@ -3,7 +3,6 @@
   "columns": [
     ["Personne", "ID"],
     ["Personne", "NOM"],
-    ["", "BB"],
     ["", "ID2"]
   ],
   "conditions": null,
