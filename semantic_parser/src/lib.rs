@@ -1,4 +1,4 @@
-mod structures;
+pub mod structures;
 mod error_creator;
 
 use std::fs;
