@@ -35,10 +35,3 @@ pub struct TableMetadata {
     pub columns: Vec<ColumnNameTypeCouple>,
     pub constraints: Vec<Constraint>
 }
-
-/// Represents the Metadata file, which is a vector of table metadata
-// TODO : Unused ?
-#[derive(Serialize, Deserialize, Debug)]
-struct MetadataFile {
-    metadata_list: Vec<TableMetadata>
-}
