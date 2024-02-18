@@ -16,7 +16,7 @@
       {
         "constraint_name": "PK_Personne",
         "constraint_type": "PrimaryKey",
-        "attribut_list": [
+        "attribute_list": [
           "ID"
         ]
       }
@@ -40,7 +40,7 @@
       {
         "constraint_name": "PK_Personne",
         "constraint_type": "PrimaryKey",
-        "attribut_list": [
+        "attribute_list": [
           "ID"
         ]
       }

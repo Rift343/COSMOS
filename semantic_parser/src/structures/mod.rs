@@ -1,4 +1,4 @@
-pub mod fichier_parsage_syntaxique;
-pub mod table_metadonnee;
-pub mod fichier_parsage_semantique;
-pub mod couple_nom_colonne;
+pub mod syntaxic_parser_file;
+pub mod table_metadata;
+pub mod semantic_parser_file;
+pub mod column_table_name_couple;
