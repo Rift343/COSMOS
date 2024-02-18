@@ -11,7 +11,7 @@ pub fn create_semantic_error(error: String) -> File{
         error,
     };
 
-    let mut error_file = File::options().read(true).write(true).create(true).open("semantic_parser/TestData/Error.json").expect("Error occurred whilst creating semantic error file.");
+    let mut error_file = File::options().read(true).write(true).create(true).open("data/SemanticTestData/Error.json").expect("Error occurred whilst creating semantic error file.");
 
     error_file.set_len(0).expect("Error occurred whilst wiping semantic error file.");
     error_file.write_all(serde_json::to_string(&temp).expect("Error during attempt to Stringify error structure.").as_bytes()).expect("Error occurred whilst writing to semantic error file.");

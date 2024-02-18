@@ -76,7 +76,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
         }
     };
 
-    let table_metadata_as_struct: Vec<TableMetadata> = get_metadata("semantic_parser/TestData/FM_1.json".to_string());
+    let table_metadata_as_struct: Vec<TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
 
     // Temporary variable to store what will be returned in the file
     // Done now due to the vector requiring allocating
@@ -170,7 +170,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
     // Before returning it
     let output_semantic_file_as_str = serde_json::to_string(&res_printable).expect("Error whilst serialising semantic file struct.");
 
-    let mut output_semantic_file = File::options().read(true).write(true).create(true).open("semantic_parser/TestData/FSE_1.json").expect("Error whilst creating semantic parser output file");
+    let mut output_semantic_file = File::options().read(true).write(true).create(true).open("data/SemanticTestData/FSE_1.json").expect("Error whilst creating semantic parser output file");
 
 
     output_semantic_file.set_len(0).expect("Error whilst reinitialising semantic output file.");
