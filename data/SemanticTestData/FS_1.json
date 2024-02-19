@@ -1,9 +1,8 @@
 {
-  "table_name": ["Personne", "PersonneClonee"],
+  "table_name": ["Personne"],
   "columns": [
     ["Personne", "ID"],
-    ["Personne", "NOM"],
-    ["", "ID2"]
+    ["Personne", "NOM"]
   ],
   "conditions": null,
   "status": true

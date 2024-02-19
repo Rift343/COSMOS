@@ -1,9 +1,11 @@
 use std::fs::File;
 use std::io::Read;
 
+
+use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
 use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
-
+use engine::csv_to_string;
 fn main() {
     /*
 
@@ -66,6 +68,45 @@ fn main() {
 
     // -----------------------------------------------------
     // ------------------ Semantic Parser ------------------
+    // ------------------------ End ------------------------
+    // -----------------------------------------------------
+
+    // -----------------------------------------------------
+    // ------------------ Runner_scheduler ------------------
+    // ----------------------- Start -----------------------
+    // -----------------------------------------------------
+
+    let csv_file_returned = scheduler(&semantic_file);
+    match csv_file_returned {
+        Ok(content) => {
+            let printable_string;
+            printable_string=csv_to_string(&content);
+            match printable_string {
+                Ok(content) => println!("{}",content),
+                Err(_) => println!("
+                    -----------------------------------------------------
+                    ---------------------Engine--------------------------
+                    ---------------------Error 1--------------------------
+                    -----------------------------------------------------
+                    Maybe CSV file is already used or not existe anymore.
+                    Please check the data/CSV directory
+                    "),
+            }
+
+
+        },//Case 1, we have a CSV file so CSV_to_string then result_printer
+        Err(_) => {println!("
+        -----------------------------------------------------
+        -----------------Runner_scheduler--------------------
+        ---------------------Error 2-------------------------
+        -----------------------------------------------------
+        Maybe CSV file is already used or not existe anymore.
+        Please check the data/CSV directory
+        ");},//Case2, print there is a error on a file for the runner_scheduler
+    }
+
+    // -----------------------------------------------------
+    // ------------------ Runner_scheduler ------------------
     // ------------------------ End ------------------------
     // -----------------------------------------------------
 

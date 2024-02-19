@@ -1,3 +1,4 @@
+use std::fs::OpenOptions;
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -28,7 +29,13 @@ impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->File{
-        let mut file:File = File::create("../data/transferFile/result.csv").expect("Error : Can't create the resultFile");
+        let mut file:File = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open("./data/transferFile/result.csv").expect("error");
+        
+        //File::create("./data/transferFile/result.csv").expect("Error : Can't create the resultFile");
         file.write_all(self.to_string().as_bytes());
         file.rewind();
         return file;
@@ -121,13 +128,13 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
 pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
-    let mut path:String = "../data/CSV/".to_string();
+    let mut path:String = "./data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
-    let reader = File::open(path)?; //.expect("Error there is no file here");
+    let reader = File::open(path).expect("Error there is no file here");
     let mut buffer = BufReader::new(reader);
     let mut csv_string = String::new();
-    buffer.read_to_string(&mut csv_string)?; //.expect("Can't read this file");
+    buffer.read_to_string(&mut csv_string).expect("Can't read this file");
     //println!("{}",std::env::consts::OS);
     let separator_ligne:String;
     if (std::env::consts::OS == "windows"){
