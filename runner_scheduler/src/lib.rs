@@ -44,7 +44,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
         //println!("{:?}",intermediary_vector);
         //println!("{}",parse_json["table"][i]["table_name"]);
         println!("{}",parse_json["tables"][i]["table_name"].to_string());
-        let mut open_file:CSVFile = operator::open_relation(parse_json["tables"][i]["table_name"].to_string(), parse_json["table"][i]["table_name"].to_string())?;//.expect("error");//We open each relation
+        let mut open_file:CSVFile = operator::open_relation(parse_json["tables"][i]["table_name"].to_string(), parse_json["tables"][i]["table_name"].to_string())?;//.expect("error");//We open each relation
         open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
         dictionnary.insert(parse_json["tables"][i]["table_name"].to_string(),open_file);//We insert the projected file in a dictionnary
 
