@@ -5,10 +5,10 @@ def is_valid_sql(query):
     # Get grammar file
     sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
     try:
-        # Analyse de la requête SQL
+        # Analyse SQL query
         model = sql_meta.model_from_str(query)
 
-        # Si la requête est bien formée, sauvegardez les données dans un dictionnaire
+        # If the syntax is correct, create the dict structure in which the elements of the query will be stored
         result = {
             "table_name": [],
             "columns": [],
@@ -18,46 +18,43 @@ def is_valid_sql(query):
         }
 
         if model.attributes:
-            #print("Les Attributs = ",model.attributes.attribute)
+            # If the attribute is a "*"
             if model.attributes.attribute==['*']:
                 result["columns"].append(["","*"])
             else:
+                # If there is a list of attributes
                 for attr in model.attributes.attribute:
                     result["columns"].append(["",attr.attributeName])
 
 
         if model.relations:
-            #print("Les relations = ",model.relations.relation)
+            # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
             for relation in model.relations.relation:
                 result["table_name"].append(relation)
                 for col in result["columns"]:
                     col[0] = relation
 
-
+        # Conditions are not handled for the time being
         result["conditions"] = "NULL"
+
+        # "error" field is null
         result["error"] = "NULL"
 
-        # Conversion du dictionnaire en Json
+        # Convert the dict to Json string
         json_result = json.dumps(result, indent=4)
 
-        # Affichage du JSON
-        #print(json_result)
+
         return json_result
 
     except textx.exceptions.TextXSyntaxError as e:
-        # En cas d'erreur de syntaxe, retourner une réponse d'erreur au format JSON
+        # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
         result = {
             "status": False,
             "error": f"Syntax Error line {e.line}, row {e.col}: {e.message}"
         }
 
-        # Convertissez le dictionnaire en une chaîne JSON
+        # Convert the dict to Json string
         json_result = json.dumps(result, indent=4)
 
-        # Affichez ou sauvegardez le JSON
-        #print(json_result)
-        return json_result
 
-#if __name__ == "__main__":
-#    query = "SELECT * FROM table1;"
-#    is_valid_sql(query)
+        return json_result
