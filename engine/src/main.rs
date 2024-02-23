@@ -53,7 +53,7 @@ fn main() {
 
     // Show "status" and "error" fields
     println!("Status : {}\nError : {}\n",parsing_value["status"], parsing_value["error"]);
-    if parsing_value["satus"]=="false" {
+    if parsing_value["status"]=="false" {
         // Print for now, should send to the view later (result_printer)
         println!("{}",parsing_value["error"]);
     }
