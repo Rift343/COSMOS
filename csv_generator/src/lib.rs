@@ -1,5 +1,6 @@
 pub mod generator_mod{
     use std::error::Error;
+    use std::fs::File;
     use std::io;
     use csv::Writer;
     use rand::Rng;
@@ -8,7 +9,16 @@ pub mod generator_mod{
     //csv generator nbline -> csv + return () or Error
     pub fn generator(nb_line : i32) -> Result<(),Box<dyn Error>>{
         //ouverture du reader
-        let mut wtr = Writer::from_path("csv_generator/data_set.csv")?;
+        let w1 = Writer::from_path("csv_generator/data_set.csv");
+        //gerer en fonction de comment est lance le module
+        let mut wtr :Writer<File>;
+        //Si le premier path fail, on teste le deuxieme
+        match w1 {
+            Ok(r) => wtr = r,
+            Err(..) => wtr = Writer::from_path("data_set.csv")?
+        }
+
+
         //definition random name
         let rng_s = RNG::try_from(&Language::Elven).unwrap();
         //def rng age
