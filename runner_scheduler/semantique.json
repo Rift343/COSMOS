@@ -1,5 +1,5 @@
 {
-"table":[
+"tables":[
 {"table_name":"Personne",
 "columns":[["Personne","ID"],["Personne","NOM"]]
 },{"table_name":"Personne2",

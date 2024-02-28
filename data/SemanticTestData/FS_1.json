@@ -1,0 +1,9 @@
+{
+  "table_name": ["Personne"],
+  "columns": [
+    ["Personne", "ID"],
+    ["Personne", "NOM"]
+  ],
+  "conditions": null,
+  "status": true
+}
