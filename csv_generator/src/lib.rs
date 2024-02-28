@@ -8,7 +8,7 @@ pub mod generator_mod{
     //csv generator nbline -> csv + return () or Error
     pub fn generator(nb_line : i32) -> Result<(),Box<dyn Error>>{
         //ouverture du reader
-        let mut wtr = Writer::from_path("csv_generator/data_set.csv")?;
+        let mut wtr = Writer::from_path("data_set.csv")?;
         //definition random name
         let rng_s = RNG::try_from(&Language::Elven).unwrap();
         //def rng age

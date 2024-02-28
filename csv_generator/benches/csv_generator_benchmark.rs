@@ -10,7 +10,7 @@ use criterion::{
 
 fn csv_benchmark(c: &mut Criterion) {
     let nb = black_box(
-        200000
+        200
     );
 
     c.bench_function(

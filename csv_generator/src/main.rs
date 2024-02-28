@@ -1,5 +1,4 @@
 use csv_generator::generator_mod::{generator, input};
-
 fn main() {
     let res_input = input();
     match res_input {
