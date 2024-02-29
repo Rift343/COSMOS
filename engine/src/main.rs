@@ -77,11 +77,11 @@ fn main() {
     // -----------------------------------------------------
 
     let csv_file_returned = scheduler(&semantic_file);
-    match csv_file_returned {
+    match csv_file_returned {//First match on the result of the runner_scheduler. 
         Ok(content) => {
             let printable_string;
             printable_string=csv_to_string(&content);
-            match printable_string {
+            match printable_string {//Seconde math when the result string from the CSV File
                 Ok(content) => println!("{}",content),
                 Err(_) => println!("
                     -----------------------------------------------------
@@ -90,7 +90,7 @@ fn main() {
                     -----------------------------------------------------
                     Maybe CSV file is already used or not existe anymore.
                     Please check the data/CSV directory
-                    "),
+                    "),//error message of csv_to_string return an error
             }
 
 
