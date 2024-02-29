@@ -1,4 +1,4 @@
-use std::fs::OpenOptions;
+use std::fs::{self, OpenOptions};
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -29,6 +29,7 @@ impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->File{
+        fs::remove_file("./data/transferFile/result.csv").expect("error");
         let mut file:File = OpenOptions::new()
         .read(true)
         .write(true)
@@ -38,7 +39,7 @@ pub(crate)fn to_file(&self)->File{
         //File::create("./data/transferFile/result.csv").expect("Error : Can't create the resultFile");
         file.write_all(self.to_string().as_bytes());
         file.rewind();
-        return file;
+        file
     }
 
 #[doc = r"To string of the descriptor who separate the attribute with ',' and the ligne with '\\r\\n' if you use a Windows or '\\n' if you use Linux or Max OS."]
@@ -54,7 +55,7 @@ pub(crate)fn to_string(&self) -> String{
             }
         }
         result_string = result_string+ &self.descriptor[self.descriptor.len()-1].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
-        return result_string; 
+        result_string 
     }
 
 #[doc = r"print the name of the CSVFile, usefull for debug"]
@@ -136,13 +137,12 @@ pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<d
     let mut csv_string = String::new();
     buffer.read_to_string(&mut csv_string).expect("Can't read this file");
     //println!("{}",std::env::consts::OS);
-    let separator_ligne:String;
-    if (std::env::consts::OS == "windows"){
-        separator_ligne = "\r\n".to_string();
+    let separator_ligne:String= if (std::env::consts::OS == "windows"){
+        "\r\n".to_string()
     }
     else {
-        separator_ligne = "\n".to_string();
-    }
+        "\n".to_string()
+    };
     let first_vec :Vec<&str>=csv_string.split(&separator_ligne).collect::<Vec<_>>();
     let mut final_vec: Vec<Vec<_>> = [first_vec[0].split(';').map(|x| x.to_string()).collect()].to_vec();
     for i in 0..final_vec[0].len(){
@@ -152,7 +152,7 @@ pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<d
         final_vec.push(first_vec[ligne].split(';').map(|x| x.to_string()).collect());
     } 
     
-    return Ok(final_vec);
+    Ok(final_vec)
 }
 /*
 fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
@@ -168,8 +168,8 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
 pub(crate)fn open_relation(pathcsv:String,name1:String)->Result<CSVFile,Box<dyn Error>>{
     match csv_read_by_ligne(pathcsv){
-        Ok(res) => return Ok(CSVFile { name:name1, descriptor: res }),
-        Err(e) => return Err(e)
+        Ok(res) => Ok(CSVFile { name:name1, descriptor: res }),
+        Err(e) => Err(e)
     }
     //let file:CSVFile = CSVFile { name:name1, descriptor:   };/*  = CSVFile { name: name1, descriptor:  } */;
     //return file;

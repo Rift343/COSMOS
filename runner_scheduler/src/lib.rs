@@ -61,9 +61,8 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
         };
 
         //let test2 =dictionnary.get(&key[i]).expect("Get error");
-        let test2 : CSVFile;
-        match dictionnary.get_mut(&key[i]){
-            Some(res) => test2 = res.clone(),
+        let test2 : CSVFile = match dictionnary.get_mut(&key[i]){
+            Some(res) => res.clone(),
             _ => return Err(Box::from("Error : Runner : Key i doesn't exist"))
         };
 
@@ -74,7 +73,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
-    return Ok (a1.to_file()); 
+    Ok (a1.to_file())
 }
 
 #[cfg(test)]
