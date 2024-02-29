@@ -1,11 +1,16 @@
 use std::fs::File;
 use std::io::Read;
+use serde_json::Value::String;
 
 
 use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
 use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
 use engine::csv_to_string;
+
+use view::error_printer;
+use view::request_receiver;
+use view::result_printer;
 fn main() {
     /*
 
@@ -13,6 +18,38 @@ fn main() {
 
     TODO : Call view for request
 
+*/
+
+    // -----------------------------------------------------
+    // ----------------------- View ------------------------
+    // ----------------------- Start -----------------------
+    // -----------------------------------------------------
+    let req_receiver = request_receiver();
+    let res : std::string::String;
+    match req_receiver {
+        Ok(s) => res = s,
+        Err(e) => error_printer(e)
+    }
+
+
+    /*
+    //match resultat de request receiver
+    match req_receiver {
+        //Si on arrive a lire la requete dans l'entrée standart
+        //On envoie la requete a l'engine
+        Ok(req) => match engine::engine_main(req){
+            Ok(res) => result_printer(res),
+            Err(err) => error_printer(err)
+        }
+        Err(e) => error_printer(e)
+
+    }
+
+
+     */
+
+    println!("Main View : fini");
+    /*
     TODO : Transfer request to syntaxic parser
 
     TODO : Verify output
@@ -45,7 +82,7 @@ fn main() {
 
     // Extract the file contents to a string first, then to a structure so that we may examine its fields.
     let semantic_file_content_as_struct: SemanticParserFile = {
-        let mut semantic_file_contents_as_string = String::new();
+        let mut semantic_file_contents_as_string :  std::string::String = Default::default();;
 
 
         match semantic_file.read_to_string(&mut semantic_file_contents_as_string)

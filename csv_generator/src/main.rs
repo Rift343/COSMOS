@@ -6,6 +6,7 @@ fn main() {
             Ok(..) => println!("CSV created"),
             Err(e) => return println!("Error Generator {:?}", e)
         },
+        
         Err(e) => return println!("Error Input: {:?} ", e)
     };
 }

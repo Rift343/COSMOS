@@ -9,10 +9,11 @@ use criterion::{
 
 
 fn csv_benchmark(c: &mut Criterion) {
-    let nb = black_box(
+    /*let nb = black_box(
         200
     );
-
+    */
+    let nb = 200;
     c.bench_function(
         "csv gen",
         |b| b.iter(|| generator(nb))
