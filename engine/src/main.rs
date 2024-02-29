@@ -1,11 +1,14 @@
 use std::fs::File;
 use std::io::Read;
+use serde_json::Value;
 
 
+use syntaxic_parser::syntaxic_parser;
 use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
 use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
 use engine::csv_to_string;
+
 fn main() {
     /*
 
@@ -29,6 +32,40 @@ fn main() {
     Later make it loop, once everyone has contributed
 
      */
+
+    // -----------------------------------------------------
+    // ------------------ Syntaxic Parser ------------------
+    // ----------------------- Start -----------------------
+    // -----------------------------------------------------
+
+    // Get query, static for now, should get from view later (request_receiver)
+    let sql_query : String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
+
+    // Call the syntaxic parser and get file handle for the syntaxic parsing file
+    let mut syntaxic_parsing_handle : File = syntaxic_parser(sql_query);
+
+    // Read the file and put its contents into a String
+    let mut syntaxic_parsing_content = String::new();
+    syntaxic_parsing_handle.read_to_string(&mut syntaxic_parsing_content).expect("Error: Unable to read syntaxic parsing file");
+
+    // Convert to a serde_json Value type
+    let parsing_value : Value = serde_json::from_str(&*syntaxic_parsing_content).expect("Error: Unable to turn JSON String into Value type");
+
+    // Show "status" and "error" fields
+    println!("Status : {}\nError : {}\n",parsing_value["status"], parsing_value["error"]);
+    if parsing_value["status"]=="false" {
+        // Print for now, should send to the view later (result_printer)
+        println!("{}",parsing_value["error"]);
+    }
+    else {
+        // Print for now, should be given to the semantic parser later
+        println!("{:?}",syntaxic_parsing_handle);
+    }
+
+    // -----------------------------------------------------
+    // ------------------ Syntaxic Parser ------------------
+    // ------------------------ End ------------------------
+    // -----------------------------------------------------
 
     // -----------------------------------------------------
     // ------------------ Semantic Parser ------------------
