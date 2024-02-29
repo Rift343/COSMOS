@@ -1,4 +1,4 @@
-use std::fs::OpenOptions;
+use std::fs::{self, OpenOptions};
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -29,6 +29,7 @@ impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->File{
+        fs::remove_file("./data/transferFile/result.csv").expect("error");
         let mut file:File = OpenOptions::new()
         .read(true)
         .write(true)
