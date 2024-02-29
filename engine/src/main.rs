@@ -76,13 +76,13 @@ fn main() {
     // -----------------------------------------------------
 
     // Get query, static for now, should get from view later (request_receiver)
-    let sql_query : String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
+    let sql_query : std::string::String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
 
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
     let mut syntaxic_parsing_handle : File = syntaxic_parser(sql_query);
 
     // Read the file and put its contents into a String
-    let mut syntaxic_parsing_content = String::new();
+    let mut syntaxic_parsing_content: std::string::String = Default::default();;
     syntaxic_parsing_handle.read_to_string(&mut syntaxic_parsing_content).expect("Error: Unable to read syntaxic parsing file");
 
     // Convert to a serde_json Value type
@@ -119,7 +119,7 @@ fn main() {
 
     // Extract the file contents to a string first, then to a structure so that we may examine its fields.
     let semantic_file_content_as_struct: SemanticParserFile = {
-        let mut semantic_file_contents_as_string :  std::string::String = Default::default();;
+        let mut semantic_file_contents_as_string :  std::string::String = Default::default();
 
 
         match semantic_file.read_to_string(&mut semantic_file_contents_as_string)
