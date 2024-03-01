@@ -1,0 +1,14 @@
+{
+    "table_name": [
+        "Personne"
+    ],
+    "columns": [
+        [
+            "Personne",
+            "PRENOM"
+        ]
+    ],
+    "conditions": "NULL",
+    "status": true,
+    "error": "NULL"
+}
