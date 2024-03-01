@@ -66,8 +66,6 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             contents_of_file
         };
 
-        println!("LALALALAAL{}", syntaxic_file_content_as_str);
-
         // Extract the string to a SyntaxicParserFile structure, and return it to allow
         // syntaxic_file_content_as_struct to receive the value
         match serde_json::from_str(syntaxic_file_content_as_str.as_str()) {
@@ -123,44 +121,75 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
         // We can give column names without a table name (if unambiguous), so this guarantees we can
         // Later properly add it to our return
         let mut corresponding_table: String = "".to_string();
+        let mut corresponding_column: String = "".to_string();
 
-        for table_metadata in &table_metadata_as_struct {
-            for column_couple in &table_metadata.columns {
-                // Both table and column name match
-                // OR if table name is empty then only match column name
-                if (requested_column.column_name == column_couple.column_name) && ((requested_column.table_name == table_metadata.table_name) || (requested_column.table_name == "")) {
-                    nb_found += 1;
-                    if nb_found == 1 {
+        // Put check here inside of loop, doesn't matter as either we have '*' and nothing else, or a list of attributes, never a mix of the two
+        if requested_column.column_name != "*" {
+            for table_metadata in &table_metadata_as_struct {
+                for column_couple in &table_metadata.columns {
+                    // Both table and column name match
+                    // OR if table name is empty then only match column name
+                    if ((requested_column.column_name == column_couple.column_name) && (requested_column.table_name == table_metadata.table_name))
+                        ||
+                        (requested_column.table_name == "") {
+                        nb_found += 1;
+                        if nb_found == 1 {
+                            corresponding_table = table_metadata.table_name.clone();
+                            corresponding_column = column_couple.column_name.clone();
+                        }
+                    } else if (requested_column.column_name == "*") && (requested_column.table_name == table_metadata.table_name) {
                         corresponding_table = table_metadata.table_name.clone();
+                        corresponding_column = column_couple.column_name.clone();
+                        nb_found = 1;
                     }
+                }
+            }
+
+            println!("Requested column : {}.{}\t", requested_column.table_name, requested_column.column_name);
+
+
+            // React differently depending on how many occurrences for a better error messages
+            match nb_found {
+                0 => {
+                    return create_semantic_error(format!("Column : {}.{}\nNot found", requested_column.table_name, requested_column.column_name));
+                }
+                1 => {
+                    // If the column is correct, then go over every requested table in our return variable
+                    // And once we found the table to which our column belongs, then we add it to it
+                    for table in &mut res_printable.tables {
+                        if table.table_name == corresponding_table {
+                            let temp_couple = ColumnTableNameCouple {
+                                table_name: corresponding_table.clone(),
+                                column_name: corresponding_column.clone(),
+                            };
+
+                            table.columns.push(temp_couple);
+                        }
+                    }
+                }
+                // Any number of occurrences beyond 1 is handled identically, all are ambiguous
+                _ => {
+                    return create_semantic_error(format!("Column : {}.{}\nAmbiguous request, multiple occurrences in requested table list.", requested_column.table_name, requested_column.column_name));
                 }
             }
         }
 
-        println!("Requested column : {}.{}\t", requested_column.table_name, requested_column.column_name);
+        // Handle the situation where we have '*' and nothing else, where we need to add every attribute to the request
+        // Will need some cleaning up but works.
+        else {
+            for table in &mut res_printable.tables {
+                for table_metadata in &table_metadata_as_struct {
+                    for column_couple in &table_metadata.columns {
+                        if table_metadata.table_name == table.table_name {
+                            let temp_couple = ColumnTableNameCouple {
+                                table_name: table.table_name.clone(),
+                                column_name: column_couple.column_name.clone(),
+                            };
 
-        // React differently depending on how many occurrences for a better error messages
-        match nb_found {
-            0 => {
-                return create_semantic_error(format!("Column : {}.{}\nNot found", requested_column.table_name, requested_column.column_name));
-            }
-            1 => {
-                // If the column is correct, then go over every requested table in our return variable
-                // And once we found the table to which our column belongs, then we add it to it
-                for table in &mut res_printable.tables {
-                    if table.table_name == corresponding_table {
-                        let temp_couple = ColumnTableNameCouple {
-                            table_name: corresponding_table.clone(),
-                            column_name: requested_column.column_name.clone(),
-                        };
-
-                        table.columns.push(temp_couple);
+                            table.columns.push(temp_couple);
+                        }
                     }
                 }
-            }
-            // Any number of occurrences beyond 1 is handled identically, all are ambiguous
-            _ => {
-                return create_semantic_error(format!("Column : {}.{}\nAmbiguous request, multiple occurrences in requested table list.", requested_column.table_name, requested_column.column_name));
             }
         }
     }
