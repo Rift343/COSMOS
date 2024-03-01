@@ -14,4 +14,14 @@ Cargo.lock
 *.pdb
 
 #Idea
-.idea
+*/.idea/
+*/.vscode/
+
+#test CSV file
+*test.csv
+*Test.csv
+test.csv
+
+#result file
+data/transferFile/
+#data/SemanticTestData/Error.json

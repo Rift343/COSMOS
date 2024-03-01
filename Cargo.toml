@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+
+members = [
+	"engine",
+	"runner_scheduler",
+	"csv_generator",
+	"view",
+	"semantic_parser",
+	"syntaxic_parser",
+
+]

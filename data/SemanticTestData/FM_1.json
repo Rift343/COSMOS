@@ -1,0 +1,49 @@
+[
+  {
+    "table_name": "Personne",
+    "columns": [
+      {
+        "column_name": "ID", "column_type": "INT"
+      },
+      {
+        "column_name": "NOM", "column_type": "VARCHAR(20)"
+      },
+      {
+        "column_name": "PRENOM", "column_type": "VARCHAR(20)"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint_name": "PK_Personne",
+        "constraint_type": "PrimaryKey",
+        "attribute_list": [
+          "ID"
+        ]
+      }
+    ]
+  },
+
+  {
+    "table_name": "PersonneClonee",
+    "columns": [
+      {
+        "column_name": "ID2", "column_type": "INT"
+      },
+      {
+        "column_name": "NOM", "column_type": "VARCHAR(20)"
+      },
+      {
+        "column_name": "PRENOM", "column_type": "VARCHAR(20)"
+      }
+    ],
+    "constraints": [
+      {
+        "constraint_name": "PK_Personne",
+        "constraint_type": "PrimaryKey",
+        "attribute_list": [
+          "ID"
+        ]
+      }
+    ]
+  }
+]
