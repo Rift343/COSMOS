@@ -66,6 +66,8 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             contents_of_file
         };
 
+        println!("LALALALAAL{}", syntaxic_file_content_as_str);
+
         // Extract the string to a SyntaxicParserFile structure, and return it to allow
         // syntaxic_file_content_as_struct to receive the value
         match serde_json::from_str(syntaxic_file_content_as_str.as_str()) {

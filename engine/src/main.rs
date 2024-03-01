@@ -1,7 +1,8 @@
 use std::fs::File;
-use std::io::Read;
-use serde_json::Value::String;
+use std::io::{Read, Seek};
+//use serde_json::Value::String;
 use serde_json::Value;
+use std::string::String;
 
 
 use syntaxic_parser::syntaxic_parser;
@@ -28,9 +29,9 @@ fn main() {
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
     let req_receiver = request_receiver();
-    let res : std::string::String;
+    let mut sql_query : std::string::String = Default::default();
     match req_receiver {
-        Ok(s) => res = s,
+        Ok(s) => sql_query = s,
         Err(e) => error_printer(e)
     }
 
@@ -76,13 +77,13 @@ fn main() {
     // -----------------------------------------------------
 
     // Get query, static for now, should get from view later (request_receiver)
-    let sql_query : std::string::String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
+    //let sql_query : std::string::String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
 
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
     let mut syntaxic_parsing_handle : File = syntaxic_parser(sql_query);
 
     // Read the file and put its contents into a String
-    let mut syntaxic_parsing_content: std::string::String = Default::default();;
+    let mut syntaxic_parsing_content: std::string::String = Default::default();
     syntaxic_parsing_handle.read_to_string(&mut syntaxic_parsing_content).expect("Error: Unable to read syntaxic parsing file");
 
     // Convert to a serde_json Value type
@@ -99,6 +100,8 @@ fn main() {
         println!("{:?}",syntaxic_parsing_handle);
     }
 
+    syntaxic_parsing_handle.rewind().expect("Aled");
+
     // -----------------------------------------------------
     // ------------------ Syntaxic Parser ------------------
     // ------------------------ End ------------------------
@@ -110,11 +113,11 @@ fn main() {
     // -----------------------------------------------------
 
     // Mock syntaxic file, replace these variables when done
-    let syntaxic_file_name = "data/SemanticTestData/FS_1.json".to_string();
-    let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
+    //let syntaxic_file_name = "data/SemanticTestData/FS_1.json".to_string();
+    //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
     // Get the outputted semantic file.
-    let mut semantic_file = semantic_parser(syntaxic_file);
+    let mut semantic_file = semantic_parser(syntaxic_parsing_handle);
 
 
     // Extract the file contents to a string first, then to a structure so that we may examine its fields.
