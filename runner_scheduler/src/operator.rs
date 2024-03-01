@@ -29,10 +29,10 @@ impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->File{
-        fs::remove_file("./data/transferFile/result.csv").expect("error");
         let mut file:File = OpenOptions::new()
         .read(true)
         .write(true)
+            .truncate(true)
         .create(true)
         .open("./data/transferFile/result.csv").expect("error");
         
