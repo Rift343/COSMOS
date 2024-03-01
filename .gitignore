@@ -21,3 +21,7 @@ Cargo.lock
 *test.csv
 *Test.csv
 test.csv
+
+#result file
+/data/transferFile/result.csv
+/data/SemanticTestData/Error.json
