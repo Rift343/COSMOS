@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{Read, Seek};
 //use serde_json::Value::String;
 use serde_json::Value;
+#[allow(unused)]
 use std::string::String;
 
 
@@ -13,6 +14,7 @@ use engine::csv_to_string;
 
 use view::error_printer;
 use view::request_receiver;
+#[allow(unused)]
 use view::result_printer;
 
 fn main() {
@@ -160,26 +162,29 @@ fn main() {
             printable_string=csv_to_string(&content);
             match printable_string {//Seconde math when the result string from the CSV File
                 Ok(content) => println!("{}",content),
-                Err(_) => println!("
+                Err(e) => println!("
                     -----------------------------------------------------
                     ---------------------Engine--------------------------
-                    ---------------------Error 1--------------------------
+                    ---------------------Error---------------------------
                     -----------------------------------------------------
                     Maybe CSV file is already used or not existe anymore.
                     Please check the data/CSV directory
-                    "),//error message of csv_to_string return an error
+                    Error Message  : {}
+
+                    ",e),//error message of csv_to_string return an error
             }
 
 
         },//Case 1, we have a CSV file so CSV_to_string then result_printer
-        Err(_) => {println!("
+        Err(e) => {println!("
         -----------------------------------------------------
         -----------------Runner_scheduler--------------------
-        ---------------------Error 2-------------------------
+        ---------------------Error---------------------------
         -----------------------------------------------------
         Maybe CSV file is already used or not existe anymore.
         Please check the data/CSV directory
-        ");},//Case2, print there is a error on a file for the runner_scheduler
+        Error Message : {}
+        ",e);},//Case2, print there is a error on a file for the runner_scheduler
     }
 
     // -----------------------------------------------------
