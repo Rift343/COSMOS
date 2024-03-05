@@ -1,9 +1,14 @@
+/*
 mod utils;
+
 use utils::error_printer::error_printer;
 use utils::result_printer::result_printer;
 use utils::request_receiver::request_receiver;
-use engine;
+ */
+
 fn main() {
+
+    /*
     let req_receiver = request_receiver();
 
 
@@ -30,5 +35,5 @@ fn main() {
     4;Didi;Jacques;04/04/2004;";
         result_printer(res_test);
 
-     */
+     */ */
 }

@@ -1,5 +1,5 @@
-use csv::Reader;
-
+use std::{fs::File, io::{BufReader, Read, Seek}};
+/* 
 pub fn engine_main(file_name : String) ->  Result<String, Box<dyn std::error::Error>> {
 
     //A CHANGER EN file_name DES QU ON PREND LE RES DE O/E
@@ -8,9 +8,15 @@ pub fn engine_main(file_name : String) ->  Result<String, Box<dyn std::error::Er
     //Convert csv to string
     let result = csv_to_string(filename);
     return result;
-}
-fn csv_to_string(file_name : &str) -> Result<String, Box<dyn std::error::Error>> {
+}*/
+pub fn csv_to_string(mut file_name : &File) -> Result<String, Box<dyn std::error::Error>> {
     //string resultat
+    file_name.rewind()?;
+    
+    let mut buf = String::new();
+    let mut my_buffreader = BufReader::new(file_name);
+    my_buffreader.read_to_string(&mut buf).expect("eror)");
+    /* 
     let mut res = String::new();
     //ouverture du reader
     let mut rdr = Reader::from_path(file_name)?;
@@ -46,6 +52,6 @@ fn csv_to_string(file_name : &str) -> Result<String, Box<dyn std::error::Error>>
         }
         //fin de ligne donc on rajoute \n
         res += "\n";
-    }
-    Ok(res)
+    }*/
+    Ok(buf)
 }
