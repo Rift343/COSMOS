@@ -121,6 +121,22 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
         self.descriptor = operation_result;
     }
 
+#[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
+pub(crate)fn union(&mut self,union_csv:&CSVFile)
+{
+    let mut result_operation : Vec<Vec<String>> = self.descriptor.clone();
+    let mut union_value = union_csv.descriptor.clone();
+    for i in 1..union_value.len()
+    {
+        if (result_operation[i]!=union_value[i])
+        {
+            let val = union_value[i].clone();
+            result_operation.push(val);
+        }
+    }
+    self.descriptor = result_operation;
+}
+
 
 
 }
@@ -186,6 +202,31 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+
+
+    #[test]
+    fn test_union()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table2 = open_relation("personneTest2".to_string(), "R2".to_string()).expect("Error");
+        table1.union(&table2);
+        let str = table1.to_string();
+        //print!("{}",str);
+        let mut val2 = File::open("./data/expectedFile/unionTest1Expected.csv").expect("error");
+        let mut str_compare=String::new();
+        let _ = val2.read_to_string(&mut str_compare).expect("Error");
+        //str_compare.to_string();
+        let string_compare = str_compare.to_string(); 
+        if string_compare==str
+        {
+            assert!(true);
+        }
+        else 
+        {
+            assert!(false);
+        }
+    }
+
     #[test]
     fn test1(){
         let res = open_relation("personneTest".to_string(), "R1".to_string());
@@ -240,7 +281,7 @@ mod tests {
                                         let mut val2 = File::open("./data/expectedFile/testCartesian.csv").expect("error");
                                         let mut str_compare=String::new();
                                         let _ = val2.read_to_string(&mut str_compare).expect("Error");
-                                        str_compare.to_string();
+                                        //str_compare.to_string();
                                         let string_compare = str_compare.to_string();
                                         if string_compare==val
                                         {
