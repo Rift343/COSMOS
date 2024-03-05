@@ -17,7 +17,7 @@ use view::request_receiver;
 #[allow(unused)]
 use view::result_printer;
 
-fn process_request(sql_query : String) -> String {
+pub fn process_request(sql_query : String) -> String {
 
 
 println!("Main View : fini");
