@@ -1,0 +1,25 @@
+Model: SelectStatement;
+
+
+SelectStatement: 'SELECT' distinctOption=DistinctOption? attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
+
+
+DistinctOption: 'DISTINCT';
+
+AttributeList: attribute=Attribute (',' attribute=Attribute)* | attribute= '*';
+Attribute: attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
+IDENTIFIER: ID_NAME| String;
+
+ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
+String: /'[^']*'/ | /"[^"]*"/;
+
+RelationList: relation=Relation (',' relation=Relation)*;
+Relation: /[A-Za-z_][A-Za-z_0-9]*/;
+
+WhereClause: 'WHERE' conditions=ConditionList;
+ConditionList: condition=Condition ('AND' condition=Condition)*;
+Condition: left=ATTRIBUTE_NAME op=Operator right=VALUE;
+Operator: '=' | '<>' | '<' | '>' | '<=' | '>=';
+VALUE: /(("([^"]|\\")*"|'([^']|\\')*')|\d+)/;  // Permettre des chaînes avec " ou ' et des nombres
+
+ATTRIBUTE_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
