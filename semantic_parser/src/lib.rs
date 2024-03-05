@@ -1,5 +1,4 @@
 pub mod structures;
-mod error_creator;
 
 use std::error::Error;
 use std::fs;
@@ -14,8 +13,6 @@ use structures::semantic_parser_file::TableDictionary;
 use structures::table_metadata::TableMetadata;
 
 use structures::column_table_name_couple::ColumnTableNameCouple;
-
-use error_creator::create_semantic_error;
 
 /// # Retrieves table metadata stored at a given path
 ///
