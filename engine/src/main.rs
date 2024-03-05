@@ -94,7 +94,10 @@ fn main() {
 
     let semantic_file = match semantic_parser_res {
         Ok(contenu) => contenu,
-        Err(err) => panic!("Error : {}", err)
+        Err(err) => {
+            error_printer(err);
+            return
+        }
     };
 
     // -----------------------------------------------------
