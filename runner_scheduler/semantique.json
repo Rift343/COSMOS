@@ -1,11 +1,1 @@
-{
-"tables":[
-{"table_name":"Personne",
-"columns":[["Personne","ID"],["Personne","NOM"]]
-},{"table_name":"Personne2",
-"columns":[["Personne2","ID"],["Personne2","NOM"]]
-}],
-
-"conditions":null,
-"status":true
-}
+{"tables":[{"table_name":"Personne","columns":[{"table_name":"Personne","column_name":"ID"}]}],"conditions":null,"status":true,"error":""}
