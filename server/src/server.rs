@@ -2,6 +2,7 @@ use std::io::prelude::*;
 use std::io::Result;
 use std::net::TcpListener;
 use std::net::TcpStream;
+use engine::process_request;
 
 fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 512];
@@ -10,9 +11,10 @@ fn handle_connection(mut stream: TcpStream) {
     //we call the main program
     let req = String::from_utf8_lossy(&buffer);
 
-    println!("Responding with: {}", String::from_utf8_lossy(b"Hello, my name is server!"));
-    let msg = b"Hello, my name is server!";
-    let _ = stream.write(msg);
+    let result = process_request(req).to_string();
+    println!("Responding with: {}", result);
+    //let msg = b"Hello, my name is server!";
+    let _ = stream.write(result.as_bytes());
 }
 
 pub fn create_listener(addr: String) -> Result<()> {
