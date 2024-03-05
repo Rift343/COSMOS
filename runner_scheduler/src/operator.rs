@@ -124,17 +124,17 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
 #[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
 pub(crate)fn union(&mut self,union_csv:&CSVFile)
 {
-    let mut result_operation : Vec<Vec<String>> = self.descriptor.clone();
-    let mut union_value = union_csv.descriptor.clone();
+    let mut result_operation : &mut Vec<Vec<String>> = &mut self.descriptor;
+    let mut union_value = &union_csv.descriptor;
     for i in 1..union_value.len()
     {
         if (result_operation[i]!=union_value[i])
         {
-            let val = union_value[i].clone();
-            result_operation.push(val);
+            let val = &union_value[i];
+            result_operation.push(val.to_vec());
         }
     }
-    self.descriptor = result_operation;
+    self.descriptor = result_operation.to_vec();
 }
 
 
