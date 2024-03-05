@@ -1,6 +1,7 @@
 pub mod structures;
 mod error_creator;
 
+use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
@@ -50,7 +51,7 @@ fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
 /// Panics for file or JSON errors
 /// Does not panic for errors related to the syntaxic file, but as expected returns a semantic
 /// parser file with the reason for failure filled out
-pub fn semantic_parser(mut syntaxic_file: File) -> File {
+pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> {
     // Extract the file contents to a structure
     let syntaxic_file_content_as_struct: SyntaxicParserFile = {
         // File stores a str not structure, so we must first extract it before converting and put it
@@ -60,7 +61,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
 
             match syntaxic_file.read_to_string(&mut contents_of_file) {
                 Ok(_) => (),
-                Err(error) => panic!("Error : {}", error)
+                Err(error) => return Err(Box::try_from(error).unwrap())
             }
 
             contents_of_file
@@ -72,7 +73,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             Ok(content) => {
                 content
             }
-            Err(error) => panic!("Error : {}", error)
+            Err(error) => return Err(Box::try_from(error).unwrap())
         }
     };
 
@@ -151,7 +152,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             // React differently depending on how many occurrences for a better error messages
             match nb_found {
                 0 => {
-                    return create_semantic_error(format!("Column : {}.{}\nNot found", requested_column.table_name, requested_column.column_name));
+                    return Err(Box::from(format!("Column : {}.{}\nNot found", requested_column.table_name, requested_column.column_name)))
                 }
                 1 => {
                     // If the column is correct, then go over every requested table in our return variable
@@ -169,7 +170,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
                 }
                 // Any number of occurrences beyond 1 is handled identically, all are ambiguous
                 _ => {
-                    return create_semantic_error(format!("Column : {}.{}\nAmbiguous request, multiple occurrences in requested table list.", requested_column.table_name, requested_column.column_name));
+                    return Err(Box::from(format!("Column : {}.{}\nAmbiguous request, multiple occurrences in requested table list.", requested_column.table_name, requested_column.column_name)))
                 }
             }
         }
@@ -208,5 +209,5 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
     output_semantic_file.write_all(output_semantic_file_as_str.as_bytes()).expect("Error occurred whilst writing to semantic output file.");
     output_semantic_file.seek(SeekFrom::Start(0)).expect("Error whilst seeking in semantic output file.");
 
-    output_semantic_file
+    Ok(output_semantic_file)
 }
