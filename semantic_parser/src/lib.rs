@@ -104,6 +104,10 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
         println!("Tables requested : {}\tFound : {}", requested_table, found_table);
 
+        if (! found_table){
+            return Err(Box::from(format!("Requested table not found : {}\n", requested_table)));
+        }
+
         let temp_dic_table = TableDictionary {
             table_name: requested_table,
             columns: vec![],
