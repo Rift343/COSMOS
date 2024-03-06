@@ -11,7 +11,8 @@ pub struct SyntaxicParserFile {
     /// Vector of all the requested columns, which we can't yet associate to their table name
     pub columns: Vec<ColumnTableNameCouple>,
     /// Status of the result, set to true if no errors occurred, else false, in which case the error field is filled out
-    status: bool,
+    /// Set to optional to later allow to easily get rid of it
+    status: Option<bool>,
     /// If the status is set to false, contains the error which occurred to be displayed to the user
     /// Assumed that the error field may not be filled out (if we received the file, that is because
     /// the engine allowed it, aka no errors have occurred which we need to think about
