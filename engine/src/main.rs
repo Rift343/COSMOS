@@ -10,7 +10,7 @@ use engine::csv_to_string;
 
 use view::error_printer;
 use view::request_receiver;
-use view::result_printer;
+//use view::result_printer;
 
 fn main() {
 
@@ -90,7 +90,7 @@ fn main() {
     //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
     // Get the outputted semantic file.
-    let mut semantic_parser_res = semantic_parser(syntaxic_parsing_handle);
+    let semantic_parser_res = semantic_parser(syntaxic_parsing_handle);
 
     let semantic_file = match semantic_parser_res {
         Ok(contenu) => contenu,
