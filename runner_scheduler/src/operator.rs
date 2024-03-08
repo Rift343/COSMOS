@@ -1,4 +1,4 @@
-use std::fs::{self, OpenOptions};
+use std::fs::OpenOptions;
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -28,18 +28,16 @@ pub(crate) struct CSVFile{
 impl CSVFile {
 
 #[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
-pub(crate)fn to_file(&self)->File{
-        let mut file:File = OpenOptions::new()
-        .read(true)
-        .write(true)
-            .truncate(true)
-        .create(true)
-        .open("./data/transferFile/result.csv").expect("error");
+pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
+        let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {
+            Ok(e) => e,
+            Err(e) =>  return Err(Box::new(e)),
+        };
         
         //File::create("./data/transferFile/result.csv").expect("Error : Can't create the resultFile");
         file.write_all(self.to_string().as_bytes());
         file.rewind();
-        file
+        Ok(file)
     }
 
 #[doc = r"To string of the descriptor who separate the attribute with ',' and the ligne with '\\r\\n' if you use a Windows or '\\n' if you use Linux or Max OS."]
@@ -132,10 +130,16 @@ pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<d
     let mut path:String = "./data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
-    let reader = File::open(path).expect("Error there is no file here");
+    let reader = match File::open(path) {
+        Ok(e) => e,
+        Err(e) => return Err(Box::new(e)),
+    };
     let mut buffer = BufReader::new(reader);
     let mut csv_string = String::new();
-    buffer.read_to_string(&mut csv_string).expect("Can't read this file");
+    let i: usize = match buffer.read_to_string(&mut csv_string) {
+        Err(e) => return  Err(Box::new(e)),
+        Ok(e) => e,
+    } ;
     //println!("{}",std::env::consts::OS);
     let separator_ligne:String= if (std::env::consts::OS == "windows"){
         "\r\n".to_string()
@@ -194,7 +198,7 @@ mod tests {
         a1.projection(["personneTest.id".to_string(),"personneTest.prenom".to_string()].to_vec());
         let time_passed = now.elapsed();
         println!("The projection with personneTest.csv took {} seconde", time_passed.as_secs());
-        a1.to_file();
+        a1.to_file().expect("error");
         //print!("{}",a1.to_string());
         
         //println!("{:?}",a1.descriptor);
@@ -223,6 +227,6 @@ mod tests {
         }
 
         //a1.expect("REASON").cartesian_product( &a2);
-        a1.expect("REASON").to_file();
+        a1.expect("REASON").to_file().expect("error");
     }
 }

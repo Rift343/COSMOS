@@ -73,7 +73,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
-    Ok (a1.to_file())
+    Ok (a1.to_file()?)
 }
 
 #[cfg(test)]
