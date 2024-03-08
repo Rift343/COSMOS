@@ -1,5 +1,4 @@
 pub mod structures;
-
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -103,7 +102,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
         println!("Tables requested : {}\tActual name {}\tFound : {}", requested_table, table_name, found_table);
 
-        if (! found_table){
+        if ! found_table{
             return Err(Box::from(format!("Requested table not found : {}\n", requested_table)));
         }
 
