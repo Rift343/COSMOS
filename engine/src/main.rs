@@ -1,30 +1,18 @@
 use std::fs::File;
 use std::io::{Read, Seek};
-//use serde_json::Value::String;
 use serde_json::Value;
-#[allow(unused)]
-use std::string::String;
 
 
 use syntaxic_parser::syntaxic_parser;
 use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
-use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
 use engine::csv_to_string;
 
 use view::error_printer;
 use view::request_receiver;
-#[allow(unused)]
 use view::result_printer;
 
 fn main() {
-    /*
-
-    Basic plan :
-
-    TODO : Call view for request
-
-*/
 
     // -----------------------------------------------------
     // ----------------------- View ------------------------
@@ -55,23 +43,6 @@ fn main() {
      */
 
     println!("Main View : fini");
-    /*
-    TODO : Transfer request to syntaxic parser
-
-    TODO : Verify output
-
-    TODO : Transfer its result to semantic parser
-
-    Verify output
-
-    TODO : Transfer to runner / scheduler
-
-    TODO : Transfer output to view for display
-
-    ----
-    Later make it loop, once everyone has contributed
-
-     */
 
     // -----------------------------------------------------
     // ------------------ Syntaxic Parser ------------------
@@ -119,31 +90,15 @@ fn main() {
     //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
     // Get the outputted semantic file.
-    let mut semantic_file = semantic_parser(syntaxic_parsing_handle);
+    let mut semantic_parser_res = semantic_parser(syntaxic_parsing_handle);
 
-
-    // Extract the file contents to a string first, then to a structure so that we may examine its fields.
-    let semantic_file_content_as_struct: SemanticParserFile = {
-        let mut semantic_file_contents_as_string :  std::string::String = Default::default();
-
-
-        match semantic_file.read_to_string(&mut semantic_file_contents_as_string)
-        {
-            Ok(_) => (),
-            Err(error) => panic!("ENGINE :\tError occurred whilst reading semantic parser file output\n{}", error)
-        }
-
-        match serde_json::from_str(semantic_file_contents_as_string.as_str()) {
-            Ok(content) => {
-                content
-            }
-            Err(error) => panic!("ENGINE :\tError occurred whilst parsing String to a structure\n{}", error)
+    let semantic_file = match semantic_parser_res {
+        Ok(contenu) => contenu,
+        Err(err) => {
+            error_printer(err);
+            return
         }
     };
-
-    // Print the results for a feedback, may be removed when judged necessary
-    println!("{:?}", semantic_file_content_as_struct);
-    println!("{:?}\t{:?}", semantic_file_content_as_struct.status, semantic_file_content_as_struct.error);
 
     // -----------------------------------------------------
     // ------------------ Semantic Parser ------------------
