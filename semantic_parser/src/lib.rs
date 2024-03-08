@@ -92,21 +92,23 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
     // res_printable
     for requested_table in syntaxic_file_content_as_struct.table_name {
         let mut found_table = false;
+        let mut table_name = "".to_string();
 
         for table_metadata in &table_metadata_as_struct {
-            if table_metadata.table_name == requested_table {
+            if table_metadata.table_name.to_lowercase() == requested_table.to_lowercase() {
                 found_table = true;
+                table_name = table_metadata.table_name.clone();
             }
         }
 
-        println!("Tables requested : {}\tFound : {}", requested_table, found_table);
+        println!("Tables requested : {}\tActual name {}\tFound : {}", requested_table, table_name, found_table);
 
         if (! found_table){
             return Err(Box::from(format!("Requested table not found : {}\n", requested_table)));
         }
 
         let temp_dic_table = TableDictionary {
-            table_name: requested_table,
+            table_name,
             columns: vec![],
         };
 
@@ -131,7 +133,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                 for column_couple in &table_metadata.columns {
                     // Both table and column name match
                     // OR if table name is empty then only match column name
-                    if ((requested_column.column_name == column_couple.column_name) && (requested_column.table_name == table_metadata.table_name))
+                    if ((requested_column.column_name.to_lowercase() == column_couple.column_name.to_lowercase()) && (requested_column.table_name.to_lowercase() == table_metadata.table_name.to_lowercase()))
                         ||
                         (requested_column.table_name == "") {
                         nb_found += 1;
@@ -147,7 +149,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                 }
             }
 
-            println!("Requested column : {}.{}\t", requested_column.table_name, requested_column.column_name);
+            println!("Requested column : {}.{}\tActual : {}.{}", requested_column.table_name, requested_column.column_name, corresponding_table, corresponding_column);
 
 
             // React differently depending on how many occurrences for a better error messages
