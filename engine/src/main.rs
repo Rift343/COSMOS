@@ -18,79 +18,37 @@ use view::result_printer;
 
 fn main() {
     let mut run = true;
-    // -----------------------------------------------------
-    // ----------------------- View ------------------------
-    // ----------------------- Start -----------------------
-    // -----------------------------------------------------
-    while run {
+    while run
+    {
         let req_receiver = request_receiver();
-        match req_receiver {
-            Ok(request) => 
-                if (request == "exit".to_string()){
+        match req_receiver
+            {
+            Ok(request) =>
+                {
+                if request == "exit".to_string() {
                     run = false;
                     result_printer("Another stellar performance! 🌟".to_string());
                 }
                 else{
-                    match engine(request){
+                    match engine(request)
+                        {
                         Ok(result) => result_printer(result),
                         Err(error_engine) => error_printer(error_engine)
+                        }
+                    }
                 }
-                }
-             
             Err(error_request_receiver) => error_printer(error_request_receiver)
-        }
+            }
     }
     println!("Another stellar performance! 🌟");
-
-
-
-
-
 }
 
-fn engine(request : String) -> Result<String,Box<dyn Error>>{
-    /*
-    //match resultat de request receiver
-    match req_receiver {
-        //Si on arrive a lire la requete dans l'entrée standart
-        //On envoie la requete a l'engine
-        Ok(req) => match engine::engine_main(req){
-            Ok(res) => result_printer(res),
-            Err(err) => error_printer(err)
-        }
-        Err(e) => error_printer(e)
+fn engine(request : String) ->Result<std::string::String, Box<(dyn std::error::Error + 'static)>> {
 
-    }
-
-
-     */
-
-     println!("Main View : fini");
-     /*
-     TODO : Transfer request to syntaxic parser
- 
-     TODO : Verify output
- 
-     TODO : Transfer its result to semantic parser
- 
-     Verify output
- 
-     TODO : Transfer to runner / scheduler
- 
-     TODO : Transfer output to view for display
- 
-     ----
-     Later make it loop, once everyone has contributed
- 
-      */
- 
      // -----------------------------------------------------
      // ------------------ Syntaxic Parser ------------------
      // ----------------------- Start -----------------------
      // -----------------------------------------------------
- 
-     // Get query, static for now, should get from view later (request_receiver)
-     //let sql_query : std::string::String = "SELECT Id, Nom, Prenom FROM Personne;".to_string();
  
      // Call the syntaxic parser and get file handle for the syntaxic parsing file
      let mut syntaxic_parsing_handle : File = syntaxic_parser(request);
@@ -169,31 +127,57 @@ fn engine(request : String) -> Result<String,Box<dyn Error>>{
      let csv_file_returned = scheduler(&semantic_file);
      match csv_file_returned {//First match on the result of the runner_scheduler.
          Ok(content) => {
-             let mut printable_string : Result<String, Box<dyn Error>>;
+             let printable_string : Result<String, Box<dyn Error>>;
              printable_string=csv_to_string(&content);
+             //Ok(printable_string?)
+
              match printable_string {//Seconde math when the result string from the CSV File
-                 Ok(content) => println!("Hey"), //rintln!("{}",content),
+                 Ok(content) => {
+                     println!("{}",content);
+                     Ok(content)
+                 },
+
                  
-                 Err(_) => println!("
+                 Err(_) => {
+                     println!("
                      -----------------------------------------------------
                      ---------------------Engine--------------------------
                      ---------------------Error 1--------------------------
                      -----------------------------------------------------
                      Maybe CSV file is already used or not existe anymore.
                      Please check the data/CSV directory
-                     "),//error message of csv_to_string return an error
+                     ");
+                     Ok("
+                     -----------------------------------------------------
+                     ---------------------Engine--------------------------
+                     ---------------------Error 1--------------------------
+                     -----------------------------------------------------
+                     Maybe CSV file is already used or not existe anymore.
+                     Please check the data/CSV directory
+                     ".to_string())
+                 }
+                    //error message of csv_to_string return an error
              }
- 
+
  
          },//Case 1, we have a CSV file so CSV_to_string then result_printer
-         Err(_) => {println!("
+         Err(_) => {
+             println!("
          -----------------------------------------------------
          -----------------Runner_scheduler--------------------
          ---------------------Error 2-------------------------
          -----------------------------------------------------
          Maybe CSV file is already used or not existe anymore.
          Please check the data/CSV directory
-         ");},//Case2, print there is a error on a file for the runner_scheduler
+         ");
+             Ok("
+         -----------------------------------------------------
+         -----------------Runner_scheduler--------------------
+         ---------------------Error 2-------------------------
+         -----------------------------------------------------
+         Maybe CSV file is already used or not existe anymore.
+         Please check the data/CSV directory
+         ".to_string())},//Case2, print there is a error on a file for the runner_scheduler
      }
  
      // -----------------------------------------------------
