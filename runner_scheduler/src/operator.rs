@@ -27,6 +27,184 @@ pub(crate) struct CSVFile{
 
 impl CSVFile {
 
+#[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
+return a Vec of string with the name of the attribute and the value of the COUNT.
+TODO ==> Need to be tested"]
+pub(crate)fn count(self,attribut_count:&String) -> Vec<String>
+{
+    let mut result_vec = Vec::new();
+    result_vec.push("COUNT(".to_string()+attribut_count+")");
+    let mut counter:usize = 0;
+    if attribut_count=="*" {counter = self.descriptor.len();}//If we have * then we just have to count the numbers of rows with ".len()" method
+    else//Else we have to count all the row, excluding the NULL and NIL value
+    { 
+            let mut index: usize = 0;
+            for i in 0..self.descriptor[0].len()
+            {
+                if self.descriptor[0][i] == attribut_count.to_string()
+                {
+                    index = i;
+                    break;
+                }
+            }
+        
+            for i in 1..self.descriptor.len()
+            {
+                if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
+                {
+                    counter = counter+1;
+                }
+                
+            }
+        
+
+        }
+        
+    result_vec.push(counter.to_string());
+
+    return result_vec;
+}
+
+
+pub(crate)fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
+{
+    let mut result_vec = Vec::new();
+    result_vec.push("SUM(".to_string()+attribut+")");
+    let mut sum = 0;
+    let mut sum2 : f64 = 0.0;
+    let mut index: usize = 0;
+    for i in 0..self.descriptor[0].len()
+    {
+        if self.descriptor[0][i] == attribut.to_string()
+        {
+            index = i;
+            break;
+        }
+    }
+    for i in 1..self.descriptor.len()
+    {
+        if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
+        {
+            if type_attr == "INTEGER"
+            {
+                let value : i128 = self.descriptor[i][index].parse().unwrap();
+                sum=sum+value;
+            }
+            else if type_attr == "FLOAT"
+            {
+                let value : f64 = self.descriptor[i][index].parse().unwrap();
+                sum2=sum2+value;
+            }
+        }
+                
+    }
+    if type_attr == "INTEGER"
+            {
+                result_vec.push(sum.to_string());
+                return result_vec;
+            }
+    else if type_attr == "FLOAT"
+    {
+        result_vec.push(sum2.to_string());
+        return result_vec;
+    }
+    else {
+        result_vec.push("Err".to_string());
+        return result_vec;
+    }
+    
+}
+
+pub(crate)fn min(self,attribut: &String,type_attr: &String)->Vec<String>
+{
+    let mut return_vec = Vec::new();
+    return_vec.push("MIN(".to_string()+attribut+")");
+    let mut index=0;
+    for i in 0..self.descriptor[0].len()
+    {
+        if self.descriptor[0][i] == attribut.to_string()
+        {
+            index = i;
+            break;
+        }
+    }
+    if (type_attr=="FLOAT"||type_attr=="INTEGER")
+    {
+        let mut minus_str = &self.descriptor[1][index].clone();
+        let mut minus:f64 = minus_str.parse().unwrap();
+        for i in 2..self.descriptor.len()
+        {
+            let mut minus_str = &self.descriptor[i][index].clone();
+            let test :f64 = minus_str.parse().unwrap();
+            if test < minus
+            {
+                minus = test;
+            }
+        }
+        return_vec.push(minus.to_string());
+    }
+    else 
+    {
+        let mut minus = &self.descriptor[1][index];
+        for i in 2..self.descriptor.len()
+        {
+            let test = &self.descriptor[i][index];
+            if test < minus
+            {
+                minus = test;
+            }
+        }
+        return_vec.push(minus.to_string());    
+    }
+    return return_vec;
+}
+
+
+pub(crate)fn max(self,attribut: &String,type_attr: &String)->Vec<String>
+{
+    let mut return_vec = Vec::new();
+    return_vec.push("MAX(".to_string()+attribut+")");
+    let mut index=0;
+    for i in 0..self.descriptor[0].len()
+    {
+        if self.descriptor[0][i] == attribut.to_string()
+        {
+            index = i;
+            break;
+        }
+    }
+    if (type_attr=="FLOAT"||type_attr=="INTEGER")
+    {
+        let mut maxi_str = &self.descriptor[1][index].clone();
+        let mut maxi:f64 = maxi_str.parse().unwrap();
+        for i in 2..self.descriptor.len()
+        {
+            let mut maxi_str = &self.descriptor[i][index].clone();
+            let test :f64 = maxi_str.parse().unwrap();
+            if test > maxi
+            {
+                maxi = test;
+            }
+        }
+        return_vec.push(maxi.to_string());
+    }
+    else 
+    {
+        let mut maxi = &self.descriptor[1][index];
+        for i in 2..self.descriptor.len()
+        {
+            let test = &self.descriptor[i][index];
+            if test > maxi
+            {
+                maxi = test;
+            }
+        }
+        return_vec.push(maxi.to_string());    
+    }
+    return return_vec;
+}
+
+
 #[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
         let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {
@@ -202,6 +380,54 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+
+    #[test]
+    fn test_count()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.ID".to_string();
+        let test = table1.count(&path_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,10);
+        println!("{:?}",test);
+    }
+
+    #[test]
+    fn test_sum()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.sum(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,400);
+        println!("{:?}",test);
+    }
+
+    #[test]
+    fn test_min()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.min(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,1);
+        println!("{:?}",test);
+
+    }
+    #[test]
+    fn test_max()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.max(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,85);
+        println!("{:?}",test);
+
+    }
 
 
     #[test]
