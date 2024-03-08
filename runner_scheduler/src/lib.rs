@@ -108,7 +108,7 @@ mod tests {
     #[should_panic]
     fn test_on_json(){
         let fichier_json_test:std::fs::File = File::open("semantique.json").expect("Error ==> Can't read the JSON file");
-        let _ =scheduler(&fichier_json_test);
+        let _ =scheduler(&fichier_json_test).expect("error");
     }
 }
 

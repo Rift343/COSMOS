@@ -27,7 +27,7 @@ pub(crate) struct CSVFile{
 
 impl CSVFile {
 
-#[doc =r"Write a CSV file with the descriptor in ../data/transferFile/result.csv file "]
+#[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
         let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {
             Ok(e) => e,
@@ -99,6 +99,8 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
         //println!("{:?}",transpose);
         self.descriptor = transpose.to_vec();
     }
+#[doc = "Method for the cartesian product. Need another CSVFile in input and the self object take the cartesian product between self and another_csv\n
+Complexity of O(n²)"]
 pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
     let mut operation_result : Vec<Vec<String>>=Vec::new();
     let mut transition: Vec<String>;
@@ -118,6 +120,22 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
         }
         self.descriptor = operation_result;
     }
+
+#[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
+pub(crate)fn union(&mut self,union_csv:&CSVFile)
+{
+    let mut result_operation : &mut Vec<Vec<String>> = &mut self.descriptor;
+    let mut union_value = &union_csv.descriptor;
+    for i in 1..union_value.len()
+    {
+        if (result_operation[i]!=union_value[i])
+        {
+            let val = &union_value[i];
+            result_operation.push(val.to_vec());
+        }
+    }
+    self.descriptor = result_operation.to_vec();
+}
 
 
 
@@ -184,6 +202,31 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+
+
+    #[test]
+    fn test_union()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table2 = open_relation("personneTest2".to_string(), "R2".to_string()).expect("Error");
+        table1.union(&table2);
+        let str = table1.to_string();
+        //print!("{}",str);
+        let mut val2 = File::open("./data/expectedFile/unionTest1Expected.csv").expect("error");
+        let mut str_compare=String::new();
+        let _ = val2.read_to_string(&mut str_compare).expect("Error");
+        //str_compare.to_string();
+        let string_compare = str_compare.to_string(); 
+        if string_compare==str
+        {
+            assert!(true);
+        }
+        else 
+        {
+            assert!(false);
+        }
+    }
+
     #[test]
     fn test1(){
         let res = open_relation("personneTest".to_string(), "R1".to_string());
@@ -191,14 +234,27 @@ mod tests {
         match res {
             Ok(o) => a1 = o,
             Err(..) => panic!("Error")
-        };
+         };
         a1.print_csv_file();
         let now = Instant::now();
-        println!("{:?}",a1.descriptor[0]);
-        a1.projection(["personneTest.id".to_string(),"personneTest.prenom".to_string()].to_vec());
+        println!("{:?}",a1.descriptor[0]);    
+        a1.projection(["personneTest.ID".to_string(),"personneTest.PRENOM".to_string()].to_vec());
         let time_passed = now.elapsed();
         println!("The projection with personneTest.csv took {} seconde", time_passed.as_secs());
-        a1.to_file().expect("error");
+        let val: String = a1.to_string();
+        let mut val2 = File::open("./data/expectedFile/test1Expect.csv").expect("error");
+        let mut str_compare=String::new();
+        let _ = val2.read_to_string(&mut str_compare).expect("Error");
+        str_compare.to_string();
+        let string_compare = str_compare.to_string();
+        if string_compare==val{
+            assert!(true);
+        }
+        else {
+            assert!(false);
+        }
+        
+
         //print!("{}",a1.to_string());
         
         //println!("{:?}",a1.descriptor);
@@ -208,18 +264,37 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_csv_read_ligne(){
-        let a1 = "../data/CSV/personneTest.csv".to_string();
+        let a1 = "./data/CSV/personneTest.csv".to_string();
         csv_read_by_ligne(a1).expect("TODO: panic message");
 
     }
 
     #[test]
     fn test_cartesian() {
-        let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
-        let a2 = open_relation("Personne".to_string(), "R1".to_string());
+        let mut a1 = open_relation("personneTest".to_string(), "R1".to_string());
+        let a2 = open_relation("personneTest".to_string(), "R1".to_string());
         match a1{
             Ok(ref mut res1) =>         match a2{
-                Ok(res2) => res1.cartesian_product(&res2),
+                Ok(res2) => {
+                                        res1.cartesian_product(&res2);
+                                        let val =res1.to_string();
+                                        let mut val2 = File::open("./data/expectedFile/testCartesian.csv").expect("error");
+                                        let mut str_compare=String::new();
+                                        let _ = val2.read_to_string(&mut str_compare).expect("Error");
+                                        //str_compare.to_string();
+                                        let string_compare = str_compare.to_string();
+                                        if string_compare==val
+                                        {
+                                            assert!(true);
+                                        }
+                                        else 
+                                        {
+                                            assert!(false);
+                                        }
+                                    
+                                    
+                                    
+                                    },
                 Err(..) => panic!("Error")
             }
             Err(..) => panic!("Error")
