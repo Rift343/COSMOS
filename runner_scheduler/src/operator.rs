@@ -48,7 +48,7 @@ pub(crate)fn count(self,attribut_count:&String) -> Vec<String>
                 }
             }
         
-            for i in 0..self.descriptor.len()
+            for i in 1..self.descriptor.len()
             {
                 if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
                 {
@@ -81,7 +81,7 @@ pub(crate)fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
             break;
         }
     }
-    for i in 0..self.descriptor.len()
+    for i in 1..self.descriptor.len()
     {
         if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
         {
@@ -380,6 +380,54 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+
+    #[test]
+    fn test_count()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.ID".to_string();
+        let test = table1.count(&path_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,10);
+        println!("{:?}",test);
+    }
+
+    #[test]
+    fn test_sum()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.sum(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,400);
+        println!("{:?}",test);
+    }
+
+    #[test]
+    fn test_min()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.min(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,1);
+        println!("{:?}",test);
+
+    }
+    #[test]
+    fn test_max()
+    {
+        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.max(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,85);
+        println!("{:?}",test);
+
+    }
 
 
     #[test]
