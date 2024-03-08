@@ -30,7 +30,7 @@ impl CSVFile {
 #[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
 return a Vec of string with the name of the attribute and the value of the COUNT.
 TODO ==> Need to be tested"]
-pub(crate)fn count(&mut self,attribut_count:&String) -> Vec<String>
+pub(crate)fn count(self,attribut_count:&String) -> Vec<String>
 {
     let mut result_vec = Vec::new();
     result_vec.push("COUNT(".to_string()+attribut_count+")");
@@ -65,6 +65,24 @@ pub(crate)fn count(&mut self,attribut_count:&String) -> Vec<String>
     return result_vec;
 }
 
+
+pub(crate)fn sum(self,attribut: &String,type_attr:&String)-> Vec<String>
+{
+    let mut result_vec = Vec::new();
+    result_vec.push("COUNT(".to_string()+attribut+")");
+    let mut sum:usize = 0;
+    return result_vec;
+    let mut index: usize = 0;
+            for i in 0..self.descriptor[0].len()
+            {
+                if self.descriptor[0][i] == attribut.to_string()
+                {
+                    index = i;
+                    break;
+                }
+            }
+    return result_vec;
+}
 
 #[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
