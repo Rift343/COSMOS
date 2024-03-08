@@ -27,6 +27,45 @@ pub(crate) struct CSVFile{
 
 impl CSVFile {
 
+#[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
+return a Vec of string with the name of the attribute and the value of the COUNT.
+TODO ==> Need to be tested"]
+pub(crate)fn count(&mut self,attribut_count:&String) -> Vec<String>
+{
+    let mut result_vec = Vec::new();
+    result_vec.push("COUNT(".to_string()+attribut_count+")");
+    let mut counter:usize = 0;
+    if attribut_count=="*" {counter = self.descriptor.len();}//If we have * then we just have to count the numbers of rows with ".len()" method
+    else//Else we have to count all the row, excluding the NULL and NIL value
+    { 
+            let mut index: usize = 0;
+            for i in 0..self.descriptor[0].len()
+            {
+                if self.descriptor[0][i] == attribut_count.to_string()
+                {
+                    index = i;
+                    break;
+                }
+            }
+        
+            for i in 0..self.descriptor.len()
+            {
+                if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
+                {
+                    counter = counter+1;
+                }
+                
+            }
+        
+
+        }
+        
+    result_vec.push(counter.to_string());
+
+    return result_vec;
+}
+
+
 #[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
         let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {

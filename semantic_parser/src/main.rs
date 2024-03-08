@@ -8,7 +8,7 @@ fn main() {
     let in_file = File::options().read(true).write(true).create(true).open(fs1_filename).expect("Erreur lors de création de out_file");
 
 
-    let mut out_file = semantic_parser(in_file);
+    let mut out_file = semantic_parser(in_file).expect("error");
 
     let mut temp: String = String::new();
 
