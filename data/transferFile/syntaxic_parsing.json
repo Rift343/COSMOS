@@ -1,12 +1,21 @@
 {
     "table_name": [
-        "Personne"
+        {
+            "table_name": "Personne",
+            "use_name_table": "P"
+        }
     ],
     "columns": [
-        [
-            "Personne",
-            "ID"
-        ]
+        {
+            "use_name_table": "P",
+            "attribute_name": "id",
+            "use_name_attribute": "someIds"
+        },
+        {
+            "use_name_table": "P",
+            "attribute_name": "nom",
+            "use_name_attribute": "someNames"
+        }
     ],
     "conditions": "NULL",
     "status": true,
