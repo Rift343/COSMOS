@@ -115,7 +115,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
         }
 
         let temp_dic_table = TableDictionary {
-            table_name: TableNameCouple{
+            table: TableNameCouple{
                 table_name,
                 use_name_table: requested_table.use_name_table.clone(),
             },
@@ -181,7 +181,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                     // If the column is correct, then go over every requested table in our return variable
                     // And once we found the table to which our column belongs, then we add it to it
                     for table in &mut res_printable.tables {
-                        if table.table_name.table_name == corresponding_table {
+                        if table.table.table_name == corresponding_table {
                             let temp_couple = ColumnNameCouple {
                                 attribute_name: corresponding_column.clone(),
                                 use_name_attribute: requested_column.use_name_attribute.clone(),
@@ -204,7 +204,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
             for table in &mut res_printable.tables {
                 for table_metadata in &table_metadata_as_struct {
                     for column_couple in &table_metadata.columns {
-                        if table_metadata.table_name == table.table_name.table_name {
+                        if table_metadata.table_name == table.table.table_name {
                             let temp_couple = ColumnNameCouple {
                                 attribute_name: column_couple.column_name.clone(),
                                 // If * used, as we have no way of renaming individual attributes we just reuse the name

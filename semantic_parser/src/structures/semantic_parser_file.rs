@@ -11,7 +11,7 @@ pub struct ColumnNameCouple {
 /// Represents a dictionary where the key is the table_name, and the value being a vector of a ColumnTableNameCouple structure
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TableDictionary {
-    pub table_name: TableNameCouple,
+    pub table: TableNameCouple,
     pub columns: Vec<ColumnNameCouple>
 }
 
