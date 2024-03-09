@@ -137,7 +137,7 @@ pub(crate) fn replace_as (&mut self,dico:&HashMap<String,String>)
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
-pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
+pub(crate)fn csv_read_by_ligne(path_file:String,table_name:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
     let mut path:String = "./data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
@@ -161,7 +161,7 @@ pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<d
     let first_vec :Vec<&str>=csv_string.split(&separator_ligne).collect::<Vec<_>>();
     let mut final_vec: Vec<Vec<_>> = [first_vec[0].split(';').map(|x| x.to_string()).collect()].to_vec();
     for i in 0..final_vec[0].len(){
-        final_vec[0][i]= (path_file.clone()+"."+&final_vec[0][i]).to_string();
+        final_vec[0][i]= (table_name.clone()+"."+&final_vec[0][i]).to_string();
     }
     for ligne in 1..first_vec.len(){
         final_vec.push(first_vec[ligne].split(';').map(|x| x.to_string()).collect());
@@ -181,9 +181,9 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 
 #[allow(unused)]
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
-pub(crate)fn open_relation(pathcsv:String,name1:String)->Result<CSVFile,Box<dyn Error>>{
-    match csv_read_by_ligne(pathcsv){
-        Ok(res) => Ok(CSVFile { name:name1, descriptor: res }),
+pub(crate)fn open_relation(pathcsv:String,name1:&String)->Result<CSVFile,Box<dyn Error>>{
+    match csv_read_by_ligne(pathcsv,name1.to_string()){
+        Ok(res) => Ok(CSVFile { name:name1.to_string(), descriptor: res }),
         Err(e) => Err(e)
     }
     //let file:CSVFile = CSVFile { name:name1, descriptor:   };/*  = CSVFile { name: name1, descriptor:  } */;
@@ -197,7 +197,7 @@ mod tests {
     use super::*;
     #[test]
     fn test1(){
-        let res = open_relation("personneTest".to_string(), "R1".to_string());
+        let res = open_relation("personneTest".to_string(), &"R1".to_string());
         let mut a1 : CSVFile;
         match res {
             Ok(o) => a1 = o,
@@ -220,14 +220,14 @@ mod tests {
     #[should_panic]
     fn test_csv_read_ligne(){
         let a1 = "../data/CSV/personneTest.csv".to_string();
-        csv_read_by_ligne(a1).expect("TODO: panic message");
+        csv_read_by_ligne(a1,"personne".to_string()).expect("TODO: panic message");
 
     }
 
     #[test]
     fn test_cartesian() {
-        let mut a1 = open_relation("Personne".to_string(), "R1".to_string());
-        let a2 = open_relation("Personne".to_string(), "R1".to_string());
+        let mut a1 = open_relation("Personne".to_string(), &"R1".to_string());
+        let a2 = open_relation("Personne".to_string(), &"R1".to_string());
         match a1{
             Ok(ref mut res1) =>         match a2{
                 Ok(res2) => res1.cartesian_product(&res2),
