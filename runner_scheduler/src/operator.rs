@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::{fs::File, io::Read};
 use std::error::Error;
@@ -119,6 +120,16 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
         self.descriptor = operation_result;
     }
 
+pub(crate) fn replace_as (&mut self,dico:&HashMap<String,String>)
+{
+    for i in 0..self.descriptor[0].len()
+    {
+        if dico.contains_key(&self.descriptor[0][i].to_string())
+        {
+            self.descriptor[0][i]=dico[&self.descriptor[0][i].to_string()].to_string();
+        }
+    }
+}
 
 
 }
