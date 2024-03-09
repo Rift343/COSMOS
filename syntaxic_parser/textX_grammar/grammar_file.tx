@@ -14,7 +14,9 @@ ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
 String: /'[^']*'/ | /"[^"]*"/;
 
 RelationList: relation=Relation (',' relation=Relation)*;
-Relation: /[A-Za-z_][A-Za-z_0-9]*/;
+Relation: relationName=RELATION_NAME (space=SPACE alias=ID_NAME)?;
+RELATION_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
+SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
 ConditionList: condition=Condition ('AND' condition=Condition)*;

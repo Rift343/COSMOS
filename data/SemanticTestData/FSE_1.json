@@ -1,1 +1,1 @@
-{"tables":[{"table_name":"Personne","columns":[{"table_name":"Personne","column_name":"ID"}]}],"conditions":null,"status":true,"error":""}
+{"tables":[{"table":{"table_name":"Personne","use_name_table":"r1"},"columns":[{"attribute_name":"ID","use_name_attribute":"ident"},{"attribute_name":"NOM","use_name_attribute":"NOM"}]}],"conditions":null,"status":true,"error":""}

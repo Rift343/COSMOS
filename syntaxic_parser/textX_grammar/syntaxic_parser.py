@@ -17,22 +17,52 @@ def is_valid_sql(query):
             "error": ""
         }
 
-        if model.attributes:
-            # If the attribute is a "*"
-            if model.attributes.attribute==['*']:
-                result["columns"].append(["","*"])
-            else:
-                # If there is a list of attributes
-                for attr in model.attributes.attribute:
-                    result["columns"].append(["",attr.attributeName])
-
-
         if model.relations:
             # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
             for relation in model.relations.relation:
-                result["table_name"].append(relation)
-                for col in result["columns"]:
-                    col[0] = relation
+                table_name = {
+                    "table_name": relation.relationName,
+                    "use_name_table": ""
+                }
+
+                if relation.alias :
+                    table_name["use_name_table"] = relation.alias
+                else :
+                    table_name["use_name_table"] = relation.relationName
+
+                result["table_name"].append(table_name)
+
+
+
+        if model.attributes:
+
+            # If the attribute is a "*"
+            if model.attributes.attribute==['*']:
+                columns = {
+                    "use_name_table": result["table_name"][0]["use_name_table"],
+                    "attribute_name": "*",
+                    "use_name_attribute": "*"
+                }
+
+                result["columns"].append(columns)
+
+            else:
+                # If there is a list of attributes
+                for attribute in model.attributes.attribute:
+
+                    columns = {
+                        "use_name_table": result["table_name"][0]["use_name_table"],
+                        "attribute_name": attribute.attributeName,
+                        "use_name_attribute": ""
+                    }
+
+                    if attribute.alias :
+                        columns["use_name_attribute"] = attribute.alias
+                    else :
+                        columns["use_name_attribute"] = attribute.attributeName
+
+                    result["columns"].append(columns)
+
 
         # Conditions are not handled for the time being
         result["conditions"] = "NULL"

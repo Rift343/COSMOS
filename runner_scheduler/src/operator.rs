@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::{fs::File, io::Read};
 use std::error::Error;
@@ -241,6 +242,8 @@ pub(crate)fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
+    //println!("{:?}",self.to_string());
+    //println!("{:?}",list_attribute);
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){
             transpose.push(Vec::new());
@@ -299,6 +302,17 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
         self.descriptor = operation_result;
     }
 
+pub(crate) fn replace_as (&mut self,dico:&HashMap<String,String>)
+{
+    for i in 0..self.descriptor[0].len()
+    {
+        if dico.contains_key(&self.descriptor[0][i].to_string())
+        {
+            self.descriptor[0][i]=dico[&self.descriptor[0][i].to_string()].to_string();
+        }
+    }
+}
+
 #[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
 pub(crate)fn union(&mut self,union_csv:&CSVFile)
 {
@@ -317,12 +331,13 @@ pub(crate)fn union(&mut self,union_csv:&CSVFile)
 
 
 
+
 }
 
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
-pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
+pub(crate)fn csv_read_by_ligne(path_file:String,table_name:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
     let mut path:String = "./data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
@@ -346,7 +361,7 @@ pub(crate)fn csv_read_by_ligne(path_file:String)-> Result<Vec<Vec<String>>,Box<d
     let first_vec :Vec<&str>=csv_string.split(&separator_ligne).collect::<Vec<_>>();
     let mut final_vec: Vec<Vec<_>> = [first_vec[0].split(';').map(|x| x.to_string()).collect()].to_vec();
     for i in 0..final_vec[0].len(){
-        final_vec[0][i]= (path_file.clone()+"."+&final_vec[0][i]).to_string();
+        final_vec[0][i]= (table_name.clone()+"."+&final_vec[0][i]).to_string();
     }
     for ligne in 1..first_vec.len(){
         final_vec.push(first_vec[ligne].split(';').map(|x| x.to_string()).collect());
@@ -366,9 +381,9 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 
 #[allow(unused)]
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
-pub(crate)fn open_relation(pathcsv:String,name1:String)->Result<CSVFile,Box<dyn Error>>{
-    match csv_read_by_ligne(pathcsv){
-        Ok(res) => Ok(CSVFile { name:name1, descriptor: res }),
+pub(crate)fn open_relation(pathcsv:String,name1:&String)->Result<CSVFile,Box<dyn Error>>{
+    match csv_read_by_ligne(pathcsv,name1.to_string()){
+        Ok(res) => Ok(CSVFile { name:name1.to_string(), descriptor: res }),
         Err(e) => Err(e)
     }
     //let file:CSVFile = CSVFile { name:name1, descriptor:   };/*  = CSVFile { name: name1, descriptor:  } */;
@@ -455,7 +470,7 @@ mod tests {
 
     #[test]
     fn test1(){
-        let res = open_relation("personneTest".to_string(), "R1".to_string());
+        let res = open_relation("personneTest".to_string(), &"R1".to_string());
         let mut a1 : CSVFile;
         match res {
             Ok(o) => a1 = o,
@@ -490,15 +505,16 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_csv_read_ligne(){
-        let a1 = "./data/CSV/personneTest.csv".to_string();
-        csv_read_by_ligne(a1).expect("TODO: panic message");
+        let a1 = "../data/CSV/personneTest.csv".to_string();
+        csv_read_by_ligne(a1,"personne".to_string()).expect("TODO: panic message");
+
 
     }
 
     #[test]
     fn test_cartesian() {
-        let mut a1 = open_relation("personneTest".to_string(), "R1".to_string());
-        let a2 = open_relation("personneTest".to_string(), "R1".to_string());
+        let mut a1 = open_relation("Personne".to_string(), &"R1".to_string());
+        let a2 = open_relation("Personne".to_string(), &"R1".to_string());
         match a1{
             Ok(ref mut res1) =>         match a2{
                 Ok(res2) => {

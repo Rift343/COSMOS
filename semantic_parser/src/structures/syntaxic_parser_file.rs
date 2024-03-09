@@ -1,15 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use super::column_table_name_couple::ColumnTableNameCouple;
+use super::column_table_name_triple::ColumnTableNameTriple;
+use super::table_name_couple::TableNameCouple;
 
 
 /// Structure representing the Syntaxic Parser File, which is a dictionary with four keys : table_name, columns, status and error
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SyntaxicParserFile {
     /// Vector of all the requested table names bundled together
-    pub table_name: Vec<String>,
+    pub table_name: Vec<TableNameCouple>,
     /// Vector of all the requested columns, which we can't yet associate to their table name
-    pub columns: Vec<ColumnTableNameCouple>,
+    pub columns: Vec<ColumnTableNameTriple>,
     /// Status of the result, set to true if no errors occurred, else false, in which case the error field is filled out
     /// Set to optional to later allow to easily get rid of it
     status: Option<bool>,
