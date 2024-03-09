@@ -399,7 +399,7 @@ mod tests {
     #[test]
     fn test_count()
     {
-        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.ID".to_string();
         let test = table1.count(&path_str);
         let value:u128 = test[1].parse().unwrap();
@@ -410,7 +410,7 @@ mod tests {
     #[test]
     fn test_sum()
     {
-        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
         let type_str = "INTEGER".to_string();
         let test = table1.sum(&path_str, &type_str);
@@ -422,7 +422,7 @@ mod tests {
     #[test]
     fn test_min()
     {
-        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
         let type_str = "INTEGER".to_string();
         let test = table1.min(&path_str, &type_str);
@@ -434,7 +434,7 @@ mod tests {
     #[test]
     fn test_max()
     {
-        let table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
+        let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
         let type_str = "INTEGER".to_string();
         let test = table1.max(&path_str, &type_str);
@@ -448,8 +448,8 @@ mod tests {
     #[test]
     fn test_union()
     {
-        let mut table1 = open_relation("personneTest".to_string(), "R1".to_string()).expect("Error");
-        let table2 = open_relation("personneTest2".to_string(), "R2".to_string()).expect("Error");
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let table2 = open_relation("personneTest2".to_string(), &"personneTest2".to_string()).expect("Error");
         table1.union(&table2);
         let str = table1.to_string();
         //print!("{}",str);
@@ -470,7 +470,7 @@ mod tests {
 
     #[test]
     fn test1(){
-        let res = open_relation("personneTest".to_string(), &"R1".to_string());
+        let res = open_relation("personneTest".to_string(), &"personneTest".to_string());
         let mut a1 : CSVFile;
         match res {
             Ok(o) => a1 = o,
@@ -513,13 +513,14 @@ mod tests {
 
     #[test]
     fn test_cartesian() {
-        let mut a1 = open_relation("Personne".to_string(), &"R1".to_string());
-        let a2 = open_relation("Personne".to_string(), &"R1".to_string());
+        let mut a1 = open_relation("personneTest".to_string(), &"personneTest".to_string());
+        let a2 = open_relation("personneTest".to_string(), &"personneTest".to_string());
         match a1{
             Ok(ref mut res1) =>         match a2{
                 Ok(res2) => {
                                         res1.cartesian_product(&res2);
                                         let val =res1.to_string();
+                                        //println!("{}",val);
                                         let mut val2 = File::open("./data/expectedFile/testCartesian.csv").expect("error");
                                         let mut str_compare=String::new();
                                         let _ = val2.read_to_string(&mut str_compare).expect("Error");
