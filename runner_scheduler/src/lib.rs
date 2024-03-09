@@ -39,10 +39,13 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
             my_str.push_str(&parse_json["tables"][i]["columns"][y]["attribute_name"].to_string());
             //println!("{}",my_str);
             intermediary_vector.push(my_str.clone());
-            let mut as_str = parse_json["tables"][i]["table"]["use_name_table"].to_string();
-            as_str.push('.');
-            as_str.push_str(&parse_json["tables"][i]["columns"][y]["use_name_attribute"].to_string());
-            as_hashmap.insert(my_str.clone(), as_str.clone());
+            if parse_json["tables"][i]["columns"][y]["use_name_attribute"] !=parse_json["tables"][i]["columns"][y]["attribute_name"]
+            {
+                let mut as_str = "".to_string();//parse_json["tables"][i]["table"]["use_name_table"].to_string();
+                //as_str.push('.');
+                as_str.push_str(&parse_json["tables"][i]["columns"][y]["use_name_attribute"].to_string());
+                as_hashmap.insert(my_str.clone(), as_str.clone());
+            }
             final_proj.push(my_str);
             
 
@@ -80,6 +83,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
+    println!("{:?}",as_hashmap);
     a1.replace_as(&as_hashmap);
     Ok (a1.to_file()?)
 }
