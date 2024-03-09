@@ -11,3 +11,4 @@ authors = ["Conrath Matthieu"]
 [dependencies]
 csv = "1.3.0"
 json = "0.12.4"
+same-file = "1"

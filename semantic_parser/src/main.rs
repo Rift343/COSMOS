@@ -21,11 +21,12 @@ fn main() {
         res
     };
 
+
     let mut temp: String = String::new();
 
     println!("Pre-finished");
 
-    out_file.read_to_string(& mut temp).expect("");
+    out_file.expect("REASON").read_to_string(& mut temp).expect("");
 
     println!("{}", temp);
 
