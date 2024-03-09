@@ -12,7 +12,7 @@ use structures::semantic_parser_file::TableDictionary;
 
 use structures::table_metadata::TableMetadata;
 
-use structures::column_table_name_couple::ColumnTableNameCouple;
+use structures::column_table_name_triple::ColumnTableNameTriple;
 
 /// # Retrieves table metadata stored at a given path
 ///
@@ -162,7 +162,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                     // And once we found the table to which our column belongs, then we add it to it
                     for table in &mut res_printable.tables {
                         if table.table_name == corresponding_table {
-                            let temp_couple = ColumnTableNameCouple {
+                            let temp_couple = ColumnTableNameTriple {
                                 table_name: corresponding_table.clone(),
                                 column_name: corresponding_column.clone(),
                             };
@@ -185,7 +185,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                 for table_metadata in &table_metadata_as_struct {
                     for column_couple in &table_metadata.columns {
                         if table_metadata.table_name == table.table_name {
-                            let temp_couple = ColumnTableNameCouple {
+                            let temp_couple = ColumnTableNameTriple {
                                 table_name: table.table_name.clone(),
                                 column_name: column_couple.column_name.clone(),
                             };
