@@ -13,7 +13,6 @@ use structures::semantic_parser_file::TableDictionary;
 
 use structures::table_metadata::TableMetadata;
 
-use structures::column_table_name_triple::ColumnTableNameTriple;
 use crate::structures::semantic_parser_file::ColumnNameCouple;
 use crate::structures::table_name_couple::TableNameCouple;
 
@@ -110,7 +109,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
         println!("Tables requested : {:?}\tActual name {}\tRenamed name : {}\tFound : {}", requested_table, table_name, requested_table.use_name_table.clone() ,found_table);
 
-        if (! found_table){
+        if ! found_table {
             return Err(Box::from(format!("Requested table not found : {}\n", table_name)));
         }
 

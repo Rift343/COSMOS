@@ -7,14 +7,14 @@
   ],
   "columns": [
     {
-      "table_name": "Piuuuu",
-      "attribute_name": "ID",
-      "use_name_attribute": "ID"
+      "use_name_table": "Piuuuu",
+      "attribute_name": "Id",
+      "use_name_attribute": "Not an ID"
     },
     {
-      "table_name": "Piuuuu",
+      "use_name_table": "Piuuuu",
       "attribute_name": "NOM",
-      "use_name_attribute": "NOM"
+      "use_name_attribute": "AAAAAAAH"
     }
   ]
 }
