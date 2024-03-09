@@ -2,19 +2,14 @@
     "table_name": [
         {
             "table_name": "Personne",
-            "use_name_table": "P"
+            "use_name_table": "R1"
         }
     ],
     "columns": [
         {
-            "use_name_table": "P",
-            "attribute_name": "id",
-            "use_name_attribute": "someIds"
-        },
-        {
-            "use_name_table": "P",
-            "attribute_name": "nom",
-            "use_name_attribute": "someNames"
+            "use_name_table": "R1",
+            "attribute_name": "ID",
+            "use_name_attribute": "identifiant"
         }
     ],
     "conditions": "NULL",
