@@ -1,14 +1,16 @@
 Model: SelectStatement;
 
 
-SelectStatement: 'SELECT' distinctOption=DistinctOption? attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
+SelectStatement: 'SELECT' attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
 
-
-DistinctOption: 'DISTINCT';
 
 AttributeList: attribute=Attribute (',' attribute=Attribute)* | attribute= '*';
-Attribute: attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
+Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
 IDENTIFIER: ID_NAME| String;
+DistinctOption: 'DISTINCT';
+
+AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME) ')' | aggregateName='COUNT(*)';
+AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
 ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
 String: /'[^']*'/ | /"[^"]*"/;

@@ -51,17 +51,45 @@ def is_valid_sql(query):
                 for attribute in model.attributes.attribute:
 
                     columns = {
-                        "use_name_table": result["table_name"][0]["use_name_table"],
-                        "attribute_name": attribute.attributeName,
+                        "use_name_table": "",
+                        "attribute_name": "",
                         "use_name_attribute": ""
                     }
 
+                    # if the attribute is an aggregate function
+                    if attribute.aggregate :
+                        columns["use_name_table"] = result["table_name"][0]["use_name_table"]
+
+                        if attribute.aggregate.aggregateName == "COUNT(*)" :
+                            columns["attribute_name"] = '*'
+                            #columns["attribute_name"] = attribute.aggregate.aggregateName
+                        else :
+                            columns["attribute_name"] = attribute.aggregate.attributeName
+                            #columns["attribute_name"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName +')'
+
+
+                    # if the attribute is a regular attribute
+                    else :
+                        columns["attribute_name"] = attribute.attributeName
+
+
+                    # If the table the attribute belongs to is specified
+                    if attribute.table :
+                        columns["use_name_table"] = attribute.table
+                    else :
+                        columns["use_name_table"] = result["table_name"][0]["use_name_table"]
+
+                    # If the attribute is renamed with AS
                     if attribute.alias :
                         columns["use_name_attribute"] = attribute.alias
                     else :
-                        columns["use_name_attribute"] = attribute.attributeName
+                        columns["use_name_attribute"] = columns["attribute_name"]
+
 
                     result["columns"].append(columns)
+
+                    #if attribute.distinctOption == "DISTINCT":
+                    #    result["conditions"] = "distinct" + columns["use_name_attribute"]
 
 
         # Conditions are not handled for the time being
