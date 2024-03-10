@@ -14,6 +14,9 @@ pub fn request_receiver() -> Result<String,Box<dyn Error>> {
     io::stdin()
         .read_line(&mut request)?;
 
+    if request.len() > 0 {
+        request.pop();
+    }
     Ok(request)
 }
 
