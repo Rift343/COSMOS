@@ -1,4 +1,14 @@
 {
-    "status": false,
-    "error": "Syntax Error line 1, row 25: Expected EOF"
+    "table_name": [
+        "Personne"
+    ],
+    "columns": [
+        [
+            "Personne",
+            "ID"
+        ]
+    ],
+    "conditions": "NULL",
+    "status": true,
+    "error": "NULL"
 }
