@@ -14,10 +14,10 @@ pub fn request_receiver() -> Result<String,Box<dyn Error>> {
     io::stdin()
         .read_line(&mut request)?;
 
-    if request.len() > 0 {
-        request.pop();
-    }
-    Ok(request)
+    let request_without_n = request.trim_end_matches('\n').to_string();
+    let request_without_nr = request_without_n.trim_end_matches('\r').to_string();
+
+    Ok(request_without_nr)
 }
 
 pub fn result_printer(result: String){

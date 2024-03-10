@@ -17,7 +17,7 @@ pub fn csv_to_string(mut file_name : &File) -> Result<String, Box<dyn std::error
     
     let mut buf = String::new();
     let mut my_buffreader = BufReader::new(file_name);
-    my_buffreader.read_to_string(&mut buf).expect("eror)");
+    my_buffreader.read_to_string(&mut buf).expect("error)");
     /* 
     let mut res = String::new();
     //ouverture du reader
