@@ -12,8 +12,8 @@ use semantic_parser::semantic_parser;
 use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
 
 
-use view::error_printer;
-use view::request_receiver;
+//use view::error_printer;
+//use view::request_receiver;
 #[allow(unused)]
 use view::result_printer;
 

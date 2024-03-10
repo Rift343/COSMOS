@@ -9,7 +9,7 @@ fn handle_connection(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
     println!("Request: {}", String::from_utf8_lossy(&buffer));
     //we call the main program
-    let mut req = String::from_utf8_lossy(&buffer);
+    let req = String::from_utf8_lossy(&buffer);
     //req = req.replace("\n", "").into();
     let mut req_string = req.to_string();
     req_string.pop();
