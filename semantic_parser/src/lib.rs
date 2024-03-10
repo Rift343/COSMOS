@@ -1,6 +1,7 @@
 pub mod structures;
-mod error_creator;
 
+use std::collections::HashMap;
+use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
@@ -12,9 +13,8 @@ use structures::semantic_parser_file::TableDictionary;
 
 use structures::table_metadata::TableMetadata;
 
-use structures::column_table_name_couple::ColumnTableNameCouple;
-
-use error_creator::create_semantic_error;
+use crate::structures::semantic_parser_file::ColumnNameCouple;
+use crate::structures::table_name_couple::TableNameCouple;
 
 /// # Retrieves table metadata stored at a given path
 ///
@@ -50,7 +50,7 @@ fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
 /// Panics for file or JSON errors
 /// Does not panic for errors related to the syntaxic file, but as expected returns a semantic
 /// parser file with the reason for failure filled out
-pub fn semantic_parser(mut syntaxic_file: File) -> File {
+pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> {
     // Extract the file contents to a structure
     let syntaxic_file_content_as_struct: SyntaxicParserFile = {
         // File stores a str not structure, so we must first extract it before converting and put it
@@ -60,7 +60,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
 
             match syntaxic_file.read_to_string(&mut contents_of_file) {
                 Ok(_) => (),
-                Err(error) => panic!("Error : {}", error)
+                Err(error) => return Err(Box::try_from(error).unwrap())
             }
 
             contents_of_file
@@ -72,11 +72,13 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             Ok(content) => {
                 content
             }
-            Err(error) => panic!("Error : {}", error)
+            Err(error) => return Err(Box::try_from(error).unwrap())
         }
     };
 
     let table_metadata_as_struct: Vec<TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
+
+    let mut table_name_correspondent: HashMap<String, String> = HashMap::new();
 
     // Temporary variable to store what will be returned in the file
     // Done now due to the vector requiring allocating
@@ -94,17 +96,29 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
     // res_printable
     for requested_table in syntaxic_file_content_as_struct.table_name {
         let mut found_table = false;
+        let mut table_name = "".to_string();
 
         for table_metadata in &table_metadata_as_struct {
-            if table_metadata.table_name == requested_table {
+            if table_metadata.table_name.to_lowercase() == requested_table.table_name.to_lowercase() {
                 found_table = true;
+                table_name = table_metadata.table_name.clone();
+
+                table_name_correspondent.insert(requested_table.use_name_table.clone(), table_name.clone());
             }
         }
 
-        println!("Tables requested : {}\tFound : {}", requested_table, found_table);
+        println!("Tables requested : {:?}\tActual name {}\tRenamed name : {}\tFound : {}", requested_table, table_name, requested_table.use_name_table.clone() ,found_table);
+
+        if ! found_table {
+            return Err(Box::from(format!("Requested table not found : {}\n", table_name)));
+
+        }
 
         let temp_dic_table = TableDictionary {
-            table_name: requested_table,
+            table: TableNameCouple{
+                table_name,
+                use_name_table: requested_table.use_name_table.clone(),
+            },
             columns: vec![],
         };
 
@@ -124,20 +138,30 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
         let mut corresponding_column: String = "".to_string();
 
         // Put check here inside of loop, doesn't matter as either we have '*' and nothing else, or a list of attributes, never a mix of the two
-        if requested_column.column_name != "*" {
+        if requested_column.attribute_name != "*" {
             for table_metadata in &table_metadata_as_struct {
                 for column_couple in &table_metadata.columns {
+                    let corresponding_table_name = {
+                        let res;
+
+                        match table_name_correspondent.get(&requested_column.use_name_table.clone()) {
+                            None => return Err(Box::from(format!("Renamed table not found : {}\n", requested_column.use_name_table))),
+                            Some(name) => res = name
+                        };
+
+                        res.to_lowercase()
+                    };
                     // Both table and column name match
                     // OR if table name is empty then only match column name
-                    if ((requested_column.column_name == column_couple.column_name) && (requested_column.table_name == table_metadata.table_name))
+                    if ((requested_column.attribute_name.to_lowercase() == column_couple.column_name.to_lowercase()) && (corresponding_table_name == table_metadata.table_name.to_lowercase()))
                         ||
-                        (requested_column.table_name == "") {
+                        (corresponding_table_name == "") {
                         nb_found += 1;
                         if nb_found == 1 {
                             corresponding_table = table_metadata.table_name.clone();
                             corresponding_column = column_couple.column_name.clone();
                         }
-                    } else if (requested_column.column_name == "*") && (requested_column.table_name == table_metadata.table_name) {
+                    } else if (requested_column.attribute_name == "*") && (corresponding_table_name == table_metadata.table_name.to_lowercase()) {
                         corresponding_table = table_metadata.table_name.clone();
                         corresponding_column = column_couple.column_name.clone();
                         nb_found = 1;
@@ -145,22 +169,22 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
                 }
             }
 
-            println!("Requested column : {}.{}\t", requested_column.table_name, requested_column.column_name);
+            println!("Requested column : '{}.{}'\tActual : '{}.{}'", requested_column.use_name_table, requested_column.use_name_attribute, corresponding_table, corresponding_column);
 
 
             // React differently depending on how many occurrences for a better error messages
             match nb_found {
                 0 => {
-                    return create_semantic_error(format!("Column : {}.{}\nNot found", requested_column.table_name, requested_column.column_name));
+                    return Err(Box::from(format!("Column : '{}.{}'\tNon-Renamed : {}\nNot found", requested_column.use_name_table, requested_column.use_name_attribute, requested_column.attribute_name)))
                 }
                 1 => {
                     // If the column is correct, then go over every requested table in our return variable
                     // And once we found the table to which our column belongs, then we add it to it
                     for table in &mut res_printable.tables {
-                        if table.table_name == corresponding_table {
-                            let temp_couple = ColumnTableNameCouple {
-                                table_name: corresponding_table.clone(),
-                                column_name: corresponding_column.clone(),
+                        if table.table.table_name == corresponding_table {
+                            let temp_couple = ColumnNameCouple {
+                                attribute_name: corresponding_column.clone(),
+                                use_name_attribute: requested_column.use_name_attribute.clone(),
                             };
 
                             table.columns.push(temp_couple);
@@ -169,7 +193,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
                 }
                 // Any number of occurrences beyond 1 is handled identically, all are ambiguous
                 _ => {
-                    return create_semantic_error(format!("Column : {}.{}\nAmbiguous request, multiple occurrences in requested table list.", requested_column.table_name, requested_column.column_name));
+                    return Err(Box::from(format!("Column : '{}.{}'\nAmbiguous request, multiple occurrences in requested table list.", requested_column.use_name_table, requested_column.use_name_attribute)))
                 }
             }
         }
@@ -180,10 +204,11 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
             for table in &mut res_printable.tables {
                 for table_metadata in &table_metadata_as_struct {
                     for column_couple in &table_metadata.columns {
-                        if table_metadata.table_name == table.table_name {
-                            let temp_couple = ColumnTableNameCouple {
-                                table_name: table.table_name.clone(),
-                                column_name: column_couple.column_name.clone(),
+                        if table_metadata.table_name == table.table.table_name {
+                            let temp_couple = ColumnNameCouple {
+                                attribute_name: column_couple.column_name.clone(),
+                                // If * used, as we have no way of renaming individual attributes we just reuse the name
+                                use_name_attribute: column_couple.column_name.clone(),
                             };
 
                             table.columns.push(temp_couple);
@@ -208,5 +233,5 @@ pub fn semantic_parser(mut syntaxic_file: File) -> File {
     output_semantic_file.write_all(output_semantic_file_as_str.as_bytes()).expect("Error occurred whilst writing to semantic output file.");
     output_semantic_file.seek(SeekFrom::Start(0)).expect("Error whilst seeking in semantic output file.");
 
-    output_semantic_file
+    Ok(output_semantic_file)
 }

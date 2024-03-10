@@ -17,10 +17,6 @@ Cargo.lock
 */.idea/
 */.vscode/
 
-#test CSV file
-*test.csv
-*Test.csv
-test.csv
 
 #result file
 data/transferFile/result.csv

@@ -1,3 +1,4 @@
+
 //use std::fs::File;
 //use std::io::{Read, Seek};
 //use serde_json::Value::String;
@@ -12,19 +13,12 @@ use std::string::String;
 //use semantic_parser::structures::semantic_parser_file::SemanticParserFile;
 //use engine::csv_to_string;
 use engine::process_request;
+
 use view::error_printer;
 use view::request_receiver;
-#[allow(unused)]
-use view::result_printer;
+//use view::result_printer;
 
 fn main() {
-    /*
-
-    Basic plan :
-
-    TODO : Call view for request
-
-*/
 
     // -----------------------------------------------------
     // ----------------------- View ------------------------
@@ -54,7 +48,9 @@ fn main() {
         Err(e) => error_printer(e)
 
     }
+
 */
+
 }
 
 

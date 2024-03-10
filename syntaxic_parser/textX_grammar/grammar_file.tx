@@ -1,20 +1,24 @@
 Model: SelectStatement;
 
 
-SelectStatement: 'SELECT' distinctOption=DistinctOption? attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
+SelectStatement: 'SELECT' attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
 
-
-DistinctOption: 'DISTINCT';
 
 AttributeList: attribute=Attribute (',' attribute=Attribute)* | attribute= '*';
-Attribute: attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
+Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
 IDENTIFIER: ID_NAME| String;
+DistinctOption: 'DISTINCT';
+
+AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME) ')' | aggregateName='COUNT(*)';
+AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
 ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
 String: /'[^']*'/ | /"[^"]*"/;
 
 RelationList: relation=Relation (',' relation=Relation)*;
-Relation: /[A-Za-z_][A-Za-z_0-9]*/;
+Relation: relationName=RELATION_NAME (space=SPACE alias=ID_NAME)?;
+RELATION_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
+SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
 ConditionList: condition=Condition ('AND' condition=Condition)*;

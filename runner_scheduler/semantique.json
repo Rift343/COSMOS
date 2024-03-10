@@ -1,11 +1,24 @@
 {
-"tables":[
-{"table_name":"Personne",
-"columns":[["Personne","ID"],["Personne","NOM"]]
-},{"table_name":"Personne2",
-"columns":[["Personne2","ID"],["Personne2","NOM"]]
-}],
-
-"conditions":null,
-"status":true
+    "tables": [
+        {
+            "table": {
+                "table_name": "Personne",
+                "use_name_table": "Piuuuu"
+            },
+            "columns": [
+                {
+                    "attribute_name": "ID",
+                    "use_name_attribute": "Not an ID"
+                },
+                {
+                    "attribute_name": "NOM",
+                    "use_name_attribute": "AAAAAAAH"
+                }
+            ]
+        }
+    ],
+    "conditions": null,
+    "status": true,
+    "error": ""
 }
+

@@ -8,7 +8,19 @@ fn main() {
     let in_file = File::options().read(true).write(true).create(true).open(fs1_filename).expect("Erreur lors de création de out_file");
 
 
-    let mut out_file = semantic_parser(in_file);
+    let mut out_file = {
+        let res ;
+        match semantic_parser(in_file) {
+            Ok(c) => res = c,
+            Err(err) => {
+                eprintln!("{}", err);
+                return
+            }
+        };
+
+        res
+    };
+
 
     let mut temp: String = String::new();
 

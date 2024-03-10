@@ -30,23 +30,33 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
-
+    let mut as_hashmap: HashMap<String,String> = HashMap::new();
     for i in 0..parse_json["tables"].len(){
         let mut intermediary_vector:Vec<String>=Vec::new();
         for y in 0..parse_json["tables"][i]["columns"].len(){
-            let mut my_str:String = parse_json["tables"][i]["columns"][y]["table_name"].to_string();//We rename immediatly the columns for more simplicity in the next operation (for the future we need to search a methode to apply the rename of the user ( key word 'as'))
+            let mut my_str:String = parse_json["tables"][i]["table"]["use_name_table"].to_string();//We rename immediatly the columns for more simplicity in the next operation (for the future we need to search a methode to apply the rename of the user ( key word 'as'))
             my_str.push('.');
-            my_str.push_str(&parse_json["tables"][i]["columns"][y]["column_name"].to_string());
+            my_str.push_str(&parse_json["tables"][i]["columns"][y]["attribute_name"].to_string());
+            //println!("{}",my_str);
             intermediary_vector.push(my_str.clone());
-            final_proj.push(my_str); 
+            if parse_json["tables"][i]["columns"][y]["use_name_attribute"] !=parse_json["tables"][i]["columns"][y]["attribute_name"]
+            {
+                let mut as_str = "".to_string();//parse_json["tables"][i]["table"]["use_name_table"].to_string();
+                //as_str.push('.');
+                as_str.push_str(&parse_json["tables"][i]["columns"][y]["use_name_attribute"].to_string());
+                as_hashmap.insert(my_str.clone(), as_str.clone());
+            }
+            final_proj.push(my_str);
+            
+
         }
-        key.push(parse_json["tables"][i]["table_name"].to_string());
+        key.push(parse_json["tables"][i]["table"]["use_name_table"].to_string());
         //println!("{:?}",intermediary_vector);
-        //println!("{}",parse_json["table"][i]["table_name"]);
-        println!("{}",parse_json["tables"][i]["table_name"].to_string());
-        let mut open_file:CSVFile = operator::open_relation(parse_json["tables"][i]["table_name"].to_string(), parse_json["tables"][i]["table_name"].to_string())?;//.expect("error");//We open each relation
+        //println!("{}",parse_json["tables"][i]["table"]["table_name"].to_string());
+        //println!("{:?}",as_hashmap);
+        let mut open_file:CSVFile = operator::open_relation(parse_json["tables"][i]["table"]["table_name"].to_string(), &parse_json["tables"][i]["table"]["use_name_table"].to_string())?;//.expect("error");//We open each relation
         open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
-        dictionnary.insert(parse_json["tables"][i]["table_name"].to_string(),open_file);//We insert the projected file in a dictionnary
+        dictionnary.insert(parse_json["tables"][i]["table"]["use_name_table"].to_string(),open_file);//We insert the projected file in a dictionnary
 
     }
     // Now we need to do the cartesian product on all the relation use in the request. For this we made the cartesian product on the first open file.
@@ -73,6 +83,8 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
+    println!("{:?}",as_hashmap);
+    a1.replace_as(&as_hashmap);
     Ok (a1.to_file()?)
 }
 
@@ -105,10 +117,14 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_on_json(){
         let fichier_json_test:std::fs::File = File::open("semantique.json").expect("Error ==> Can't read the JSON file");
-        let _ =scheduler(&fichier_json_test);
+        let _a = match scheduler(&fichier_json_test)  {
+            Ok(_) => print!("ok"),
+            Err(e) => println!("{}",e),
+        };
+        
+
     }
 }
 
