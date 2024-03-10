@@ -9,4 +9,4 @@ cargo add csv
 
 
 To use the server-client, the server need to be run with : "cargo run --bin server"
-When the server is running, you can launch the client with the binary ./target/debug/client
+When the server is running, you can launch the client with "cargo run --bin client"

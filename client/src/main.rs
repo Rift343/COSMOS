@@ -16,6 +16,7 @@ fn main() -> std::io::Result<()> {
     let mut msg = String::new();
     std::io::stdin().read_line(&mut msg)?;
     // we write the message to the server
+    println!("Sending: '{}'", msg);
     stream.write(msg.as_bytes())?;
     let mut buffer = [0; 512];
     // we read the response from the server
