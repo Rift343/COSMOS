@@ -9,8 +9,8 @@ fn handle_connection(mut stream: TcpStream) {
     stream.read(&mut buffer).unwrap();
     println!("Request: {}", String::from_utf8_lossy(&buffer));
     //we call the main program
-    let req = String::from_utf8_lossy(&buffer);
-
+    let mut req = String::from_utf8_lossy(&buffer);
+    //req = req.replace("\n", "\0").into();
     let result = process_request(req.to_string()).to_string();
     println!("Responding with: {}", result);
     //let msg = b"Hello, my name is server!";
