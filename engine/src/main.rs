@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Seek};
+use std::process::exit;
 use serde_json::Value;
 use std::string::String;
 
@@ -15,7 +16,7 @@ use view::request_receiver;
 use view::result_printer;
 
 fn main() {
-    let mut run = true;
+    let run = true;
     while run
     {
         let req_receiver = request_receiver();
@@ -24,8 +25,9 @@ fn main() {
             Ok(request) =>
                 {
                 if request == "exit".to_string() {
-                    run = false;
+                    //run = false;
                     result_printer("Another stellar performance! 🌟".to_string());
+                    exit(0);
                 }
                 else{
                     match engine(request)
@@ -115,7 +117,7 @@ fn engine(request : String) ->Result<std::string::String, Box<(dyn std::error::E
              printable_string=csv_to_string(&content);
              match printable_string {//Seconde math when the result string from the CSV File
                  Ok(content) => {
-                     println!("{}",content);
+                     //println!("{}",content);
                      return Ok(content);
                  },
 
