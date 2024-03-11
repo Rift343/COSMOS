@@ -8,6 +8,5 @@ members = [
 	"view",
 	"semantic_parser",
 	"syntaxic_parser",
-	"server","client"
 
 ]
