@@ -28,6 +28,18 @@ pub(crate) struct CSVFile{
 
 impl CSVFile {
 
+#[doc = "Method to add a column on a table when we use a agregate methode (SUM,MIN,MAX...)\n"]
+pub(crate) fn add_column_for_agregate(&mut self,column:&Vec<String>)
+{
+    self.descriptor[0].push(column[0].to_string());
+    for i in 1..self.descriptor.len()
+    {
+        self.descriptor[i].push(column[0].to_string());
+    }
+} 
+
+
+
 pub(crate)fn set_name(&mut self, name:&String)
 {
     self.name = name.to_string();
@@ -39,6 +51,7 @@ pub(crate)fn set_descriptor(&mut self, list_data:&Vec<String>)
     vec1.push(list_data.to_vec());
     self.descriptor = vec1;
 }
+
 
 #[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
 return a Vec of string with the name of the attribute and the value of the COUNT.
