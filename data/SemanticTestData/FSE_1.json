@@ -1,1 +1,2 @@
-{"tables":[{"table":{"table_name":"Personne","use_name_table":"Personne"},"columns":[{"attribute_name":"ID","use_name_attribute":"ID"},{"attribute_name":"NOM","use_name_attribute":"NOM"},{"attribute_name":"PRENOM","use_name_attribute":"PRENOM"}]}],"conditions":null,"status":true,"error":""}
+{"tables":[{"table":{"table_name":"Personne","use_name_table":"personne"},"columns":[{"attribute_name":"ID","use_name_attribute":"id"}]}],"conditions":null,"status":true,"error":""}
+

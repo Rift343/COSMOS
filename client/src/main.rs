@@ -61,8 +61,6 @@ fn receive_response(mut stream: &TcpStream) -> io::Result<String> {
     Ok(response)
 }
 
-    
-
 fn main() -> std::io::Result<()> {
     // Resolve the address and connect to the server
     let hostname = "pavieroutaboul.fr"; //
