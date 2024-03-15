@@ -50,27 +50,12 @@ fn engine(request : String) ->Result<std::string::String, Box<(dyn std::error::E
      // -----------------------------------------------------
 
      // Call the syntaxic parser and get file handle for the syntaxic parsing file
-     let mut syntaxic_parsing_handle : File = syntaxic_parser(request);
-
-     // Read the file and put its contents into a String
-     let mut syntaxic_parsing_content: std::string::String = Default::default();
-     syntaxic_parsing_handle.read_to_string(&mut syntaxic_parsing_content).expect("Error: Unable to read syntaxic parsing file");
-
-     // Convert to a serde_json Value type
-     let parsing_value : Value = serde_json::from_str(&*syntaxic_parsing_content).expect("Error: Unable to turn JSON String into Value type");
-
-     // Show "status" and "error" fields
-     println!("Status : {}\nError : {}\n",parsing_value["status"], parsing_value["error"]);
-     if parsing_value["status"]=="false" {
-         // Print for now, should send to the view later (result_printer)
-         println!("{}",parsing_value["error"]);
-     }
-     else {
-         // Print for now, should be given to the semantic parser later
-         println!("{:?}",syntaxic_parsing_handle);
-     }
-
-     syntaxic_parsing_handle.rewind().expect("Aled");
+     let syntaxic_parsing_handle : File = match syntaxic_parser(request){
+         Ok(file) => file,
+         Err(error) => {
+             return Err(error);
+         }
+     };
 
      // -----------------------------------------------------
      // ------------------ Syntaxic Parser ------------------
