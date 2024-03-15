@@ -1,6 +1,5 @@
 use std::{fs::File, io::{BufReader, Read, Seek}};
 use std::error::Error;
-use std::process::exit;
 use serde_json::Value;
 use std::string::String;
 
@@ -10,9 +9,6 @@ use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
 //use engine::csv_to_string;
 
-use view::error_printer;
-use view::request_receiver;
-use view::result_printer;
 
 //use csv::Reader;
 /* 
