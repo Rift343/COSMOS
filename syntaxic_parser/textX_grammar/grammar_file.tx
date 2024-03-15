@@ -5,15 +5,16 @@ SelectStatement: 'SELECT' attributes=AttributeList 'FROM' relations=RelationList
 
 
 AttributeList: attribute=Attribute (',' attribute=Attribute)* | attribute= '*';
-Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
-IDENTIFIER: ID_NAME| String;
+Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | staticAttribute=STATIC_ATTRIBUTE | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
+IDENTIFIER: ID_NAME| STRING;
 DistinctOption: 'DISTINCT';
 
 AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME) ')' | aggregateName='COUNT(*)';
 AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
 ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
-String: /'[^']*'/ | /"[^"]*"/;
+STRING: /'[^']*'/ | /"[^"]*"/;
+STATIC_ATTRIBUTE: STRING | INT;
 
 RelationList: relation=Relation (',' relation=Relation)*;
 Relation: relationName=RELATION_NAME (space=SPACE alias=ID_NAME)?;
