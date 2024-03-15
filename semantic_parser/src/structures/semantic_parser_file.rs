@@ -1,12 +1,18 @@
 use serde::{Deserialize, Serialize};
+use crate::structures::table_name_couple::TableNameCouple;
 
-use super::column_table_name_couple::ColumnTableNameCouple;
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ColumnNameCouple {
+    pub attribute_name: String,
+    pub use_name_attribute: String
+}
+
 
 /// Represents a dictionary where the key is the table_name, and the value being a vector of a ColumnTableNameCouple structure
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TableDictionary {
-    pub table_name: String,
-    pub columns: Vec<ColumnTableNameCouple>
+    pub table: TableNameCouple,
+    pub columns: Vec<ColumnNameCouple>
 }
 
 /// Structure representing the contents of the Semantic Parser File, being a dictionary with four keys : tables, conditions, status and error

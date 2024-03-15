@@ -1,14 +1,19 @@
 {
     "table_name": [
-        "Personne"
+        {
+            "table_name": "personne",
+            "use_name_table": "personne"
+        }
     ],
     "columns": [
-        [
-            "Personne",
-            "ID"
-        ]
+        {
+            "use_name_table": "personne",
+            "attribute_name": "id",
+            "use_name_attribute": "id"
+        }
     ],
     "conditions": "NULL",
     "status": true,
     "error": "NULL"
+
 }
