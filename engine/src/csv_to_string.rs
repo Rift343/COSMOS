@@ -81,7 +81,13 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // -----------------------------------------------------
 
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
-    let mut syntaxic_parsing_handle : File = syntaxic_parser(request);
+    let mut syntaxic_parsing_handle : File = match syntaxic_parser(request){
+        Ok(file) => file,
+        Err(error) => {
+            println!("{}", error.to_string());
+            return Err(error);
+        }
+    };
 
     // Read the file and put its contents into a String
     let mut syntaxic_parsing_content: std::string::String = Default::default();
