@@ -17,6 +17,9 @@ Cargo.lock
 */.idea/
 */.vscode/
 
+#We ignore the log.txt file as anyone can modify that and it is not relevant to update it
+log.txt
+
 
 #result file
 data/transferFile/result.csv
