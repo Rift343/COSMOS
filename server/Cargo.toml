@@ -1,0 +1,15 @@
+[package]
+name = "server"
+version = "0.0.1"
+edition = "2021"
+authors = ["Pavie Routaboul Clément"]
+
+[dependencies]
+engine={path= "../engine" }
+
+
+[lib]
+name = "server"
+path = "src/server.rs"
+
+
