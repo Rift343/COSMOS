@@ -62,9 +62,24 @@ fn receive_response(mut stream: &TcpStream) -> io::Result<String> {
 }
 
 fn main() -> std::io::Result<()> {
+    // Ask the user if they want to change the hostname
+    println!("Do you want to change the hostname? (y/n)");
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input)?;
+
+    let hostname = if input.trim() == "y" {
+        // Read the user input for the hostname
+        println!("Enter the hostname:");
+        let mut hostname = String::new();
+        std::io::stdin().read_line(&mut hostname)?;
+        hostname.trim().to_string()
+    } else {
+        // Use the default hostname
+        "pavieroutaboul.fr".to_string()
+    };
+
     // Resolve the address and connect to the server
-    let hostname = "pavieroutaboul.fr"; //
-    let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+    let ips: Vec<std::net::IpAddr> = lookup_host(&hostname).unwrap();
     println!("IPs for {}: {:?}", hostname, ips);
     let ip = ips[0];
     let ip_str = ip.to_string();
@@ -72,6 +87,7 @@ fn main() -> std::io::Result<()> {
 
     // Connect to the server
     let stream = TcpStream::connect(addr)?;
+
     // Ask the user for input
     println!("Enter a message to send to the server (type 'exit' to quit):");
 
@@ -82,6 +98,8 @@ fn main() -> std::io::Result<()> {
         // Check if the user wants to exit
         if msg.trim() == "exit" {
             println!("Exiting...");
+            // Cleanly close the stream
+            stream.shutdown(std::net::Shutdown::Both)?;
             break;
         }
 
