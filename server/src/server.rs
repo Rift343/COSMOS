@@ -29,7 +29,11 @@ fn handle_connection(mut stream: TcpStream) {
     let req = String::from_utf8_lossy(&buffer);
     let req_string = req.trim_end_matches(char::from(0)).to_string();
     println!("Request after processing: {}", req_string);
-    
+    let exit_string =String::from("exit\n") ;
+    if(req_string==exit_string){
+        println!("Le client nous abandonne");
+        return;
+    }
     // Writing the request to the log
     let res = write_log(&req_string, "./log.txt");
 

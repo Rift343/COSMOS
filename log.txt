@@ -2,3 +2,30 @@ select * from Personne;
 
 test
 
+exit
+
+
+exit
+
+
+exit
+
+exit
+
+exit
+
+exit
+
+exit
+
+exit
+
+exit
+
+exit
+
+exit
+
+
+exit
+

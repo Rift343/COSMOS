@@ -1,6 +1,7 @@
 use std::io::prelude::*;
 use std::net::TcpStream;
 use dns_lookup::lookup_host;
+use std::process;
 fn main() -> std::io::Result<()> {
     //we resolve the address and connect to the server
     let hostname = "pavieroutaboul.fr";
@@ -15,10 +16,17 @@ fn main() -> std::io::Result<()> {
     println!("enter a message to send to the server :");
     let mut msg = String::new();
     std::io::stdin().read_line(&mut msg)?;
+    
     // we write the message to the server
     //msg = msg.trim_end_matches('\n').to_string();
+    
+
     println!("Sending: '{}'", msg);
     stream.write(msg.as_bytes())?;
+    let exit_string =String::from("exit\n") ;
+    if(msg==exit_string){
+        process::exit(0);
+    }
     let mut buffer = [0; 512];
     // we read the response from the server
     stream.read(&mut buffer)?;
