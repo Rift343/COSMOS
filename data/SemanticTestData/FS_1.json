@@ -15,6 +15,16 @@
       "use_name_table": "Piuuuu",
       "attribute_name": "NOM",
       "use_name_attribute": "AAAAAAAH"
+    },
+    {
+      "use_name_table":  "Piuuuu",
+      "attribute_name": "COUNT,ID",
+      "use_attribute_name": "COUNT(ID)"
+    },
+    {
+      "use_name_table":  "",
+      "attribute_name": "SUM,ID",
+      "use_attribute_name": "SUM(ID)"
     }
   ]
 }
