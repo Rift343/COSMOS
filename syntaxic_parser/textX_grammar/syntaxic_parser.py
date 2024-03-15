@@ -21,14 +21,14 @@ def is_valid_sql(query):
             # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
             for relation in model.relations.relation:
                 table_name = {
-                    "table_name": relation.relationName,
+                    "table_name": relation.relationName.upper(),
                     "use_name_table": ""
                 }
 
                 if relation.alias :
                     table_name["use_name_table"] = relation.alias
                 else :
-                    table_name["use_name_table"] = relation.relationName
+                    table_name["use_name_table"] = table_name["table_name"]
 
                 result["table_name"].append(table_name)
 
@@ -58,32 +58,40 @@ def is_valid_sql(query):
 
                     # if the attribute is an aggregate function
                     if attribute.aggregate :
-                        columns["use_name_table"] = result["table_name"][0]["use_name_table"]
+                        # If the table is specified
+                        if attribute.aggregate.table :
+                            columns["use_name_table"] = attribute.aggregate.table
 
+                        # If the aggregate is a COUNT(*)
                         if attribute.aggregate.aggregateName == "COUNT(*)" :
-                            columns["attribute_name"] = '*'
-                            #columns["attribute_name"] = attribute.aggregate.aggregateName
+                            columns["attribute_name"] = 'COUNT,*'
+
+                        # If it is any other aggregate function
                         else :
-                            columns["attribute_name"] = attribute.aggregate.attributeName
-                            #columns["attribute_name"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName +')'
+                            columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
+
+                        # If the attribute is renamed with AS
+                        if attribute.alias :
+                            columns["use_name_attribute"] = attribute.alias
+                        else :
+                            columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
 
 
                     # if the attribute is a regular attribute
                     else :
-                        columns["attribute_name"] = attribute.attributeName
+                        columns["attribute_name"] = attribute.attributeName.upper()
 
 
-                    # If the table the attribute belongs to is specified
-                    if attribute.table :
-                        columns["use_name_table"] = attribute.table
-                    else :
-                        columns["use_name_table"] = result["table_name"][0]["use_name_table"]
+                        # If the table the attribute belongs to is specified
+                        if attribute.table :
+                            columns["use_name_table"] = attribute.table.upper()
 
-                    # If the attribute is renamed with AS
-                    if attribute.alias :
-                        columns["use_name_attribute"] = attribute.alias
-                    else :
-                        columns["use_name_attribute"] = columns["attribute_name"]
+
+                        # If the attribute is renamed with AS
+                        if attribute.alias :
+                            columns["use_name_attribute"] = attribute.alias
+                        else :
+                            columns["use_name_attribute"] = columns["attribute_name"]
 
 
                     result["columns"].append(columns)
