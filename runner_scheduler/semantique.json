@@ -1,0 +1,24 @@
+{
+    "tables": [
+        {
+            "table": {
+                "table_name": "Personne",
+                "use_name_table": "Piuuuu"
+            },
+            "columns": [
+                {
+                    "attribute_name": "ID",
+                    "use_name_attribute": "Not an ID"
+                },
+                {
+                    "attribute_name": "NOM",
+                    "use_name_attribute": "AAAAAAAH"
+                }
+            ]
+        }
+    ],
+    "conditions": null,
+    "status": true,
+    "error": ""
+}
+
