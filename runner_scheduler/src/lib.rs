@@ -7,6 +7,7 @@ use std::error::Error;
 
 use crate::operator::CSVFile;
 mod operator;
+mod relation_creater;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
@@ -85,7 +86,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     a1.projection(final_proj);
     println!("{:?}",as_hashmap);
     a1.replace_as(&as_hashmap);
-    Ok (a1.to_file()?)
+    a1.to_file()
 }
 
 #[cfg(test)]
