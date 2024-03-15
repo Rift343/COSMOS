@@ -32,19 +32,19 @@ pub fn syntaxic_parser(sql_query : String) -> Result<File,Box<dyn Error>> {
     // The truncate(true) option allows for overwriting the entire file, needed when writing less bytes than already present
     let mut synt_parsing_file : File = match File::options().read(true).write(true).truncate(true).create(true).open("data/transferFile/syntaxic_parsing.json"){
         Ok(result) => result,
-        Err(error) => return Err(Box::from(format!("Error, Unable to open or create file : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to open or create file : {}\n", error)))
     };
 
     // Write the contents of res_textx in the file
     match synt_parsing_file.write_all(res_textx.as_bytes()){
         Ok(_) => (),
-        Err(error) => return Err(Box::from(format!("Error, Unable to write in file : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to write in file : {}\n", error)))
     };
 
     // Set the offset to the beginning of the file
     match synt_parsing_file.seek(SeekFrom::Start(0)){
         Ok(_) => (),
-        Err(error) => return Err(Box::from(format!("Error, Unable to seek from start : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to seek from start : {}\n", error)))
         //return Err(Box::from(&("Error, Unable to seek from start".to_string() + error_str))) to get rid of type str_err
     };
 
@@ -61,27 +61,32 @@ fn get_textx_result(request: String, py: Python) -> Result<String,Box<dyn Error>
     // Type &PyModule var containing the code of syntaxic_parser.py
     let textx_code = match PyModule::from_code(py,synt_parser_file,"syntaxic_parser.py",synt_parser_file){
         Ok(result) => result,
-        Err(error) => return Err(Box::from(format!("Error, Unable to fetch Python code : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to fetch Python code : {}\n", error)))
     };
 
     // Extract is_valid_sql() function
     let func_is_valid_sql : &PyAny = match textx_code.getattr("is_valid_sql"){
         Ok(result) => result,
-        Err(error) => return Err(Box::from(format!("Error, Unable to get Python function : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to get Python function : {}\n", error)))
     };
 
     // Call is_valid_sql() with request
     let res_is_valid_sql : &PyAny = match func_is_valid_sql.call1((request,)){
         Ok(result) => result,
-        Err(error) => return Err(Box::from(format!("Error, Unable to call Python function : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("When calling the Python code : {}", error)))
     };
 
     // Extract result into a String
     let res_textx : String = match res_is_valid_sql.extract(){
         Ok(result) => result,
-        Err(error) => return Err(Box::from(format!("Error, Unable to extract Pyhton result String : {}\n", error)))
+        Err(error) => return Err(Box::from(format!("Unable to extract Python result String : {}\n", error)))
     };
 
-    // Return String with the contents of the syntaxic parsing file to be written, or Error
+    // If the result is a syntaxic error, wrap it in an Err() and return it
+    if res_textx.starts_with('S') {
+        return Err(Box::from(res_textx))
+    }
+
+    // If the result is correct, return String with the contents of the syntaxic parsing file to be written
     Ok(res_textx)
 }
