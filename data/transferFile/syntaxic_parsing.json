@@ -1,4 +1,19 @@
 {
-    "status": false,
-    "error": "Syntax Error line 1, row 1: Expected 'SELECT'"
+    "table_name": [
+        {
+            "table_name": "personne",
+            "use_name_table": "personne"
+        }
+    ],
+    "columns": [
+        {
+            "use_name_table": "personne",
+            "attribute_name": "id",
+            "use_name_attribute": "id"
+        }
+    ],
+    "conditions": "NULL",
+    "status": true,
+    "error": "NULL"
+
 }
