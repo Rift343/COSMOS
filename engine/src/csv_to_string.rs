@@ -1,6 +1,5 @@
 use std::{fs::File, io::{BufReader, Read, Seek}};
 use std::error::Error;
-use std::process::exit;
 use serde_json::Value;
 use std::string::String;
 
@@ -10,9 +9,6 @@ use runner_scheduler::scheduler;
 use semantic_parser::semantic_parser;
 //use engine::csv_to_string;
 
-use view::error_printer;
-use view::request_receiver;
-use view::result_printer;
 
 //use csv::Reader;
 /* 
@@ -81,7 +77,13 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // -----------------------------------------------------
 
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
-    let mut syntaxic_parsing_handle : File = syntaxic_parser(request);
+    let mut syntaxic_parsing_handle : File = match syntaxic_parser(request){
+        Ok(file) => file,
+        Err(error) => {
+            println!("{}", error.to_string());
+            return Err(error);
+        }
+    };
 
     // Read the file and put its contents into a String
     let mut syntaxic_parsing_content: std::string::String = Default::default();

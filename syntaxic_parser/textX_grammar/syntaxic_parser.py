@@ -106,13 +106,7 @@ def is_valid_sql(query):
 
     except textx.exceptions.TextXSyntaxError as e:
         # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
-        result = {
-            "status": False,
-            "error": f"Syntax Error line {e.line}, row {e.col}: {e.message}"
-        }
 
-        # Convert the dict to Json string
-        json_result = json.dumps(result, indent=4)
+        error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
 
-
-        return json_result
+        return error

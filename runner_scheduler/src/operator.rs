@@ -8,9 +8,11 @@ use std::io::{BufReader, Seek, Write};
 #[allow(unused_must_use)]
 
 #[allow(unused)]
-struct Attribute {
-    name: String,
-    table: String,
+
+#[doc = "That struct is use for the where. The boolean_value indicate the if where_value contain a attribute of a relation or a constant"]
+pub(crate)struct WhereElement {
+    where_value:String,
+    boolean_value:bool,//if true then it's an attribute, false if it's a const
 }
 
 #[allow(unused)]
@@ -28,6 +30,1365 @@ pub(crate) struct CSVFile{
 
 impl CSVFile {
 
+
+
+
+
+pub(crate) fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
+{
+    match element_1.boolean_value==true {
+        true => match element_2.boolean_value == true {
+            true => self.predicat_interpretation_with_no_const(operation, type_expression, element_1, element_2),//case no constant
+            false => self.predicat_interpretation_with_one_const_2(operation, type_expression, element_1, element_2.where_value),//case element_2 is a constant
+        },
+        false => match element_2.boolean_value == true {
+            true => self.predicat_interpretation_with_one_const(operation, type_expression, element_1.where_value, element_2),//case element_1 is a constant
+            false => self.predicat_interpretation_with_two_const(operation, type_expression, element_1.where_value, element_2.where_value),//case both element are constant
+        },
+    }
+
+}
+
+
+
+
+pub(crate) fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
+{
+    println!("1");
+    println!("{}{}{}",element_1,operation,element_2.where_value);
+    let mut index;
+    let mut i = 0 ;
+    let mut final_vec:Vec<Vec<String>>= Vec::new();
+    final_vec.push(self.descriptor[0].to_vec());
+    while i<self.descriptor[0].len() && element_2.where_value.to_string() != self.descriptor[0][i].to_string() {
+        i = i + 1;       
+    }
+    index = i;
+    println!("here : {}",index);
+    if operation == "=".to_string()
+    {
+        if type_expression == "FLOAT".to_string()
+        {
+            let value:f64 = element_1.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    //self.descriptor.remove(i);
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let value:i128 = element_1.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+
+    }
+    else if operation == "<=".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+            let value:f64 = element_1.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let value:i128 = element_1.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+    }//end section
+    else if operation == ">=".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                ;
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    else if operation == "<>".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == "<".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == ">".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_1.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_1;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    /* 
+    for i in 1..self.descriptor.len()
+    {
+
+    }*/
+    
+
+}
+
+pub(crate) fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
+{
+    println!("2");
+    println!("{}{}{}",element_1.where_value,operation,element_2);
+
+    let mut index;
+    let mut i = 0 ;
+    let mut final_vec:Vec<Vec<String>>= Vec::new();
+    final_vec.push(self.descriptor[0].to_vec());
+    while i<self.descriptor[0].len() && element_1.where_value.to_string() != self.descriptor[0][i].to_string() {
+        i = i + 1;       
+    }
+    index = i;
+    println!("here : {}",index);
+    if operation == "=".to_string()
+    {
+        if type_expression == "FLOAT".to_string()
+        {
+            let value:f64 = element_2.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    //self.descriptor.remove(i);
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let value:i128 = element_2.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            let value = element_2;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            let value = element_2;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+
+    }
+    else if operation == "<=".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+            let value:f64 = element_2.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value2 <= value ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let value:i128 = element_2.parse().unwrap();
+            for i in 1..self.descriptor.len()
+            {
+                let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                if (value2 <= value ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            let value = element_2;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value2 <= value ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            let value = element_2;
+            for i in 1..self.descriptor.len()
+            {
+                let value2 = self.descriptor[i][index].clone(); 
+                if (value2 <= value ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+    }//end section
+    else if operation == ">=".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 >= value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 >= value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                ;
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 >= value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 >= value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    else if operation == "<>".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == "<".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 < value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 < value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 < value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 < value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == ">".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                let value:f64 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 > value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let value:i128 = element_2.parse().unwrap();
+                for i in 1..self.descriptor.len()
+                {
+                    let value2:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    if (value2 > value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 > value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                let value = element_2;
+                for i in 1..self.descriptor.len()
+                {
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value2 > value ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    /* 
+    for i in 1..self.descriptor.len()
+    {
+
+    }*/
+    
+
+}
+
+
+pub(crate) fn predicat_interpretation_with_two_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:String)
+{
+    let mut final_vec:Vec<Vec<String>>= Vec::new();
+    final_vec.push(self.descriptor[0].to_vec());
+    
+    if operation == "=".to_string()
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+           let val1:f64 = element_1.parse().unwrap();
+           let val2:f64 = element_2.parse().unwrap();
+           if !(val1 == val2)
+           {
+            self.descriptor = final_vec;
+           }
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let val1:i128 = element_1.parse().unwrap();
+            let val2:i128 = element_2.parse().unwrap();
+            if !(val1 == val2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            if !(element_1 == element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            if !(element_1 == element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+
+    }//end section
+    else if operation == "<=".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+           let val1:f64 = element_1.parse().unwrap();
+           let val2:f64 = element_2.parse().unwrap();
+           if !(val1 <= val2)
+           {
+            self.descriptor = final_vec;
+           }
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let val1:i128 = element_1.parse().unwrap();
+            let val2:i128 = element_2.parse().unwrap();
+            if !(val1 <= val2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            if !(element_1 <= element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            if !(element_1 <= element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+
+    }//end section
+    else if operation == ">=".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+           let val1:f64 = element_1.parse().unwrap();
+           let val2:f64 = element_2.parse().unwrap();
+           if !(val1 >= val2)
+           {
+            self.descriptor = final_vec;
+           }
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let val1:i128 = element_1.parse().unwrap();
+            let val2:i128 = element_2.parse().unwrap();
+            if !(val1 >= val2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            if !(element_1 >= element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            if !(element_1 >= element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+
+    }//end section
+    else if operation == "<>".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+           let val1:f64 = element_1.parse().unwrap();
+           let val2:f64 = element_2.parse().unwrap();
+           if !(val1 != val2)
+           {
+            self.descriptor = final_vec;
+           }
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            let val1:i128 = element_1.parse().unwrap();
+            let val2:i128 = element_2.parse().unwrap();
+            if !(val1 != val2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            if !(element_1 != element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            if !(element_1 != element_2)
+            {
+                self.descriptor = final_vec;
+            }
+        }
+
+    }//end section
+    else if operation == "<".to_string() 
+    {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+               let val1:f64 = element_1.parse().unwrap();
+               let val2:f64 = element_2.parse().unwrap();
+               if !(val1 < val2)
+               {
+                self.descriptor = final_vec;
+               }
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let val1:i128 = element_1.parse().unwrap();
+                let val2:i128 = element_2.parse().unwrap();
+                if !(val1 < val2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                if !(element_1 < element_2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                if !(element_1 < element_2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+    
+    }//end section
+    else if operation == ">".to_string() 
+    {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+               let val1:f64 = element_1.parse().unwrap();
+               let val2:f64 = element_2.parse().unwrap();
+               if !(val1 > val2)
+               {
+                self.descriptor = final_vec;
+               }
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                let val1:i128 = element_1.parse().unwrap();
+                let val2:i128 = element_2.parse().unwrap();
+                if !(val1 > val2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                if !(element_1 > element_2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                if !(element_1 > element_2)
+                {
+                    self.descriptor = final_vec;
+                }
+            }
+    
+        }//end section    
+    /* 
+    for i in 1..self.descriptor.len()
+    {
+
+    }*/
+    
+
+}
+
+
+pub(crate) fn predicat_interpretation_with_no_const (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
+{
+    let mut index;
+    let mut index2;
+    let mut i = 0 ;
+    let mut final_vec:Vec<Vec<String>>= Vec::new();
+    final_vec.push(self.descriptor[0].to_vec());
+    while i<self.descriptor[0].len() && element_1.where_value.to_string() != self.descriptor[0][i].to_string() {
+        i = i + 1;       
+    }
+    index = i;
+    i=0;
+    while i<self.descriptor[0].len() && element_2.where_value.to_string() != self.descriptor[0][i].to_string() {
+        i = i + 1;       
+    }
+    index2 = i;
+    
+    if operation == "=".to_string()
+    {
+        if type_expression == "FLOAT".to_string()
+        {
+            for i in 1..self.descriptor.len()
+            {
+                let value:f64 = self.descriptor[i][index].clone().parse().unwrap();
+                let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    //self.descriptor.remove(i);
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            
+            for i in 1..self.descriptor.len()
+            {
+                let value:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value = self.descriptor[i][index].clone();
+                let value2 = self.descriptor[i][index2].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            let value = element_1;
+            for i in 1..self.descriptor.len()
+            {
+                let value = self.descriptor[i][index].clone();
+                let value2 = self.descriptor[i][index2].clone(); 
+                if (value == value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+
+    }
+    else if operation == "<=".to_string() 
+    {//begin section
+        if type_expression == "FLOAT".to_string()
+        {
+            for i in 1..self.descriptor.len()
+            {
+                let value:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+
+        }
+        else if type_expression == "INTEGER".to_string() 
+        {
+            for i in 1..self.descriptor.len()
+            {
+                let value:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "VARCHAR".to_string() 
+        {
+            for i in 1..self.descriptor.len()
+            {
+                let value = self.descriptor[i][index].clone(); 
+                let value2 = self.descriptor[i][index2].clone(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+        else if type_expression == "CHAR".to_string() 
+        {
+            for i in 1..self.descriptor.len()
+            {                
+                let value = self.descriptor[i][index].clone(); 
+                let value2 = self.descriptor[i][index2].clone(); 
+                if (value <= value2 ) {
+                    final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+        }
+    }//end section
+    else if operation == ">=".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:f64 = self.descriptor[i][index].clone().parse().unwrap();
+                    let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:i128 = self.descriptor[i][index].clone().parse().unwrap();
+                    let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                ;
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone();
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone();
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value >= value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    else if operation == "<>".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:f64 = self.descriptor[i][index].clone().parse().unwrap();
+                    let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone();
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone(); 
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value != value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == "<".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:f64 = self.descriptor[i][index].clone().parse().unwrap();
+                    let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone(); 
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone(); 
+
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value < value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+        else if operation == ">".to_string() 
+        {//begin section
+            if type_expression == "FLOAT".to_string()
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:f64 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    let value2:f64 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+    
+            }
+            else if type_expression == "INTEGER".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value:i128 = self.descriptor[i][index].clone().parse().unwrap(); 
+                    let value2:i128 = self.descriptor[i][index2].clone().parse().unwrap(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                    }
+                }
+                self.descriptor = final_vec;
+                
+            }
+            else if type_expression == "VARCHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone(); 
+                    let value2 = self.descriptor[i][index2].clone(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+            else if type_expression == "CHAR".to_string() 
+            {
+                for i in 1..self.descriptor.len()
+                {
+                    let value = self.descriptor[i][index].clone(); 
+                    let value2 = self.descriptor[i][index].clone(); 
+                    if (value > value2 ) {
+                        final_vec.push(self.descriptor[i].to_vec());
+                }
+            }
+            self.descriptor = final_vec;
+            
+            }
+        }//end section
+    /* 
+    for i in 1..self.descriptor.len()
+    {
+
+    }*/
+    
+
+}
+
+
+#[doc = "Method to add a column on a table when we use a agregate methode (SUM,MIN,MAX...)\n"]
+pub(crate) fn add_column_for_agregate(&mut self,column:&Vec<String>)
+{
+    self.descriptor[0].push(column[0].to_string());
+    for i in 1..self.descriptor.len()
+    {
+        self.descriptor[i].push(column[0].to_string());
+    }
+} 
+
+
+
 pub(crate)fn set_name(&mut self, name:&String)
 {
     self.name = name.to_string();
@@ -39,6 +1400,7 @@ pub(crate)fn set_descriptor(&mut self, list_data:&Vec<String>)
     vec1.push(list_data.to_vec());
     self.descriptor = vec1;
 }
+
 
 #[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
 return a Vec of string with the name of the attribute and the value of the COUNT.
@@ -407,6 +1769,59 @@ mod tests {
     use std::time::Instant;
 
     use super::*;
+
+
+
+    #[test]
+    fn test_where1()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let val1 = WhereElement { where_value: "personneTest.NOM".to_string(),boolean_value: true };
+        let val2 = WhereElement { where_value: "Zasanten".to_string(),boolean_value: false };
+        table1.predicat_interpretation('='.to_string(), "VARCHAR".to_string(), val1, val2);
+        println!("{}",table1.to_string());
+    }
+
+    #[test]
+    fn test_where2()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let val1 = WhereElement { where_value: "personneTest.ID".to_string(),boolean_value: true };
+        let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
+        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val1, val2);
+        println!("{}",table1.to_string());
+    }
+    #[test]
+    fn test_where3()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let val1 = WhereElement { where_value: "personneTest.ID".to_string(),boolean_value: true };
+        let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
+        table1.predicat_interpretation("<=".to_string(), "INTEGER".to_string(), val1, val2);
+        println!("{}",table1.to_string());
+    }
+    
+
+    #[test]
+    fn test_where1_1()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let val1 = WhereElement { where_value: "5".to_string(),boolean_value: false };
+        let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
+        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val2, val1);
+        println!("{}",table1.to_string());
+    }
+
+    #[test]
+    fn test_where2_2()
+    {
+        let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let val1 = WhereElement { where_value: "55".to_string(),boolean_value: false };
+        let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
+        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val1, val2);
+        println!("{}",table1.to_string());
+    }
+    
 
     #[test]
     fn test_count()
