@@ -1,6 +1,6 @@
 import textx
 import json
-from pprint import pprint
+#from pprint import pprint
 def lbd_parser(query):
         print("we enter the lbd_parser")
         sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
