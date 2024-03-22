@@ -1,7 +1,7 @@
 import textx
 import json
 #from pprint import pprint
-def lbd_parser(query):
+def lmd_parser(query):
         print("we enter the lbd_parser")
         sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
         try:
@@ -97,7 +97,7 @@ def lbd_parser(query):
 
             # "error" field is null
             result["error"] = "NULL"
-
+            result["action"] = "select"
             # Convert the dict to Json string
             json_result = json.dumps(result, indent=4)
 
@@ -114,7 +114,7 @@ def lbd_parser(query):
 
 def ldd_parser(query):
         print("test")
-        sql_meta = textx.metamodel_from_file("./textx_for_LDD.tx", ignore_case = True)
+        sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
         try:
             print("enter try")
             # Analyse SQL query
@@ -202,7 +202,7 @@ def is_valid_sql(query):
     if len(query) < 6:
         return "Query is too short"
     elif query[0:6].upper() == "SELECT":
-        return lbd_parser(query)
+        return lmd_parser(query)
     else:
         print("we go good way")
         return ldd_parser(query)
