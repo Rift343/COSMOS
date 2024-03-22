@@ -24,3 +24,6 @@ log.txt
 #result file
 data/transferFile/result.csv
 #data/SemanticTestData/Error.json
+data/SemanticTestData/FSE_1.json
+data/SemanticTestData/FSE_1.json
+data/transferFile/syntaxic_parsing.json
