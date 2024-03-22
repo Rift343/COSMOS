@@ -11,8 +11,8 @@ use std::io::{BufReader, Seek, Write};
 
 #[doc = "That struct is use for the where. The boolean_value indicate the if where_value contain a attribute of a relation or a constant"]
 pub(crate)struct WhereElement {
-    where_value:String,
-    boolean_value:bool,//if true then it's an attribute, false if it's a const
+    pub where_value:String,
+    pub boolean_value:bool,//if true then it's an attribute, false if it's a const
 }
 
 #[allow(unused)]
@@ -633,11 +633,13 @@ pub(crate) fn predicat_interpretation_with_one_const_2 (&mut self, operation : S
                 for i in 1..self.descriptor.len()
                 {
                     let value2 = self.descriptor[i][index].clone(); 
+                    //println!("ok {} {}",value,value2);
                     if (value != value2 ) {
                         final_vec.push(self.descriptor[i].to_vec());
                 }
             }
             self.descriptor = final_vec;
+            //println!("{}",self.to_string());
             
             }
             else if type_expression == "CHAR".to_string() 
@@ -651,6 +653,7 @@ pub(crate) fn predicat_interpretation_with_one_const_2 (&mut self, operation : S
                 }
             }
             self.descriptor = final_vec;
+            println!("{:?}",self.descriptor);
             
             }
         }//end section

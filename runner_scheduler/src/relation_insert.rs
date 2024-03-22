@@ -13,7 +13,14 @@ pub(crate) fn relation_insert(table_name:&String,value_list :&Vec<String>)->Resu
     let mut vec = Vec::new();
     vec.push(value_list.to_vec());
     let prototype_csv:CSVFile=CSVFile{ name: table_name.to_string(), descriptor: vec };
-    let string_prototype_csv:String ="\n".to_string()+ &prototype_csv.to_string();
+    let mut string_prototype_csv;
+    if (std::env::consts::OS == "windows" ){
+        string_prototype_csv = "\r\n".to_string();
+    }
+    else{
+        string_prototype_csv = "\n".to_string();
+    }
+    string_prototype_csv=string_prototype_csv+ &prototype_csv.to_string();
     let mut path_prototype = "./data/CSV/".to_string();
     path_prototype.push_str(table_name);
     path_prototype.push_str(".csv");
@@ -33,11 +40,11 @@ mod tests {
     #[test]
     fn test_relation_insert()
     {
-        let name_test="csv_test".to_string();
+        let name_test="csv_test2".to_string();
         let mut attribut_test:Vec<String> = Vec::new();
-        attribut_test.push("test1".to_string());
-        attribut_test.push("test2".to_string());
-        attribut_test.push("test3".to_string());
+        attribut_test.push("val1".to_string());
+        attribut_test.push("val2".to_string());
+        attribut_test.push("val3".to_string());
         let _i = relation_insert(&name_test, &attribut_test).expect("errorTest");
 
 
