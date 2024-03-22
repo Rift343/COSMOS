@@ -8,6 +8,8 @@ use std::error::Error;
 use crate::operator::CSVFile;
 mod operator;
 mod relation_creater;
+mod relation_insert;
+mod relation_drop;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
