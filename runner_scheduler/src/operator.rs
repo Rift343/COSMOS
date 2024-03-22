@@ -10,7 +10,7 @@ use std::io::{BufReader, Seek, Write};
 #[allow(unused)]
 
 #[doc = "That struct is use for the where. The boolean_value indicate the if where_value contain a attribute of a relation or a constant"]
-pub(crate)struct WhereElement {
+pub struct WhereElement {
     pub where_value:String,
     pub boolean_value:bool,//if true then it's an attribute, false if it's a const
 }
@@ -21,9 +21,9 @@ Use the function open_relation(pathcsv:String,name1:String) to create a CSVFile 
 
 #[derive(Clone)]
 
-pub(crate) struct CSVFile{
-    pub(crate) name:String,
-    pub(crate) descriptor:Vec<Vec<String>>
+pub struct CSVFile{
+    pub name:String,
+    pub descriptor:Vec<Vec<String>>
 }
 
 #[allow(unused)]
@@ -34,7 +34,7 @@ impl CSVFile {
 
 
 
-pub(crate) fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
+pub fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
 {
     match element_1.boolean_value==true {
         true => match element_2.boolean_value == true {
@@ -52,7 +52,7 @@ pub(crate) fn predicat_interpretation (&mut self, operation : String, type_expre
 
 
 
-pub(crate) fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
+pub fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
 {
     println!("1");
     println!("{}{}{}",element_1,operation,element_2.where_value);
@@ -413,7 +413,7 @@ pub(crate) fn predicat_interpretation_with_one_const (&mut self, operation : Str
 
 }
 
-pub(crate) fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
+pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
 {
     println!("2");
     println!("{}{}{}",element_1.where_value,operation,element_2);
@@ -779,7 +779,7 @@ pub(crate) fn predicat_interpretation_with_one_const_2 (&mut self, operation : S
 }
 
 
-pub(crate) fn predicat_interpretation_with_two_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:String)
+pub fn predicat_interpretation_with_two_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:String)
 {
     let mut final_vec:Vec<Vec<String>>= Vec::new();
     final_vec.push(self.descriptor[0].to_vec());
@@ -1010,7 +1010,7 @@ pub(crate) fn predicat_interpretation_with_two_const (&mut self, operation : Str
 }
 
 
-pub(crate) fn predicat_interpretation_with_no_const (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
+pub fn predicat_interpretation_with_no_const (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
 {
     let mut index;
     let mut index2;
@@ -1381,7 +1381,7 @@ pub(crate) fn predicat_interpretation_with_no_const (&mut self, operation : Stri
 
 
 #[doc = "Method to add a column on a table when we use a agregate methode (SUM,MIN,MAX...)\n"]
-pub(crate) fn add_column_for_agregate(&mut self,column:&Vec<String>)
+pub fn add_column_for_agregate(&mut self,column:&Vec<String>)
 {
     self.descriptor[0].push(column[0].to_string());
     for i in 1..self.descriptor.len()
@@ -1392,12 +1392,12 @@ pub(crate) fn add_column_for_agregate(&mut self,column:&Vec<String>)
 
 
 
-pub(crate)fn set_name(&mut self, name:&String)
+pub fn set_name(&mut self, name:&String)
 {
     self.name = name.to_string();
 }
 
-pub(crate)fn set_descriptor(&mut self, list_data:&Vec<String>)
+pub fn set_descriptor(&mut self, list_data:&Vec<String>)
 {
     let mut vec1 = Vec::new();
     vec1.push(list_data.to_vec());
@@ -1408,7 +1408,7 @@ pub(crate)fn set_descriptor(&mut self, list_data:&Vec<String>)
 #[doc = "Methode to count the number of line for a columns. If the parameter is \"*\"then the NULL and NIL value are not counted.
 return a Vec of string with the name of the attribute and the value of the COUNT.
 TODO ==> Need to be tested"]
-pub(crate)fn count(self,attribut_count:&String) -> Vec<String>
+pub fn count(self,attribut_count:&String) -> Vec<String>
 {
     let mut result_vec = Vec::new();
     result_vec.push("COUNT(".to_string()+attribut_count+")");
@@ -1444,7 +1444,7 @@ pub(crate)fn count(self,attribut_count:&String) -> Vec<String>
 }
 
 
-pub(crate)fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
+pub fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
 {
     let mut result_vec = Vec::new();
     result_vec.push("SUM(".to_string()+attribut+")");
@@ -1493,7 +1493,7 @@ pub(crate)fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
     
 }
 
-pub(crate)fn min(self,attribut: &String,type_attr: &String)->Vec<String>
+pub fn min(self,attribut: &String,type_attr: &String)->Vec<String>
 {
     let mut return_vec = Vec::new();
     return_vec.push("MIN(".to_string()+attribut+")");
@@ -1538,7 +1538,7 @@ pub(crate)fn min(self,attribut: &String,type_attr: &String)->Vec<String>
 }
 
 
-pub(crate)fn max(self,attribut: &String,type_attr: &String)->Vec<String>
+pub fn max(self,attribut: &String,type_attr: &String)->Vec<String>
 {
     let mut return_vec = Vec::new();
     return_vec.push("MAX(".to_string()+attribut+")");
@@ -1584,7 +1584,7 @@ pub(crate)fn max(self,attribut: &String,type_attr: &String)->Vec<String>
 
 
 #[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
-pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
+pub fn to_file(&self)->Result<File,Box<dyn Error>>{
         let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {
             Ok(e) => e,
             Err(e) =>  return Err(Box::new(e)),
@@ -1597,7 +1597,7 @@ pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
     }
 
 #[doc = r"To string of the descriptor who separate the attribute with ',' and the ligne with '\\r\\n' if you use a Windows or '\\n' if you use Linux or Max OS."]
-pub(crate)fn to_string(&self) -> String{
+pub fn to_string(&self) -> String{
         let mut result_string : String="".to_string();
         for ligne in 0..self.descriptor.len()-1{
             result_string = result_string+ &self.descriptor[ligne].clone().into_iter().map(|x| x.to_string()).collect::<Vec<_>>().join(";");
@@ -1618,7 +1618,7 @@ pub(crate)fn to_string(&self) -> String{
     }
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
-pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
+pub fn projection(&mut self,list_attribute:Vec<String>){
     //println!("{:?}",self.to_string());
     //println!("{:?}",list_attribute);
         let mut transpose: Vec<Vec<String>> = Vec::new();
@@ -1659,7 +1659,7 @@ pub(crate)fn projection(&mut self,list_attribute:Vec<String>){
     }
 #[doc = "Method for the cartesian product. Need another CSVFile in input and the self object take the cartesian product between self and another_csv\n
 Complexity of O(n²)"]
-pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
+pub fn cartesian_product(&mut self,another_csv: &CSVFile){
     let mut operation_result : Vec<Vec<String>>=Vec::new();
     let mut transition: Vec<String>;
     transition = self.descriptor[0].clone();
@@ -1679,7 +1679,7 @@ pub(crate)fn cartesian_product(&mut self,another_csv: &CSVFile){
         self.descriptor = operation_result;
     }
 
-pub(crate) fn replace_as (&mut self,dico:&HashMap<String,String>)
+pub fn replace_as (&mut self,dico:&HashMap<String,String>)
 {
     for i in 0..self.descriptor[0].len()
     {
@@ -1691,7 +1691,7 @@ pub(crate) fn replace_as (&mut self,dico:&HashMap<String,String>)
 }
 
 #[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
-pub(crate)fn union(&mut self,union_csv:&CSVFile)
+pub fn union(&mut self,union_csv:&CSVFile)
 {
     let mut result_operation : &mut Vec<Vec<String>> = &mut self.descriptor;
     let mut union_value = &union_csv.descriptor;
@@ -1714,7 +1714,7 @@ pub(crate)fn union(&mut self,union_csv:&CSVFile)
 
 #[allow(unused)]
 #[doc = r"This fonction take the name of the CSV file and read this file in the ../data/CSV/ directory. That function return of Vec of Vec of String who represent the CSV file ligne by ligne"]
-pub(crate)fn csv_read_by_ligne(path_file:String,table_name:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
+pub fn csv_read_by_ligne(path_file:String,table_name:String)-> Result<Vec<Vec<String>>,Box<dyn Error>>{
     let mut path:String = "./data/CSV/".to_string();
     path.push_str(&path_file);
     path.push_str(".csv");
@@ -1758,7 +1758,7 @@ fn csv_read_by_columns(path_file:String)/*->CSVFile*/{
 
 #[allow(unused)]
 #[doc = r"Create a CSVFile with the name you want and the name of the CSV file to open"]
-pub(crate)fn open_relation(pathcsv:String,name1:&String)->Result<CSVFile,Box<dyn Error>>{
+pub fn open_relation(pathcsv:String,name1:&String)->Result<CSVFile,Box<dyn Error>>{
     match csv_read_by_ligne(pathcsv,name1.to_string()){
         Ok(res) => Ok(CSVFile { name:name1.to_string(), descriptor: res }),
         Err(e) => Err(e)

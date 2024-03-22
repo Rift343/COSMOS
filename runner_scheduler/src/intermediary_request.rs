@@ -1,36 +1,13 @@
-use std::string::String;
-use std::{collections::HashMap, fs::File, io::{Read, Seek}};
-use std::error::Error;
-//use json::JsonValue::String; J'espère que les String json sont les
-//même ques les trings classique car j'arrive pas a compiler avec
-//les json string
+use std::{collections::HashMap, error::Error};
 
-use crate::operator::CSVFile;
-pub mod operator;
-pub mod relation_creater;
-pub mod relation_insert;
-pub mod relation_drop;
-pub mod intermediary_request;
+use json::JsonValue;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use crate::operator::{self, CSVFile};
 
-
-#[doc = "This fonction need the file descriptor of the Json returned by the semantic parsor. Return a file
-TODO==> Add the Where, Group by, Having and intermediary request"]
-pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
-    json_file.rewind()?; //.expect("Rewind error==> Can't reset de cursor of the File");
-    //println!("You passed the rewind");
-    let mut buffer = Vec::new();
-    json_file.read_to_end(&mut buffer)?; //.expect("Read to end error");
-    let mut str_json  : String = String::new();
-    for i in buffer{
-        str_json.push(i as char);
-    }
-    let parse_json=json::parse(&str_json.to_string()).unwrap();
-    parse_json.dump();
-    //println!("{:?}",parse_json);
+pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error>>
+{
+    println!("{}",sub_requet.dump());
+    let parse_json = sub_requet;
     let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
@@ -89,49 +66,33 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     a1.projection(final_proj);
     println!("{:?}",as_hashmap);
     a1.replace_as(&as_hashmap);
-    a1.to_file()
+    
+    Ok(a1)
 }
 
-#[cfg(test)]
 mod tests {
-    use std::io::{Read, Write};
+    
 
-    use super::*;
+    #[allow(unused)]
+    use super::intermediary_request;
+
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-    #[test]
-    #[should_panic]
-    fn test_on_create_file(){
-        {
-            let mut fichier_test:std::fs::File = File::create("test.txt").expect("Can't create a file");
-            let _ =scheduler(&fichier_test);
-            let data = b"hello world";
-            fichier_test.write_all(data).expect("Can't write in this file");
-            let _ =scheduler(&fichier_test);
+    fn test_intermediary_request()
+    {
+        let mut json_file:std::fs::File = std::fs::File::open("semantique.json").expect("Error ==> Can't read the JSON file");
+        let mut buffer = Vec::new();
+        std::io::Read::read_to_end(&mut json_file, &mut buffer).expect("error"); //.expect("Read to end error");
+        let mut str_json  : String = String::new();
+        for i in buffer{
+            str_json.push(i as char);
         }
-        let mut fichier_test:std::fs::File = File::open("test.txt").expect("Can't open the file");
-        let _ =scheduler(&fichier_test);
-        let mut buf = [1];
-        let mut _a = fichier_test.read(&mut buf).expect("Can't read a file");
-        let _ =scheduler(&fichier_test);
-    }
-
-    #[test]
-    fn test_on_json(){
-        let fichier_json_test:std::fs::File = File::open("semantique.json").expect("Error ==> Can't read the JSON file");
-        let _a = match scheduler(&fichier_json_test)  {
-            Ok(_) => print!("ok"),
+        let parse_json=json::parse(&str_json.to_string()).unwrap();
+        let a = match intermediary_request(&parse_json)  {
+            Ok(a) => print!("{}",a.to_string()),
             Err(e) => println!("{}",e),
         };
-        
 
     }
+
 }
-
-
-
-
