@@ -11,25 +11,26 @@ fn write_log(message: &str, log_file_path: &str) -> std::io::Result<()> {
         .append(true)
         .open(log_file_path)?;
 
-    // Write the log message to the file
+    // Write the received message to the file
     writeln!(file, "{}", message)?;
 
     Ok(())
 }
 
-// Function receive_response to receive the query (or any message) from the connected client (as a stream)
+
+// Function receive_response to receive the answer of the query (or technically any message) from a connected machine as a stream (here the server)
 fn receive_response(mut stream: &TcpStream) -> io::Result<String> {
-    // First we read the response length from the server
+    // Read the response length from the server (maximum 4 bytes long)
     let mut len_bytes = [0; 4];
     stream.read_exact(&mut len_bytes)?;
 
-    // Convert the response length to u32
+    // Convert the answer length to u32
     let response_len = u32::from_be_bytes(len_bytes) as usize;
 
-    // Allocate a buffer for the response
+    // Allocate a buffer for the answer
     let mut response_buffer = vec![0; response_len];
 
-    // We use a loop to receive the response in chunks until all bytes are received to make sure we received all that was planned
+    // We use a loop to receive the response in chunks until all bytes are received
     let mut bytes_received = 0;
     while bytes_received < response_len {
         let chunk = &mut response_buffer[bytes_received..];
@@ -39,10 +40,10 @@ fn receive_response(mut stream: &TcpStream) -> io::Result<String> {
                 return Err(Error::new(ErrorKind::UnexpectedEof, "End of stream reached prematurely"));
             }
             Ok(n) => {
-                // Case where we received bytes, we had that number of bytes we received to the total we received
+                // Here it went well, we add the bytes received to the total bytes received to double check we got the full response
                 bytes_received += n;
             }
-            // If the reception went bad, we return an error
+            // If the reception went bad (interrupted stream), we return an error
             Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
             Err(e) => return Err(e),
         }
@@ -52,6 +53,7 @@ fn receive_response(mut stream: &TcpStream) -> io::Result<String> {
     let response = String::from_utf8_lossy(&response_buffer[..]).to_string();
     Ok(response)
 }
+
 
 // Function send_query to send the answer of the query (or any message like an error) to the connected client (as a stream)
 fn send_query(mut stream: &TcpStream, query: &str) -> io::Result<()> {
@@ -70,7 +72,7 @@ fn send_query(mut stream: &TcpStream, query: &str) -> io::Result<()> {
                 bytes_sent += n;
             }
             Ok(_) | Err(_) => {
-                // Handle write errors or cases where no bytes were sent
+                // Here we handle errors in the case where we had an explicit error or when we sent 0 bytes
                 return Err(Error::new(ErrorKind::Other, "Error sending query to server"));
             }
         }
@@ -82,7 +84,7 @@ fn send_query(mut stream: &TcpStream, query: &str) -> io::Result<()> {
 // Function handle_connection to manage all the processing we need to do (receive query, send it to the engine, process the answer and send it back...)
 fn handle_connection(mut stream: TcpStream) {
     loop {
-        // Receive the query from the client
+        // First we receive the query from the client (number of bytes + message)
         let query = match receive_response(&mut stream) {
             Ok(q) => q,
             Err(err) => {
@@ -102,7 +104,7 @@ fn handle_connection(mut stream: TcpStream) {
         // Just a print to make sure we sent what was supposed to be sent
         println!("Received query: {}", query);
 
-        // Log the query to keep track of what happened
+        // Log the query to keep track of what happened in the log file
         if let Err(err) = write_log(&query, "./log.txt") {
             println!("Error writing log: {}", err);
         }
@@ -121,6 +123,7 @@ fn handle_connection(mut stream: TcpStream) {
             }
         };
 
+        // print just to verify we have the good answer before sending it to the client
         println!("Responding with: {}", result);
         // Send the response to the client
         if let Err(err) = send_query(&mut stream, &result) {
@@ -130,7 +133,7 @@ fn handle_connection(mut stream: TcpStream) {
     }
 }
 
-// Function create_listener that will create the stream used to connect and talk to/with the client
+// Function create_listener that creates the connection between the client and the server 
 pub fn create_listener(addr: String) -> io::Result<()> {
     let listener = TcpListener::bind(addr)?;
     for stream in listener.incoming() {
