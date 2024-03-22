@@ -1,19 +1,29 @@
 {
     "table_name": [
         {
-            "table_name": "personne",
-            "use_name_table": "personne"
+            "table_name": "communal"
         }
     ],
     "columns": [
         {
-            "use_name_table": "personne",
-            "attribute_name": "id",
-            "use_name_attribute": "id"
+            "name": "population",
+            "datatype": "INT",
+            "constraints": [
+                "PRIMARY KEY"
+            ]
+        },
+        {
+            "name": "superficie",
+            "datatype": "INT",
+            "constraints": []
+        },
+        {
+            "name": "duree_de_vie",
+            "datatype": "VARCHAR(255)",
+            "constraints": []
         }
     ],
-    "conditions": "NULL",
     "status": true,
-    "error": "NULL"
-
+    "error": "",
+    "action": "create"
 }

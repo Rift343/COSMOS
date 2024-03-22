@@ -93,11 +93,11 @@ fn main() -> std::io::Result<()> {
     // We connect to the server
     let stream = TcpStream::connect(addr)?;
 
-    // Ask the user for input (query)
-    println!("Enter a message to send to the server (type 'exit' to quit):");
-
     // We loop to wait for a query to send to the server 
     loop {
+        // Ask the user for input
+        println!("\nEnter a message to send to the server (type 'exit' to quit):");
+
         let mut msg = String::new();
         std::io::stdin().read_line(&mut msg)?;
 
@@ -114,7 +114,7 @@ fn main() -> std::io::Result<()> {
 
         // Receive response from the server
         let response = receive_response(&stream)?;
-        println!("Response: {}", response);
+        println!("\nResponse: \n{}", response);
     }
 
     Ok(())

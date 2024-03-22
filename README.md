@@ -6,7 +6,6 @@ Projet TER de L3 informatique de Montpellier de l'année scolaire 2023/2024
 A ajouter au TOML
 cargo add csv
 
-
 Run first the python server (with the web client included) : python3 web_Server.py\
 Then run the rust server using : "cargo run --bin server"
 
