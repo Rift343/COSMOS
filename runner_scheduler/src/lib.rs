@@ -6,10 +6,10 @@ use std::error::Error;
 //les json string
 
 use crate::operator::CSVFile;
-mod operator;
-mod relation_creater;
-mod relation_insert;
-mod relation_drop;
+pub mod operator;
+pub mod relation_creater;
+pub mod relation_insert;
+pub mod relation_drop;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
