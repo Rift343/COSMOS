@@ -114,7 +114,7 @@ def lbd_parser(query):
 
 def ldd_parser(query):
         print("test")
-        sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
+        sql_meta = textx.metamodel_from_file("./textx_for_LDD.tx", ignore_case = True)
         try:
             print("enter try")
             # Analyse SQL query
@@ -176,7 +176,7 @@ def ldd_parser(query):
                 print("we define the table name :", table_name)
                 columns = [column for column in model.columnNames.columnName]
                 print("we define the columns :", columns)
-                values = [str(value) for value in model.values.value]
+                values = [value for value in model.values.value]
                 print("we define the values :", values)
 
                 result["table_name"].append({"table_name": table_name})
