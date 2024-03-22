@@ -75,7 +75,7 @@ fn main() -> std::io::Result<()> {
         hostname.trim().to_string()
     } else {
         // Use the default hostname
-        "pavieroutaboul.fr".to_string()
+        "cleparo.top".to_string()
     };
 
     // Resolve the address and connect to the server
