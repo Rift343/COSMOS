@@ -6,7 +6,7 @@ use std::string::String;
 
 use syntaxic_parser::syntaxic_parser;
 use runner_scheduler::scheduler;
-use semantic_parser::semantic_parser;
+use semantic_parser::{semantic_parser, semantic_parser_ldd};
 //use engine::csv_to_string;
 
 use std::fs;
@@ -147,6 +147,7 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
    //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
    // Get the outputted semantic file.
+   let semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
     if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())){
 
         let semantic_parser_res = semantic_parser_ldd(syntaxic_parsing_handle);

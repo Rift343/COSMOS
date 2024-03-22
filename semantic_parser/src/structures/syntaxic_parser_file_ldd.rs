@@ -8,7 +8,7 @@ use super::table_name_couple::TableNameCouple;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SyntaxicParserFileLdd {
     /// Vector of all the requested table names bundled together
-    pub table_name: String,
+    pub table_name: Vec<String>,
     /// Vector of all the requested columns, which we can't yet associate to their table name
     pub columns: Vec<ColumnTableNameTripleLdd>,
     /// Status of the result, set to true if no errors occurred, else false, in which case the error field is filled out
@@ -19,7 +19,4 @@ pub struct SyntaxicParserFileLdd {
     /// the engine allowed it, aka no errors have occurred which we need to think about
     error: Option<String>,
     pub action : String,
-    pub constraint : Vec<String>,
-    pub datatype : Vec<String>,
-    pub values : Option<String>
 }

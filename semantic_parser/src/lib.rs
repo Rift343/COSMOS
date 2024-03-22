@@ -6,13 +6,14 @@ use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 
+use serde_json::to_string;
 use structures::syntaxic_parser_file::SyntaxicParserFile;
 
 use structures::semantic_parser_file::SemanticParserFile;
 use structures::syntaxic_parser_file_ldd::SyntaxicParserFileLdd;
 use structures::semantic_parser_file::TableDictionary;
 
-use structures::table_metadata::{Constraint, TableMetadata};
+use structures::table_metadata::{ColumnNameTypeCouple, Constraint, TableMetadata};
 
 use crate::structures::semantic_parser_file::ColumnNameCouple;
 use crate::structures::table_name_couple::TableNameCouple;
@@ -43,16 +44,17 @@ fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
     }
 }
 fn semantic_parser_create(syntaxic_file_content_as_struct : SyntaxicParserFileLdd,table_metadata_as_struct : Vec<TableMetadata> ) -> Result<File, Box<dyn Error>> {
+    println!("debut create");
     let new_table_name = syntaxic_file_content_as_struct.table_name;
-
-
+    let mut table_metadata_as_struct = table_metadata_as_struct;
+    println!("on check primary key");
 for table_metadata in &table_metadata_as_struct {
             if table_metadata.table_name.to_lowercase() == new_table_name.to_lowercase() {
                 return Err(Box::from("a table with this name already exist".to_string()));
             }
             let mut primary_key_present = false;
-            for column in  syntaxic_file_content_as_struct.columns{
-                for constraint in column.constraint{
+            for column in  &syntaxic_file_content_as_struct.columns{
+                for constraint in &column.constraint{
                     if constraint=="PRIMARY KEY"{
                         primary_key_present= true;
                     }
@@ -65,20 +67,44 @@ for table_metadata in &table_metadata_as_struct {
                 }
             
 
+                println!("on create table meta data");
+                let mut result = TableMetadata{
+                    table_name : new_table_name,
+                    columns : vec![],
+                    constraints: vec![], 
+                };
+                for column in &syntaxic_file_content_as_struct.columns {
+                    result.columns.push(ColumnNameTypeCouple {
+                        column_name: column.attribute_name.clone(),
+                        column_type: column.datatype.clone(),
+                    });
+                    for constraint in &column.constraint{
+                        let mut attribute_list = Vec::new();
+                        attribute_list.push(constraint.clone());
+                        result.constraints.push(Constraint {
+                            constraint_name: column.attribute_name.clone() + &constraint,
+                            constraint_type: constraint.clone(),
+                            attribute_list,
+                            foreign_key: None,
+                            check: None,
+                        });
+                        }
+                    }
 
-                let mut result = std::collections::HashMap::new();
-                //result.insert("table_name".to_string(), new_table_name);
-                result.insert("columns".to_string(), Vec::<std::collections::HashMap<String, String>>::new());
-                result.insert("constraint".to_string(), Vec::<std::collections::HashMap<String, String>>::new());
+                    table_metadata_as_struct.push(result);
+                    let json_string = match to_string(&table_metadata_as_struct) {
+                        Ok(result) => result,
+                        Err(error) => return Err(Box::from(format!("Unable to serialize struct to JSON: {}\n", error)))
+                    };
             // Open or create a file called syntaxic_parsing.json placed in data/transferFile
             // The truncate(true) option allows for overwriting the entire file, needed when writing less bytes than already present
-            let mut synt_parsing_file : File = match File::options().read(true).write(true).truncate(true).create(true).open("data/transferFile/syntaxic_parsing.json"){
+            let mut synt_parsing_file : File = match File::options().read(true).write(true).truncate(true).create(true).open("data/SemanticTestData/FM_1.json"){
                 Ok(result) => result,
                 Err(error) => return Err(Box::from(format!("Unable to open or create file : {}\n", error)))
             };
-        
+            println!("write all");
             // Write the contents of res_textx in the file
-            match synt_parsing_file.write_all(res_textx.as_bytes()){
+            match synt_parsing_file.write_all(json_string.as_bytes()){
                 Ok(_) => (),
                 Err(error) => return Err(Box::from(format!("Unable to write in file : {}\n", error)))
             };
@@ -90,7 +116,7 @@ for table_metadata in &table_metadata_as_struct {
                 //return Err(Box::from(&("Error, Unable to seek from start".to_string() + error_str))) to get rid of type str_err
             };
 
-Ok(())
+            return Ok(synt_parsing_file);
             }
 
 
@@ -109,9 +135,10 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
 
             contents_of_file
         };
-
+        println!("read syntaxe");
         // Extract the string to a SyntaxicParserFile structure, and return it to allow
         // syntaxic_file_content_as_struct to receive the value
+        println!("{}?",syntaxic_file_content_as_str.as_str());
         match serde_json::from_str(syntaxic_file_content_as_str.as_str()) {
             Ok(content) => {
                 content
@@ -119,23 +146,15 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
             Err(error) => return Err(Box::try_from(error).unwrap())
         }
     };
-
+    println!("read metadata");
     let table_metadata_as_struct: Vec<TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
 
-    let mut table_name_correspondent: HashMap<String, String> = HashMap::new();
 
     // Temporary variable to store what will be returned in the file
     // Done now due to the vector requiring allocating
     // TODO : Find a better name for this variable
-    let mut res_printable = SemanticParserFile {
-        tables: vec![],
-        conditions: None,
-        status: true,
-        error: "".to_string(),
-
-    };
     if (syntaxic_file_content_as_struct.action=="create"){
-
+        println!("parser create");
         return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);
         
     }else{
@@ -156,7 +175,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
         // File stores a str not structure, so we must first extract it before converting and put it
         // In a temporary variable
         let syntaxic_file_content_as_str = {
-            let mut contents_of_file = String::new();
+            let mut contents_of_file = "./data/transferFile/syntaxic_parsing.json".to_string();
 
             match syntaxic_file.read_to_string(&mut contents_of_file) {
                 Ok(_) => (),
@@ -165,7 +184,6 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
             contents_of_file
         };
-
         // Extract the string to a SyntaxicParserFile structure, and return it to allow
         // syntaxic_file_content_as_struct to receive the value
         match serde_json::from_str(syntaxic_file_content_as_str.as_str()) {
