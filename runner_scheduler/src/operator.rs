@@ -231,6 +231,59 @@ pub(crate)fn max(self,attribut: &String,type_attr: &String)->Vec<String>
 }
 
 
+pub(crate)fn avg(self,attribut: &String,type_attr:&String)->Vec<String>
+{
+    let mut result_vec = Vec::new();
+    result_vec.push("SUM(".to_string()+attribut+")");
+    let mut sum = 0;
+    let mut sum2 : f64 = 0.0;
+    let mut index: usize = 0;
+    for i in 0..self.descriptor[0].len()
+    {
+        if self.descriptor[0][i] == attribut.to_string()
+        {
+            index = i;
+            break;
+        }
+    }
+    for i in 1..self.descriptor.len()
+    {
+        if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
+        {
+            if type_attr == "INTEGER"
+            {
+                let value : i128 = self.descriptor[i][index].parse().unwrap();
+                sum=sum+value;
+            }
+            else if type_attr == "FLOAT"
+            {
+                let value : f64 = self.descriptor[i][index].parse().unwrap();
+                sum2=sum2+value;
+            }
+        }
+                
+    }
+    if type_attr == "INTEGER"
+            {
+                let mut avg: f64 = sum as f64;
+                avg=avg/((self.descriptor.len()-1) as f64);
+                result_vec.push(avg.to_string());
+                return result_vec;
+            }
+    else if type_attr == "FLOAT"
+    {
+        sum2 = sum2/((self.descriptor.len()-1) as f64);
+        result_vec.push(sum2.to_string());
+        return result_vec;
+    }
+    else {
+        result_vec.push("Err".to_string());
+        return result_vec;
+    }
+    
+}
+
+
 #[doc =r"Write a CSV file with the descriptor in ./data/transferFile/result.csv file "]
 pub(crate)fn to_file(&self)->Result<File,Box<dyn Error>>{
         let mut file:File = match OpenOptions::new().read(true).write(true).truncate(true).create(true).open("./data/transferFile/result.csv") {
@@ -469,6 +522,17 @@ mod tests {
 
     }
 
+    #[test]
+    fn test_avg()
+    {
+        let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
+        let path_str="personneTest.AGE".to_string();
+        let type_str = "INTEGER".to_string();
+        let test = table1.avg(&path_str, &type_str);
+        let value:u128 = test[1].parse().unwrap();
+        assert_eq!(value,40);
+        println!("{:?}",test);
+    }
 
     #[test]
     fn test_union()
