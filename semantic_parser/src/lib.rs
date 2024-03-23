@@ -6,21 +6,15 @@ use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 
-use structures::syntaxic_parser_file::SyntaxicParserFile;
-
-use structures::semantic_parser_file::SemanticParserFile;
-use structures::semantic_parser_file::TableDictionary;
-
-use structures::table_metadata::TableMetadata;
-
-use crate::structures::semantic_parser_file::ColumnNameCouple;
-use crate::structures::table_name_couple::TableNameCouple;
+use crate::structures::semantic_parser_file::{AggregateHashmap, ColumnNameCouple, SemanticParserFile, TableHashmap};
+use crate::structures::syntaxic_parser_file::{SyntaxicParserFile, TableNameCouple};
+use crate::structures::table_metadata::{ColumnNameTypeCouple, TableMetadata};
 
 /// # Retrieves table metadata stored at a given path
 ///
 /// Not a constant but a function for now so as to later allow caching and editing of metadata
 /// (Not to be included soon, part of the Data Definition Language)
-fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
+fn get_metadata(metadata_file_path: String) -> HashMap<String, TableMetadata> {
     // Store in temporary variable the file metadata but as a String
     let table_metadata_as_str = {
         match fs::read_to_string(metadata_file_path) {
@@ -38,10 +32,111 @@ fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
         Ok(content) => {
             return content;
         }
-        Err(error) => panic!("Error : {}", error)
+        Err(error) => panic!("Error : {:?}", error)
     }
 }
 
+fn get_type_of_attribute(attribute_list: &Vec<ColumnNameTypeCouple>, attribute_name: &String) -> Result<String, Box<dyn Error>>{
+    for couple in attribute_list {
+        if &couple.column_name == attribute_name {
+            return Ok(couple.column_type.clone());
+        }
+    }
+
+    return Err(Box::from(format!("Error : Attribute has no specified type in metadata : {}\n", attribute_name)));
+}
+
+fn check_if_attribute_exists_in_table(table: &TableMetadata, attribute_name: &String) -> bool {
+    for table_attribute in &table.columns {
+        if table_attribute.column_name == *attribute_name {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, attribute_name: &String) -> (Option<String>, u8) {
+    let mut found_table_name: Option<String> = None;
+    let mut nb_found = 0;
+
+    for table_name in table_metadata.keys() {
+        let table = table_metadata.get(table_name).expect("");
+        for table_attribute in &table.columns {
+            if table_attribute.column_name == *attribute_name {
+                found_table_name = Some(table_name.clone());
+                nb_found += 1;
+            }
+        }
+    }
+    return (found_table_name, nb_found);
+}
+
+fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableMetadata>, attribute_name: &String, table_use_name: &String, renamed_table_name_map: &HashMap<String, String>) -> Result<String, Box<dyn Error>>{
+    let table_name: String;
+
+    if table_use_name == "" {
+        let (optional_table_name, nb_found) = check_if_attribute_exist(&table_metadata_as_struct, attribute_name);
+
+        table_name = match optional_table_name {
+            None => {
+                return Err(Box::from(format!("No table containing requested attribute found : {}\n", attribute_name)));
+            }
+            Some(matching_table_name) => {
+                matching_table_name
+            }
+        };
+
+        match nb_found {
+            0 => {
+                return Err(Box::from(format!("Requested attribute not found : {}\n", attribute_name)));
+            }
+            1 => {
+                ()
+            }
+            _ => {
+                return Err(Box::from(format!("Multiple occurrences of requested attribute found ({}): {}\n", nb_found, attribute_name)));
+            }
+        }
+    } else {
+        table_name = match renamed_table_name_map.get(table_use_name) {
+            None => {
+                return Err(Box::from(format!("Unknown use of a table name : {}\n", table_use_name)));
+            }
+            Some(table_name) => {
+                table_name.clone()
+            }
+        };
+
+        let specified_table = match table_metadata_as_struct.get(&table_name) {
+            None => {
+                return Err(Box::from(format!("Unknown error : Table not found in metadata file despite validation : {}\t{}\n", table_use_name, table_name)));
+            }
+            Some(desired_table) => {
+                desired_table
+            }
+        };
+
+        if check_if_attribute_exists_in_table(specified_table, &attribute_name) {
+            ()
+        } else {
+            return Err(Box::from(format!("Attribute with specified table name not found : {}.{} (Alt table name : {})\n", table_name, attribute_name, table_use_name)));
+        }
+    }
+
+    Ok(table_name)
+}
+
+fn get_all_attributes_of_table(table_attribute_list: &Vec<ColumnNameTypeCouple>, to_fill_attribute_list: &mut Vec<ColumnNameCouple>){
+    for couple in table_attribute_list{
+        let temp_attribute_couple = ColumnNameCouple{
+            attribute_name: couple.column_name.clone(),
+            use_name_attribute: couple.column_name.clone(),
+        };
+
+        to_fill_attribute_list.push(temp_attribute_couple);
+    }
+}
 
 /// # Main function of the semantic parsing module
 ///
@@ -76,158 +171,136 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
         }
     };
 
-    let table_metadata_as_struct: Vec<TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
+    let table_metadata_as_struct: HashMap<String, TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
+    let mut renamed_table_name_map: HashMap<String, String> = HashMap::new();
 
-    let mut table_name_correspondent: HashMap<String, String> = HashMap::new();
-
-    // Temporary variable to store what will be returned in the file
-    // Done now due to the vector requiring allocating
-    // TODO : Find a better name for this variable
-    let mut res_printable = SemanticParserFile {
-        tables: vec![],
+    let mut semantic_parser_file_as_struct = SemanticParserFile {
+        tables: HashMap::new(),
+        aggregates: vec![],
         conditions: None,
-        status: true,
-        error: "".to_string(),
     };
 
-    // Loops over every table amongst the requested tables,
-    // Check if they exist by looping all tables in the metadata file,
-    // And if they do then store them in a TableDictionary and add it to the tables vector for
-    // res_printable
-    for requested_table in syntaxic_file_content_as_struct.table_name {
-        let mut found_table = false;
-        let mut table_name = "".to_string();
 
-        for table_metadata in &table_metadata_as_struct {
-            if table_metadata.table_name.to_lowercase() == requested_table.table_name.to_lowercase() {
-                found_table = true;
-                table_name = table_metadata.table_name.clone();
+    for requested_table in &syntaxic_file_content_as_struct.table_name {
+        match table_metadata_as_struct.get(&requested_table.table_name) {
+            None => {
+                return Err(Box::from(format!("Requested table not found : {}\n", requested_table.table_name)));
+            }
+            Some(_) => {
+                println!("Table {} found", requested_table.table_name);
+                renamed_table_name_map.insert(requested_table.use_name_table.clone(), requested_table.table_name.clone());
 
-                table_name_correspondent.insert(requested_table.use_name_table.clone(), table_name.clone());
+                let temp = TableHashmap {
+                    use_name_table: requested_table.use_name_table.clone(),
+                    columns: vec![],
+                };
+
+                semantic_parser_file_as_struct.tables.insert(requested_table.table_name.clone(), temp);
             }
         }
-
-        println!("Tables requested : {:?}\tActual name {}\tRenamed name : {}\tFound : {}", requested_table, table_name, requested_table.use_name_table.clone() ,found_table);
-
-        if ! found_table {
-            return Err(Box::from(format!("Requested table not found : {}\n", table_name)));
-
-        }
-
-        let temp_dic_table = TableDictionary {
-            table: TableNameCouple{
-                table_name,
-                use_name_table: requested_table.use_name_table.clone(),
-            },
-            columns: vec![],
-        };
-
-        res_printable.tables.push(temp_dic_table);
     }
 
-    // Loops over every column amongst the request ones, as well as loop over every metadata column,
-    // Count how many times they appear (Column and Table names must match, unless table name is
-    // Empty, in which case only the column name needs to match
-    for requested_column in syntaxic_file_content_as_struct.columns {
-        let mut nb_found = 0;
+    for requested_attribute in &syntaxic_file_content_as_struct.columns {
+        let attribute_name = requested_attribute.attribute_name.clone();
+        let use_name_attribute = requested_attribute.use_name_attribute.clone();
+        let mut use_name_table = requested_attribute.use_name_table.clone();
 
-        // Use corresponding_table variable rather than directly the requested table name because
-        // We can give column names without a table name (if unambiguous), so this guarantees we can
-        // Later properly add it to our return
-        let mut corresponding_table: String = "".to_string();
-        let mut corresponding_column: String = "".to_string();
+        if attribute_name == "*"{
+            let vec_lifetime_extender: Vec<TableNameCouple>;
+            let vector_of_table_names: &Vec<TableNameCouple>;
 
-        // Put check here inside of loop, doesn't matter as either we have '*' and nothing else, or a list of attributes, never a mix of the two
-        if requested_column.attribute_name != "*" {
-            for table_metadata in &table_metadata_as_struct {
-                for column_couple in &table_metadata.columns {
-                    let corresponding_table_name = {
-                        let res;
-
-                        match table_name_correspondent.get(&requested_column.use_name_table.clone()) {
-                            None => return Err(Box::from(format!("Renamed table not found : {}\n", requested_column.use_name_table))),
-                            Some(name) => res = name
-                        };
-
-                        res.to_lowercase()
-                    };
-                    // Both table and column name match
-                    // OR if table name is empty then only match column name
-                    if ((requested_column.attribute_name.to_lowercase() == column_couple.column_name.to_lowercase()) && (corresponding_table_name == table_metadata.table_name.to_lowercase()))
-                        ||
-                        (corresponding_table_name == "") {
-                        nb_found += 1;
-                        if nb_found == 1 {
-                            corresponding_table = table_metadata.table_name.clone();
-                            corresponding_column = column_couple.column_name.clone();
+            if use_name_table == "" {
+                vector_of_table_names = &syntaxic_file_content_as_struct.table_name;
+            }
+            else {
+                let table_name = {
+                    match renamed_table_name_map.get(&use_name_table){
+                        None => {
+                            return Err(Box::from(format!("Attribute claims to belong to a non existent table : {}.{}\n", use_name_table, attribute_name)));
                         }
-                    } else if (requested_column.attribute_name == "*") && (corresponding_table_name == table_metadata.table_name.to_lowercase()) {
-                        corresponding_table = table_metadata.table_name.clone();
-                        corresponding_column = column_couple.column_name.clone();
-                        nb_found = 1;
+                        Some(table_name) => {
+                            table_name
+                        }
                     }
-                }
+                };
+
+                let requested_table_attributes = TableNameCouple {
+                    table_name: table_name.clone(),
+                    use_name_table,
+                };
+
+                vec_lifetime_extender = vec![requested_table_attributes];
+                vector_of_table_names = &vec_lifetime_extender;
             }
 
-            println!("Requested column : '{}.{}'\tActual : '{}.{}'", requested_column.use_name_table, requested_column.use_name_attribute, corresponding_table, corresponding_column);
-
-
-            // React differently depending on how many occurrences for a better error messages
-            match nb_found {
-                0 => {
-                    return Err(Box::from(format!("Column : '{}.{}'\tNon-Renamed : {}\nNot found", requested_column.use_name_table, requested_column.use_name_attribute, requested_column.attribute_name)))
-                }
-                1 => {
-                    // If the column is correct, then go over every requested table in our return variable
-                    // And once we found the table to which our column belongs, then we add it to it
-                    for table in &mut res_printable.tables {
-                        if table.table.table_name == corresponding_table {
-                            let temp_couple = ColumnNameCouple {
-                                attribute_name: corresponding_column.clone(),
-                                use_name_attribute: requested_column.use_name_attribute.clone(),
-                            };
-
-                            table.columns.push(temp_couple);
+            for requested_table in vector_of_table_names {
+                let attribute_list_for_requested_table = {
+                    match table_metadata_as_struct.get(&requested_table.table_name){
+                        None => {
+                            return Err(Box::from(format!("Requested table not found in metadata despite validation : {}\n", requested_table.table_name)));
+                        }
+                        Some(requested_table_metadata) => {
+                            &requested_table_metadata.columns
                         }
                     }
-                }
-                // Any number of occurrences beyond 1 is handled identically, all are ambiguous
-                _ => {
-                    return Err(Box::from(format!("Column : '{}.{}'\nAmbiguous request, multiple occurrences in requested table list.", requested_column.use_name_table, requested_column.use_name_attribute)))
-                }
+                };
+
+                let attribute_list_for_requested_tables = {
+                    &mut semantic_parser_file_as_struct.tables.get_mut(&requested_table.table_name).unwrap().columns
+                };
+
+                get_all_attributes_of_table(attribute_list_for_requested_table, attribute_list_for_requested_tables);
             }
         }
 
-        // Handle the situation where we have '*' and nothing else, where we need to add every attribute to the request
-        // Will need some cleaning up but works.
+        else if attribute_name.contains(","){
+            let (aggregate_type, attribute_name) = {
+                let split_attribute_name: Vec<&str> = attribute_name.split(",").collect();
+
+                (split_attribute_name[0].to_string(), split_attribute_name[1].to_string())
+            };
+
+            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map)?;
+
+            if use_name_table == "" {
+                use_name_table = table_name.clone();
+            }
+
+            let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap().columns;
+
+            let temp_aggregate_struct = AggregateHashmap {
+                use_name_table,
+                use_name_attribute,
+                aggregate_type,
+                attribute_type: get_type_of_attribute(table_metadata_column_vec, &attribute_name)?,
+                attribute_name,
+            };
+
+            semantic_parser_file_as_struct.aggregates.push(temp_aggregate_struct);
+
+        }
         else {
-            for table in &mut res_printable.tables {
-                for table_metadata in &table_metadata_as_struct {
-                    for column_couple in &table_metadata.columns {
-                        if table_metadata.table_name == table.table.table_name {
-                            let temp_couple = ColumnNameCouple {
-                                attribute_name: column_couple.column_name.clone(),
-                                // If * used, as we have no way of renaming individual attributes we just reuse the name
-                                use_name_attribute: column_couple.column_name.clone(),
-                            };
+            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map)?;
 
-                            table.columns.push(temp_couple);
-                        }
-                    }
+            let temp_column_name_couple = ColumnNameCouple {
+                attribute_name,
+                use_name_attribute,
+            };
+
+            match semantic_parser_file_as_struct.tables.get_mut(&table_name){
+                None => {
+                    return Err(Box::from(format!("Table not found despite validation : {}\n", table_name)));
+                }
+                Some(current_table) => {
+                    current_table.columns.push(temp_column_name_couple);
                 }
             }
         }
     }
 
-    // I/O operations to first convert the structure to a String using serde_json
-    // Then to create an output file with read, write and creation permissions
-    // We then wipe the files data (if it existed prior) by setting its length to 0
-    // Then we write everything to the file, put the file cursor to the start to clean-up after ourselves
-    // Before returning it
-    let output_semantic_file_as_str = serde_json::to_string(&res_printable).expect("Error whilst serialising semantic file struct.");
+    let output_semantic_file_as_str = serde_json::to_string(&semantic_parser_file_as_struct).expect("Error whilst serialising semantic file struct.");
 
     let mut output_semantic_file = File::options().read(true).write(true).create(true).open("data/SemanticTestData/FSE_1.json").expect("Error whilst creating semantic parser output file");
-
 
     output_semantic_file.set_len(0).expect("Error whilst reinitialising semantic output file.");
     output_semantic_file.write_all(output_semantic_file_as_str.as_bytes()).expect("Error occurred whilst writing to semantic output file.");
