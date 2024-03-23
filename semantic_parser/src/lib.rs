@@ -56,14 +56,16 @@ fn check_if_attribute_exists_in_table(table: &TableMetadata, attribute_name: &St
     return false;
 }
 
-fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, attribute_name: &String) -> (Option<String>, u8) {
+fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, attribute_name: &String, list_of_selected_tables: &Vec<TableNameCouple>) -> (Option<String>, u8) {
     let mut found_table_name: Option<String> = None;
     let mut nb_found = 0;
 
-    for table_name in table_metadata.keys() {
+    for table in list_of_selected_tables {
+        let table_name = &table.table_name;
         let table = table_metadata.get(table_name).expect("");
         for table_attribute in &table.columns {
             if table_attribute.column_name == *attribute_name {
+                println!("Found in table : {}.{}", table_name, attribute_name);
                 found_table_name = Some(table_name.clone());
                 nb_found += 1;
             }
@@ -72,11 +74,11 @@ fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, att
     return (found_table_name, nb_found);
 }
 
-fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableMetadata>, attribute_name: &String, table_use_name: &String, renamed_table_name_map: &HashMap<String, String>) -> Result<String, Box<dyn Error>>{
+fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableMetadata>, attribute_name: &String, table_use_name: &String, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>) -> Result<String, Box<dyn Error>>{
     let table_name: String;
 
     if table_use_name == "" {
-        let (optional_table_name, nb_found) = check_if_attribute_exist(&table_metadata_as_struct, attribute_name);
+        let (optional_table_name, nb_found) = check_if_attribute_exist(&table_metadata_as_struct, attribute_name, selected_table_list);
 
         table_name = match optional_table_name {
             None => {
@@ -260,7 +262,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                 (split_attribute_name[0].to_string(), split_attribute_name[1].to_string())
             };
 
-            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map)?;
+            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
 
             if use_name_table == "" {
                 use_name_table = table_name.clone();
@@ -280,7 +282,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
         }
         else {
-            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map)?;
+            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
 
             let temp_column_name_couple = ColumnNameCouple {
                 attribute_name,
