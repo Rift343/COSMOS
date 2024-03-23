@@ -3,6 +3,7 @@ use std::fs::File;
 use std::error::Error;
 use std::io::Write;
 use crate::operator::CSVFile;
+use crate::relation_insert::relation_insert;
 
 #[allow(unused_variables)]
 #[allow(unused_must_use)]
@@ -22,6 +23,10 @@ pub(crate) fn relation_creater(table_name:&String,attribute_list :&Vec<String>)-
         Err(e) =>  return Err(Box::new(e)),
     };
     let _a = file.write_all(string_prototype_csv.as_bytes())?;
+    let mut vector: Vec<String> = Vec::new();
+    vector.push(table_name.to_string());
+    let meta_table = "ALL_TABLE".to_string();
+    relation_insert(&meta_table, &vector);
     Ok(0)
 }
 
@@ -33,7 +38,7 @@ mod tests {
     #[test]
     fn test_relation_creater()
     {
-        let name_test="csv_test".to_string();
+        let name_test="csv_test2".to_string();
         let mut attribut_test:Vec<String> = Vec::new();
         attribut_test.push("test1".to_string());
         attribut_test.push("test2".to_string());

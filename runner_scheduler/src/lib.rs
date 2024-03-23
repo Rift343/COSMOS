@@ -1,13 +1,17 @@
 use std::string::String;
-use std::{collections::HashMap, fs::File, io::{Read, Seek}};
+use std::{fs::File, io::{Read, Seek}};
 use std::error::Error;
 //use json::JsonValue::String; J'espère que les String json sont les
 //même ques les trings classique car j'arrive pas a compiler avec
 //les json string
 
-use crate::operator::CSVFile;
-mod operator;
-mod relation_creater;
+use intermediary_request::intermediary_request;
+
+pub mod operator;
+pub mod relation_creater;
+pub mod relation_insert;
+pub mod relation_drop;
+pub mod intermediary_request;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
@@ -26,6 +30,12 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
         str_json.push(i as char);
     }
     let parse_json=json::parse(&str_json.to_string()).unwrap();
+    let a1 = match intermediary_request(&parse_json) {
+        Ok(a) => a,
+        Err(e) => return Err(Box::from(e)),
+    }; 
+    
+    /* 
     parse_json.dump();
     //println!("{:?}",parse_json);
     let mut key:Vec<String>=Vec::new();//We need to keep the list of the key in memory
@@ -85,7 +95,7 @@ pub fn scheduler(mut json_file:&File)->Result<File,Box<dyn Error>>{
     let mut a1 = dictionnary[&key[0]].clone();
     a1.projection(final_proj);
     println!("{:?}",as_hashmap);
-    a1.replace_as(&as_hashmap);
+    a1.replace_as(&as_hashmap);*/
     a1.to_file()
 }
 
@@ -121,7 +131,7 @@ mod tests {
     fn test_on_json(){
         let fichier_json_test:std::fs::File = File::open("semantique.json").expect("Error ==> Can't read the JSON file");
         let _a = match scheduler(&fichier_json_test)  {
-            Ok(_) => print!("ok"),
+            Ok(_a) => print!("ok"),
             Err(e) => println!("{}",e),
         };
         
