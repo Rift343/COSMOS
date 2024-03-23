@@ -34,16 +34,6 @@ fn get_metadata(metadata_file_path: String) -> HashMap<String, TableMetadata> {
     }
 }
 
-fn get_type_of_attribute(attribute_list: &Vec<ColumnNameTypeCouple>, attribute_name: &String) -> Result<String, Box<dyn Error>>{
-    for couple in attribute_list {
-        if &couple.column_name == attribute_name {
-            return Ok(couple.column_type.clone());
-        }
-    }
-
-    return Err(Box::from(format!("Error : Attribute has no specified type in metadata : {}\n", attribute_name)));
-}
-
 fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, attribute_name: &String, list_of_selected_tables: &Vec<TableNameCouple>) -> (Option<String>, u8) {
     let mut found_table_name: Option<String> = None;
     let mut nb_found = 0;
@@ -255,13 +245,13 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
                 use_name_table = table_name.clone();
             }
 
-            let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap().columns;
+            let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap();
 
             let temp_aggregate_struct = AggregateHashmap {
                 use_name_table,
                 use_name_attribute,
                 aggregate_type,
-                attribute_type: get_type_of_attribute(table_metadata_column_vec, &attribute_name)?,
+                attribute_type: table_metadata_column_vec.get_type_of_attribute(&attribute_name)?,
                 attribute_name,
             };
 

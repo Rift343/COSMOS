@@ -1,3 +1,4 @@
+use std::error::Error;
 use serde::{Deserialize, Serialize};
 
 /// Represents a couple which stores columns, contains their name and their type
@@ -44,5 +45,15 @@ impl TableMetadata {
         }
 
         false
+    }
+
+    pub fn get_type_of_attribute(&self, attribute_name: &String) -> Result<String, Box<dyn Error>>{
+        for couple in &self.columns {
+            if &couple.column_name == attribute_name {
+                return Ok(couple.column_type.clone());
+            }
+        }
+
+        return Err(Box::from(format!("Error : Attribute has no specified type in metadata : {}\n", attribute_name)));
     }
 }
