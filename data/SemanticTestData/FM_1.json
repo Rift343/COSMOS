@@ -1,15 +1,17 @@
-[
-  {
-    "table_name": "Personne",
+{
+  "PERSONNE": {
     "columns": [
       {
-        "column_name": "ID", "column_type": "INT"
+        "column_name": "ID",
+        "column_type": "INT"
       },
       {
-        "column_name": "NOM", "column_type": "VARCHAR(20)"
+        "column_name": "NOM",
+        "column_type": "VARCHAR(20)"
       },
       {
-        "column_name": "PRENOM", "column_type": "VARCHAR(20)"
+        "column_name": "PRENOM",
+        "column_type": "VARCHAR(20)"
       }
     ],
     "constraints": [
@@ -23,17 +25,19 @@
     ]
   },
 
-  {
-    "table_name": "PersonneClonee",
+  "PERSONNECLONEE": {
     "columns": [
       {
-        "column_name": "ID2", "column_type": "INT"
+        "column_name": "ID2",
+        "column_type": "INT"
       },
       {
-        "column_name": "NOM", "column_type": "VARCHAR(20)"
+        "column_name": "NOM",
+        "column_type": "VARCHAR(20)"
       },
       {
-        "column_name": "PRENOM", "column_type": "VARCHAR(20)"
+        "column_name": "PRENOM",
+        "column_type": "VARCHAR(20)"
       }
     ],
     "constraints": [
@@ -46,4 +50,4 @@
       }
     ]
   }
-]
+}
