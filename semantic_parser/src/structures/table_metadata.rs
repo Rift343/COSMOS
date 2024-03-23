@@ -31,7 +31,6 @@ pub struct Constraint {
 /// Represents a tables metadata
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TableMetadata {
-    pub table_name: String,
     pub columns: Vec<ColumnNameTypeCouple>,
     pub constraints: Vec<Constraint>
 }

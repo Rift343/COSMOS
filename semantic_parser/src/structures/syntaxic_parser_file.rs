@@ -1,7 +1,12 @@
 use serde::{Deserialize, Serialize};
 
 use super::column_table_name_triple::ColumnTableNameTriple;
-use super::table_name_couple::TableNameCouple;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TableNameCouple {
+    pub table_name: String,
+    pub use_name_table: String,
+}
 
 
 /// Structure representing the Syntaxic Parser File, which is a dictionary with four keys : table_name, columns, status and error

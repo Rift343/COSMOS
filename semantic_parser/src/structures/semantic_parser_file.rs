@@ -1,5 +1,5 @@
+use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::structures::table_name_couple::TableNameCouple;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ColumnNameCouple {
@@ -10,18 +10,24 @@ pub struct ColumnNameCouple {
 
 /// Represents a dictionary where the key is the table_name, and the value being a vector of a ColumnTableNameCouple structure
 #[derive(Serialize, Deserialize, Debug)]
-pub struct TableDictionary {
-    pub table: TableNameCouple,
+pub struct TableHashmap {
+    pub use_name_table: String,
     pub columns: Vec<ColumnNameCouple>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AggregateHashmap{
+    pub use_name_table: String,
+    pub attribute_name: String,
+    pub use_name_attribute: String,
+    pub aggregate_type: String,
+    pub attribute_type: String
 }
 
 /// Structure representing the contents of the Semantic Parser File, being a dictionary with four keys : tables, conditions, status and error
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SemanticParserFile {
-    pub tables: Vec<TableDictionary>,
+    pub tables: HashMap<String, TableHashmap>,
+    pub aggregates: Vec<AggregateHashmap>,
     pub conditions: Option<String>,
-    /// Status of the result, set to true if no errors occurred, else false, in which case the error field is filled out
-    pub status: bool,
-    /// If the status is set to false, contains the error which occurred to be displayed to the user
-    pub error: String
 }
