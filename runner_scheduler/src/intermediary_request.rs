@@ -6,7 +6,7 @@ use crate::operator::{self, CSVFile};
 
 pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error>>
 {
-    println!("{}",sub_requet.dump());
+    println!("Begin runner_scheduler : {}",sub_requet.dump());
     let parse_json = sub_requet;
     let mut keylst:Vec<String>=Vec::new();//We need to keep the list of the key in memory
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
@@ -35,9 +35,16 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         //println!("{}",parse_json["tables"][i]["table"]["table_name"].to_string());
         //println!("{:?}",as_hashmap);
         let mut open_file:CSVFile = operator::open_relation(key.to_string(), &value["use_name_table"].to_string())?;//.expect("error");//We open each relation
-        open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
+        if intermediary_vector.len()!=0
+        {
+            open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
+        }
         dictionnary.insert(value["use_name_table"].to_string(),open_file);//We insert the projected file in a dictionnary
     }
+
+
+
+
     /* 
     
     for i in 0..parse_json["tables"].len(){
@@ -89,10 +96,10 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         
         dictionnary.insert(keylst[0].to_string(), test);
     }
-    println!("crash");
+    //println!("crash");
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&keylst[0]].clone();
-    a1.projection(final_proj);
+    
     //println!("{:?}",as_hashmap);
     
 
@@ -102,9 +109,13 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         tab_agregate_fun.push(parse_json["aggregates"][i].clone());
         let mut str1 = parse_json["aggregates"][i]["aggregate_type"].to_string();
         str1.push('(');
-        str1.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
-        str1.push(')');
-        as_hashmap.insert(str1,parse_json["aggregates"][i]["use_name_attribute"].to_string() );
+        let mut str2 = str1.clone();
+        str2.push_str(&parse_json["aggregates"][i]["use_name_table"].to_string());
+        str2.push('.');
+        str2.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
+        str2.push(')');
+        final_proj.push(str2.clone());
+        as_hashmap.insert(str2,parse_json["aggregates"][i]["use_name_attribute"].to_string() );
         //println!("{}",parse_json["aggregates"][i].dump());
     }
     let mut tab_thread = Vec::new();
@@ -152,6 +163,10 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         a1.add_column_for_agregate(&data_out);
 
     }
+    println!("{}",a1.to_string());
+    println!("{:?}",final_proj);
+    println!("{:?}",as_hashmap);
+    a1.projection(final_proj);
     a1.replace_as(&as_hashmap);
     Ok(a1)
 }
