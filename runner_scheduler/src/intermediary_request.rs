@@ -5,7 +5,8 @@ use json::JsonValue;
 use crate::operator::{self, CSVFile};
 
 
-#[doc = "This function is use for the query and subquery. Need in input a reference of a JsonValue of the Semantic parser. Return a CSVFile or error. Can crash if the date of the CSV are corructped"]
+#[doc = "This function is use for the query and subquery. Need in input a reference of a JsonValue of the Semantic parser. Return a CSVFile or error. Can crash if the date of the CSV are corructped
+Use thread for the agragation fonction (for the select statement) and for the intermediary request/sub-query"]
 pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error>>
 {
     println!("Begin runner_scheduler : {}",sub_requet.dump());
