@@ -96,9 +96,7 @@ fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableM
             }
         };
 
-        if specified_table.has_attribute(&attribute_name) {
-            ()
-        } else {
+        if ! specified_table.has_attribute(&attribute_name) {
             return Err(Box::from(format!("Attribute with specified table name not found : {}.{} (Alt table name : {})\n", table_name, attribute_name, table_use_name)));
         }
     }
