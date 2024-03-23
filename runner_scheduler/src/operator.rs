@@ -82,7 +82,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let value:i128 = element_1.parse().unwrap();
             for i in 1..self.descriptor.len()
@@ -140,7 +140,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let value:i128 = element_1.parse().unwrap();
             for i in 1..self.descriptor.len()
@@ -196,7 +196,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_1.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -252,7 +252,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_1.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -308,7 +308,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_1.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -364,7 +364,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_1.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -444,7 +444,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let value:i128 = element_2.parse().unwrap();
             for i in 1..self.descriptor.len()
@@ -502,7 +502,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let value:i128 = element_2.parse().unwrap();
             for i in 1..self.descriptor.len()
@@ -558,7 +558,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_2.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -614,7 +614,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_2.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -673,7 +673,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_2.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -729,7 +729,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let value:i128 = element_2.parse().unwrap();
                 for i in 1..self.descriptor.len()
@@ -795,7 +795,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
             self.descriptor = final_vec;
            }
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let val1:i128 = element_1.parse().unwrap();
             let val2:i128 = element_2.parse().unwrap();
@@ -831,7 +831,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
             self.descriptor = final_vec;
            }
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let val1:i128 = element_1.parse().unwrap();
             let val2:i128 = element_2.parse().unwrap();
@@ -867,7 +867,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
             self.descriptor = final_vec;
            }
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let val1:i128 = element_1.parse().unwrap();
             let val2:i128 = element_2.parse().unwrap();
@@ -903,7 +903,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
             self.descriptor = final_vec;
            }
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             let val1:i128 = element_1.parse().unwrap();
             let val2:i128 = element_2.parse().unwrap();
@@ -939,7 +939,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
                 self.descriptor = final_vec;
                }
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let val1:i128 = element_1.parse().unwrap();
                 let val2:i128 = element_2.parse().unwrap();
@@ -975,7 +975,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
                 self.descriptor = final_vec;
                }
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 let val1:i128 = element_1.parse().unwrap();
                 let val2:i128 = element_2.parse().unwrap();
@@ -1044,7 +1044,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             
             for i in 1..self.descriptor.len()
@@ -1105,7 +1105,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
 
         }
-        else if type_expression == "INTEGER".to_string() 
+        else if type_expression == "INT".to_string() 
         {
             for i in 1..self.descriptor.len()
             {
@@ -1161,7 +1161,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 for i in 1..self.descriptor.len()
                 {
@@ -1217,7 +1217,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 for i in 1..self.descriptor.len()
                 {
@@ -1273,7 +1273,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 for i in 1..self.descriptor.len()
                 {
@@ -1330,7 +1330,7 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
             
     
             }
-            else if type_expression == "INTEGER".to_string() 
+            else if type_expression == "INT".to_string() 
             {
                 for i in 1..self.descriptor.len()
                 {
@@ -1386,10 +1386,12 @@ pub fn add_column_for_agregate(&mut self,column:&Vec<String>)
     if column.len() != 0
     {
         self.descriptor[0].push(column[0].to_string());
+        self.descriptor[1].push(column[1].to_string());
+        /* 
         for i in 1..self.descriptor.len()
         {
             self.descriptor[i].push(column[1].to_string());
-        }
+        }*/
     }
     
 } 
@@ -1471,7 +1473,7 @@ pub fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
     {
         if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
         {
-            if type_attr == "INTEGER"
+            if type_attr == "INT"
             {
                 let value : i128 = self.descriptor[i][index].parse().unwrap();
                 sum=sum+value;
@@ -1484,7 +1486,7 @@ pub fn sum(self,attribut: &String,type_attr:&String)->Vec<String>
         }
                 
     }
-    if type_attr == "INTEGER"
+    if type_attr == "INT"
             {
                 result_vec.push(sum.to_string());
                 return result_vec;
@@ -1514,7 +1516,7 @@ pub fn min(self,attribut: &String,type_attr: &String)->Vec<String>
             break;
         }
     }
-    if (type_attr=="FLOAT"||type_attr=="INTEGER")
+    if (type_attr=="FLOAT"||type_attr=="INT")
     {
         let mut minus_str = &self.descriptor[1][index].clone();
         let mut minus:f64 = minus_str.parse().unwrap();
@@ -1559,7 +1561,7 @@ pub fn max(self,attribut: &String,type_attr: &String)->Vec<String>
             break;
         }
     }
-    if (type_attr=="FLOAT"||type_attr=="INTEGER")
+    if (type_attr=="FLOAT"||type_attr=="INT")
     {
         let mut maxi_str = &self.descriptor[1][index].clone();
         let mut maxi:f64 = maxi_str.parse().unwrap();
@@ -1610,7 +1612,7 @@ pub(crate)fn avg(self,attribut: &String,type_attr:&String)->Vec<String>
     {
         if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
         {
-            if type_attr == "INTEGER"
+            if type_attr == "INT"
             {
                 let value : i128 = self.descriptor[i][index].parse().unwrap();
                 sum=sum+value;
@@ -1623,7 +1625,7 @@ pub(crate)fn avg(self,attribut: &String,type_attr:&String)->Vec<String>
         }
                 
     }
-    if type_attr == "INTEGER"
+    if type_attr == "INT"
             {
                 let mut avg: f64 = sum as f64;
                 avg=avg/((self.descriptor.len()-1) as f64);
@@ -1852,7 +1854,7 @@ mod tests {
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let val1 = WhereElement { where_value: "personneTest.ID".to_string(),boolean_value: true };
         let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
-        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val1, val2);
+        table1.predicat_interpretation('='.to_string(), "INT".to_string(), val1, val2);
         println!("{}",table1.to_string());
     }
     #[test]
@@ -1861,7 +1863,7 @@ mod tests {
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let val1 = WhereElement { where_value: "personneTest.ID".to_string(),boolean_value: true };
         let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
-        table1.predicat_interpretation("<=".to_string(), "INTEGER".to_string(), val1, val2);
+        table1.predicat_interpretation("<=".to_string(), "INT".to_string(), val1, val2);
         println!("{}",table1.to_string());
     }
     
@@ -1872,7 +1874,7 @@ mod tests {
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let val1 = WhereElement { where_value: "5".to_string(),boolean_value: false };
         let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
-        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val2, val1);
+        table1.predicat_interpretation('='.to_string(), "INT".to_string(), val2, val1);
         println!("{}",table1.to_string());
     }
 
@@ -1882,7 +1884,7 @@ mod tests {
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let val1 = WhereElement { where_value: "55".to_string(),boolean_value: false };
         let val2 = WhereElement { where_value: "5".to_string(),boolean_value: false };
-        table1.predicat_interpretation('='.to_string(), "INTEGER".to_string(), val1, val2);
+        table1.predicat_interpretation('='.to_string(), "INT".to_string(), val1, val2);
         println!("{}",table1.to_string());
     }
     
@@ -1903,7 +1905,7 @@ mod tests {
     {
         let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
-        let type_str = "INTEGER".to_string();
+        let type_str = "INT".to_string();
         let test = table1.sum(&path_str, &type_str);
         let value:u128 = test[1].parse().unwrap();
         assert_eq!(value,400);
@@ -1915,7 +1917,7 @@ mod tests {
     {
         let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
-        let type_str = "INTEGER".to_string();
+        let type_str = "INT".to_string();
         let test = table1.min(&path_str, &type_str);
         let value:u128 = test[1].parse().unwrap();
         assert_eq!(value,1);
@@ -1927,7 +1929,7 @@ mod tests {
     {
         let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
-        let type_str = "INTEGER".to_string();
+        let type_str = "INT".to_string();
         let test = table1.max(&path_str, &type_str);
         let value:u128 = test[1].parse().unwrap();
         assert_eq!(value,85);
@@ -1940,7 +1942,7 @@ mod tests {
     {
         let table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
         let path_str="personneTest.AGE".to_string();
-        let type_str = "INTEGER".to_string();
+        let type_str = "INT".to_string();
         let test = table1.avg(&path_str, &type_str);
         let value:u128 = test[1].parse().unwrap();
         assert_eq!(value,40);

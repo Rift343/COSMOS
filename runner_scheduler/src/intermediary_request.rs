@@ -146,6 +146,15 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
                     }
                     
                 }
+                else if data_in1["aggregate_type"].to_string() == "SUM".to_string()
+                {
+                    let mut attribute =data_in1["use_name_table"].to_string().clone();
+                    attribute.push('.');
+                    attribute.push_str(&data_in1["attribute_name"].to_string());
+                    println!("{}",data_in1["attribute_type"].to_string());
+                    let data_out = data_in2.sum(&attribute, &data_in1["attribute_type"].to_string());
+                    return data_out;
+                }
                 //println!("{}", data_in1.dump());  // we can use the data here!
                 let data_out: Vec<String> = Vec::new();
                 

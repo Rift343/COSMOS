@@ -1,1 +1,1 @@
-{"tables":{"PERSONNE":{"use_name_table":"PERSONNE","columns":[]}},"aggregates":[{"use_name_table":"PERSONNE","attribute_name":"ID","use_name_attribute":"compteur","aggregate_type":"COUNT","attribute_type":"INT"}],"conditions":null}
+{"tables":{"PERSONNE":{"use_name_table":"personne","columns":[{"attribute_name":"ID","use_name_attribute":"ID"}]}},"aggregates":[{"use_name_table":"personne","attribute_name":"ID","use_name_attribute":"COUNT(ID)","aggregate_type":"COUNT","attribute_type":"INT"}],"conditions":null}
