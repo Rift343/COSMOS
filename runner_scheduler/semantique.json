@@ -1,35 +1,33 @@
 {
-    "tables": [
-      {
-        "table": {
-          "table_name": "PersonneTest",
-          "use_name_table": "personne"
-        },
-        "columns": [
-          {
-            "attribute_name": "ID",
-            "use_name_attribute": "id"
-          }
-        ]
-      }
-    ],
+  "tables": {
+
+    "PersonneTest": {
+      "use_name_table": "personne",
+      "columns": [
+        {
+          "attribute_name": "ID",
+          "use_name_attribute": "id"
+        }
+      ]
+    }
+  },
     "aggregates": [
       {
-        "use_name_table": "Piuuuu",
+        "use_name_table": "personne",
         "attribute_name": "ID",
         "use_name_attribute": "COUNT(ID)",
         "aggregate_type": "COUNT"
       },
       {
-        "use_name_table": "Piuuuu",
+        "use_name_table": "personne",
         "attribute_name": "ID",
         "use_name_attribute": "SUM(ID)",
         "aggregate_type": "SUM"
       },
       {
-        "use_name_table": "",
+        "use_name_table": "personne",
         "attribute_name": "*",
-        "use_name_attribute": "COUNT(*)",
+        "use_name_attribute": "COUNT_2",
         "aggregate_type": "COUNT"
       }
     ],

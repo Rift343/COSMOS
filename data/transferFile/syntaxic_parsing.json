@@ -8,12 +8,11 @@
     "columns": [
         {
             "use_name_table": "personne",
-            "attribute_name": "id",
-            "use_name_attribute": "id"
+            "attribute_name": "*",
+            "use_name_attribute": "*"
         }
     ],
     "conditions": "NULL",
     "status": true,
     "error": "NULL"
-
 }

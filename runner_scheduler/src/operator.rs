@@ -1383,11 +1383,15 @@ pub fn predicat_interpretation_with_no_const (&mut self, operation : String, typ
 #[doc = "Method to add a column on a table when we use a agregate methode (SUM,MIN,MAX...)\n"]
 pub fn add_column_for_agregate(&mut self,column:&Vec<String>)
 {
-    self.descriptor[0].push(column[0].to_string());
-    for i in 1..self.descriptor.len()
+    if column.len() != 0
     {
-        self.descriptor[i].push(column[0].to_string());
+        self.descriptor[0].push(column[0].to_string());
+        for i in 1..self.descriptor.len()
+        {
+            self.descriptor[i].push(column[1].to_string());
+        }
     }
+    
 } 
 
 
@@ -1413,7 +1417,7 @@ pub fn count(self,attribut_count:&String) -> Vec<String>
     let mut result_vec = Vec::new();
     result_vec.push("COUNT(".to_string()+attribut_count+")");
     let mut counter:usize = 0;
-    if attribut_count=="*" {counter = self.descriptor.len();}//If we have * then we just have to count the numbers of rows with ".len()" method
+    if attribut_count=="*" {counter = self.descriptor.len()-1;}//If we have * then we just have to count the numbers of rows with ".len()" method
     else//Else we have to count all the row, excluding the NULL and NIL value
     { 
             let mut index: usize = 0;
@@ -1425,7 +1429,11 @@ pub fn count(self,attribut_count:&String) -> Vec<String>
                     break;
                 }
             }
-        
+            if self.descriptor[0][index] != attribut_count.to_string()
+            {
+                panic!("Wrong attribute value");
+            }
+
             for i in 1..self.descriptor.len()
             {
                 if (self.descriptor[i][index] != "NULL" || self.descriptor[i][index] != "NILL")
