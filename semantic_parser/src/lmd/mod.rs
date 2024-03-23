@@ -44,16 +44,6 @@ fn get_type_of_attribute(attribute_list: &Vec<ColumnNameTypeCouple>, attribute_n
     return Err(Box::from(format!("Error : Attribute has no specified type in metadata : {}\n", attribute_name)));
 }
 
-fn check_if_attribute_exists_in_table(table: &TableMetadata, attribute_name: &String) -> bool {
-    for table_attribute in &table.columns {
-        if table_attribute.column_name == *attribute_name {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, attribute_name: &String, list_of_selected_tables: &Vec<TableNameCouple>) -> (Option<String>, u8) {
     let mut found_table_name: Option<String> = None;
     let mut nb_found = 0;
@@ -61,12 +51,11 @@ fn check_if_attribute_exist(table_metadata: &HashMap<String, TableMetadata>, att
     for table in list_of_selected_tables {
         let table_name = &table.table_name;
         let table = table_metadata.get(table_name).expect("");
-        for table_attribute in &table.columns {
-            if table_attribute.column_name == *attribute_name {
-                println!("Found in table : {}.{}", table_name, attribute_name);
-                found_table_name = Some(table_name.clone());
-                nb_found += 1;
-            }
+
+        if table.has_attribute(attribute_name) {
+            println!("Found in table : {}.{}", table_name, attribute_name);
+            found_table_name = Some(table_name.clone());
+            nb_found += 1;
         }
     }
     return (found_table_name, nb_found);
@@ -117,7 +106,7 @@ fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableM
             }
         };
 
-        if check_if_attribute_exists_in_table(specified_table, &attribute_name) {
+        if specified_table.has_attribute(&attribute_name) {
             ()
         } else {
             return Err(Box::from(format!("Attribute with specified table name not found : {}.{} (Alt table name : {})\n", table_name, attribute_name, table_use_name)));

@@ -34,3 +34,15 @@ pub struct TableMetadata {
     pub columns: Vec<ColumnNameTypeCouple>,
     pub constraints: Vec<Constraint>
 }
+
+impl TableMetadata {
+    pub fn has_attribute(&self, attribute_name: &String) -> bool{
+        for table_attribute in &self.columns {
+            if table_attribute.column_name == *attribute_name {
+                return true
+            }
+        }
+
+        false
+    }
+}
