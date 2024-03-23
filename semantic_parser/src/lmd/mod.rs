@@ -6,7 +6,7 @@ use std::io::{Read, Seek, SeekFrom, Write};
 
 use crate::structures::semantic_parser_file::{AggregateHashmap, ColumnNameCouple, SemanticParserFile, TableHashmap};
 use crate::structures::syntaxic_parser_file::{SyntaxicParserFile, TableNameCouple};
-use crate::structures::table_metadata::{ColumnNameTypeCouple, TableMetadata};
+use crate::structures::table_metadata::TableMetadata;
 
 /// # Retrieves table metadata stored at a given path
 ///
@@ -102,17 +102,6 @@ fn check_if_attribute_is_valid(table_metadata_as_struct: &HashMap<String, TableM
     }
 
     Ok(table_name)
-}
-
-fn get_all_attributes_of_table(table_attribute_list: &Vec<ColumnNameTypeCouple>, to_fill_attribute_list: &mut Vec<ColumnNameCouple>){
-    for couple in table_attribute_list{
-        let temp_attribute_couple = ColumnNameCouple{
-            attribute_name: couple.column_name.clone(),
-            use_name_attribute: couple.column_name.clone(),
-        };
-
-        to_fill_attribute_list.push(temp_attribute_couple);
-    }
 }
 
 /// # Main function of the semantic parsing module
@@ -211,22 +200,22 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
             }
 
             for requested_table in vector_of_table_names {
-                let attribute_list_for_requested_table = {
+                let table_metadata_attribute_list_for_requested_table = {
                     match table_metadata_as_struct.get(&requested_table.table_name){
                         None => {
                             return Err(Box::from(format!("Requested table not found in metadata despite validation : {}\n", requested_table.table_name)));
                         }
                         Some(requested_table_metadata) => {
-                            &requested_table_metadata.columns
+                            requested_table_metadata
                         }
                     }
                 };
 
-                let attribute_list_for_requested_tables = {
+                let semantic_parser_attribute_list_for_requested_table = {
                     &mut semantic_parser_file_as_struct.tables.get_mut(&requested_table.table_name).unwrap().columns
                 };
 
-                get_all_attributes_of_table(attribute_list_for_requested_table, attribute_list_for_requested_tables);
+                table_metadata_attribute_list_for_requested_table.get_all_attributes_of_table(semantic_parser_attribute_list_for_requested_table);
             }
         }
 

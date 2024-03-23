@@ -1,5 +1,6 @@
 use std::error::Error;
 use serde::{Deserialize, Serialize};
+use crate::structures::semantic_parser_file::ColumnNameCouple;
 
 /// Represents a couple which stores columns, contains their name and their type
 ///
@@ -45,6 +46,17 @@ impl TableMetadata {
         }
 
         false
+    }
+
+    pub fn get_all_attributes_of_table(&self, to_fill_attribute_list: &mut Vec<ColumnNameCouple>){
+        for couple in &self.columns{
+            let temp_attribute_couple = ColumnNameCouple{
+                attribute_name: couple.column_name.clone(),
+                use_name_attribute: couple.column_name.clone(),
+            };
+
+            to_fill_attribute_list.push(temp_attribute_couple);
+        }
     }
 
     pub fn get_type_of_attribute(&self, attribute_name: &String) -> Result<String, Box<dyn Error>>{
