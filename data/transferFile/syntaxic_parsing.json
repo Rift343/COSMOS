@@ -2,19 +2,23 @@
     "table_name": [
         {
             "table_name": "PERSONNE",
-            "use_name_table": "personne"
+            "use_name_table": "P"
+        },
+        {
+            "table_name": "PERSONNE2",
+            "use_name_table": "PERSONNE2"
         }
     ],
     "columns": [
         {
-            "use_name_table": "personne",
+            "use_name_table": "P",
             "attribute_name": "COUNT,ID",
             "use_name_attribute": "COUNT(ID)"
         },
         {
-            "use_name_table": "",
-            "attribute_name": "ID",
-            "use_name_attribute": "ID"
+            "use_name_table": "PERSONNE2",
+            "attribute_name": "NOM",
+            "use_name_attribute": "NOM"
         }
     ],
     "conditions": "NULL",

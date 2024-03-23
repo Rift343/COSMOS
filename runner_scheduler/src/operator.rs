@@ -33,7 +33,7 @@ impl CSVFile {
 
 
 
-
+#[doc = "Methode to shedule a boolean predicat. That methode choose the good function to use depending of the value of tje WhereElement"]
 pub fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
 {
     match element_1.boolean_value==true {
@@ -52,6 +52,8 @@ pub fn predicat_interpretation (&mut self, operation : String, type_expression: 
 
 
 
+#[doc = "Methode use for the interpretation of a boolean statement. Need one constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)
+In a first place we need to match the operation then the type.Finaly whe check the condition line by line. If possible the cast operation was done before the for statement"]
 pub fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
 {
     println!("1");
@@ -413,6 +415,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
 
 }
 
+#[doc = "Methode use for the interpretation of a boolean statement. Need one constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)"]
 pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
 {
     println!("2");
@@ -778,7 +781,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
 
 }
 
-
+#[doc = "Methode use for the interpretation of a boolean statement. Need two constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)"]
 pub fn predicat_interpretation_with_two_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:String)
 {
     let mut final_vec:Vec<Vec<String>>= Vec::new();
@@ -1009,7 +1012,7 @@ pub fn predicat_interpretation_with_two_const (&mut self, operation : String, ty
 
 }
 
-
+#[doc = "Methode use for the interpretation of a boolean statement. Need two WhereElement, the operator (=,<>...) and the type (INT,FLOAT,CHAR)"]
 pub fn predicat_interpretation_with_no_const (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
 {
     let mut index;

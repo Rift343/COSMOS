@@ -4,6 +4,8 @@ use json::JsonValue;
 
 use crate::operator::{self, CSVFile};
 
+
+#[doc = "This function is use for the query and subquery. Need in input a reference of a JsonValue of the Semantic parser. Return a CSVFile or error. Can crash if the date of the CSV are corructped"]
 pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error>>
 {
     println!("Begin runner_scheduler : {}",sub_requet.dump());
@@ -124,20 +126,23 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         let data_in1 = tab_agregate_fun[i].clone();
         let data_in2 = a1.clone();
         
-        tab_thread.push(thread::spawn(move || 
+        tab_thread.push(thread::spawn(move || //begin thread
             {
+                //Need to select with if statement between COUNT,SUM,MIN,MAX or AVG
+                //println!("thread::{:?}",thread::current().id());
                 if data_in1["aggregate_type"].to_string() == "COUNT".to_string()
                 {
-                    if data_in1["attribute_name"].to_string() =="*".to_string()
+                    //println!("thread::{:?}",thread::current().id());
+                    if data_in1["attribute_name"].to_string() =="*".to_string() // Need to select betwenn * or a attribute.
                     {
                         //println!("{}",&data_in1["attribute_name"].to_string());
-                        let data_out1 = data_in2.count(&data_in1["attribute_name"].to_string());
-                        return data_out1;
+                        let data_out1 = data_in2.count(&data_in1["attribute_name"].to_string());//start the count function
+                        return data_out1;//return the count result
 
                     }
                     else
                     {
-                        let mut attribute =data_in1["use_name_table"].to_string().clone();
+                        let mut attribute =data_in1["use_name_table"].to_string().clone();//The attribute need to be relation.attribute form
                         attribute.push('.');
                         attribute.push_str(&data_in1["attribute_name"].to_string());
                         //println!("{}",attribute);
@@ -146,20 +151,21 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
                     }
                     
                 }
-                else if data_in1["aggregate_type"].to_string() == "SUM".to_string()
+                else if data_in1["aggregate_type"].to_string() == "SUM".to_string()//statement for the SUM
                 {
-                    let mut attribute =data_in1["use_name_table"].to_string().clone();
+                    //println!("thread::{:?}",thread::current().id());
+                    let mut attribute =data_in1["use_name_table"].to_string().clone();//The attribute need to be relation.attribute form
                     attribute.push('.');
                     attribute.push_str(&data_in1["attribute_name"].to_string());
-                    println!("{}",data_in1["attribute_type"].to_string());
+                    //println!("{}",data_in1["attribute_type"].to_string());
                     let data_out = data_in2.sum(&attribute, &data_in1["attribute_type"].to_string());
-                    return data_out;
+                    return data_out;//return of the sum
                 }
                 //println!("{}", data_in1.dump());  // we can use the data here!
                 let data_out: Vec<String> = Vec::new();
                 
                 data_out // <-- simply return the data from the closure
-            }))
+            }));//end thread
     }
     for i in tab_thread
     {
@@ -169,12 +175,12 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         };
         //println!("crash{}",a1.to_string());
         //println!("{:?}",data_out);
-        a1.add_column_for_agregate(&data_out);
+        a1.add_column_for_agregate(&data_out);// <- add all result of the argregation function
 
     }
-    println!("{}",a1.to_string());
-    println!("{:?}",final_proj);
-    println!("{:?}",as_hashmap);
+    //println!("{}",a1.to_string());
+    //println!("{:?}",final_proj);
+    //println!("{:?}",as_hashmap);
     a1.projection(final_proj);
     a1.replace_as(&as_hashmap);
     Ok(a1)
