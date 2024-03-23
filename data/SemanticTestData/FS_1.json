@@ -1,14 +1,18 @@
 {
   "table_name": [
     {
-      "table_name": "Personne",
+      "table_name": "PERSONNE",
       "use_name_table": "Piuuuu"
+    },
+    {
+      "table_name": "PERSONNECLONEE",
+      "use_name_table": "Personne"
     }
   ],
   "columns": [
     {
       "use_name_table": "Piuuuu",
-      "attribute_name": "Id",
+      "attribute_name": "ID",
       "use_name_attribute": "Not an ID"
     },
     {
@@ -19,12 +23,17 @@
     {
       "use_name_table":  "Piuuuu",
       "attribute_name": "COUNT,ID",
-      "use_attribute_name": "COUNT(ID)"
+      "use_name_attribute": "COUNT(ID)"
     },
     {
       "use_name_table":  "",
       "attribute_name": "SUM,ID",
-      "use_attribute_name": "SUM(ID)"
+      "use_name_attribute": "SUM(ID)"
+    },
+    {
+      "use_name_table": "Personne",
+      "attribute_name": "*",
+      "use_name_attribute": "Not an ID"
     }
   ]
 }
