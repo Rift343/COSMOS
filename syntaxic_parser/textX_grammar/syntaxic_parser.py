@@ -195,7 +195,6 @@ def ldd_parser(query):
 
 def is_valid_sql(query):
     # Get grammar file
-    print("we enter the lbd_parser")
     # we check query length
     #if the first word of the query is SELECT,we use the lbd_parser function
     print(type(query))

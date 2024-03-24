@@ -40,49 +40,54 @@ fn get_metadata(metadata_file_path: String) -> Vec<TableMetadata> {
         Ok(content) => {
             return content;
         }
-        Err(error) => panic!("Error : {}", error)
+        Err(error) => {panic!("Error : {}", error)}
     }
 }
 fn semantic_parser_create(syntaxic_file_content_as_struct : SyntaxicParserFileLdd,table_metadata_as_struct : Vec<TableMetadata> ) -> Result<File, Box<dyn Error>> {
     println!("debut create");
-    let new_table_name = syntaxic_file_content_as_struct.table_name;
+    
+    let mut new_table_name = syntaxic_file_content_as_struct.table_name;
     let mut table_metadata_as_struct = table_metadata_as_struct;
+    //We are supposed to get only one table, we only take the first element
+    let unwraped_new_table_new =new_table_name.remove(0).table_name;
     println!("on check primary key");
 for table_metadata in &table_metadata_as_struct {
-            if table_metadata.table_name.to_lowercase() == new_table_name.to_lowercase() {
+            if table_metadata.table_name.to_lowercase() == unwraped_new_table_new.to_lowercase() {
+                println!("a table with this name already exist");
                 return Err(Box::from("a table with this name already exist".to_string()));
             }
             let mut primary_key_present = false;
             for column in  &syntaxic_file_content_as_struct.columns{
-                for constraint in &column.constraint{
+                for constraint in &column.constraints{
                     if constraint=="PRIMARY KEY"{
                         primary_key_present= true;
                     }
                 }}
             if ! primary_key_present{
 
-
+                println!("No primary key specified");
                 return Err(Box::from("No primary key specified".to_string()));
             }
                 }
             
 
                 println!("on create table meta data");
+                
                 let mut result = TableMetadata{
-                    table_name : new_table_name,
+                    table_name : unwraped_new_table_new,
                     columns : vec![],
                     constraints: vec![], 
                 };
                 for column in &syntaxic_file_content_as_struct.columns {
                     result.columns.push(ColumnNameTypeCouple {
-                        column_name: column.attribute_name.clone(),
+                        column_name: column.name.clone(),
                         column_type: column.datatype.clone(),
                     });
-                    for constraint in &column.constraint{
+                    for constraint in &column.constraints{
                         let mut attribute_list = Vec::new();
-                        attribute_list.push(constraint.clone());
+                        attribute_list.push(column.name.clone());
                         result.constraints.push(Constraint {
-                            constraint_name: column.attribute_name.clone() + &constraint,
+                            constraint_name: column.name.clone() + &constraint,
                             constraint_type: constraint.clone(),
                             attribute_list,
                             foreign_key: None,
@@ -106,16 +111,20 @@ for table_metadata in &table_metadata_as_struct {
             // Write the contents of res_textx in the file
             match synt_parsing_file.write_all(json_string.as_bytes()){
                 Ok(_) => (),
-                Err(error) => return Err(Box::from(format!("Unable to write in file : {}\n", error)))
+                Err(error) => {
+                    println!("{}?",error);
+                    return Err(Box::from(format!("Unable to write in file : {}\n", error)));}
             };
         
             // Set the offset to the beginning of the file
             match synt_parsing_file.seek(SeekFrom::Start(0)){
                 Ok(_) => (),
-                Err(error) => return Err(Box::from(format!("Unable to seek from start : {}\n", error)))
+                Err(error) => {
+                    println!("{}?",error);
+                return Err(Box::from(format!("Unable to seek from start : {}\n", error)));}
                 //return Err(Box::from(&("Error, Unable to seek from start".to_string() + error_str))) to get rid of type str_err
             };
-
+            println!("fin create");
             return Ok(synt_parsing_file);
             }
 
@@ -143,7 +152,10 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
             Ok(content) => {
                 content
             }
-            Err(error) => return Err(Box::try_from(error).unwrap())
+            Err(error) => {
+                println!("{}?", error);
+                return Err(
+                Box::try_from(error).unwrap());}
         }
     };
     println!("read metadata");

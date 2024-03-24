@@ -1,25 +1,20 @@
 {
     "table_name": [
         {
-            "table_name": "communal"
+            "table_name": "f"
         }
     ],
     "columns": [
         {
-            "name": "population",
+            "name": "ppppp",
             "datatype": "INT",
             "constraints": [
                 "PRIMARY KEY"
             ]
         },
         {
-            "name": "superficie",
+            "name": "dqzdqz",
             "datatype": "INT",
-            "constraints": []
-        },
-        {
-            "name": "duree_de_vie",
-            "datatype": "VARCHAR(255)",
             "constraints": []
         }
     ],

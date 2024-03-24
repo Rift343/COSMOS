@@ -41,3 +41,37 @@ CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie 
 
 CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
 
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vi
+
+create table c (pop INT PRIMARY KEY, super INT));
+
+create table c (pop INT PRIMARY KEY, super INT);
+
+create table c (pop INT PRIMARY KEY, super INT));
+
+create table c (pop INT PRIMARY KEY, super INT);
+
+create table f (ppppp INT PRIMARY KEY, dqzdqz INT);
+
+create table hhhhh (pfsef INT PRIMARY KEY, fsefsfs INT);
+
+create table f (ppppp INT PRIMARY KEY, dqzdqz INT);
+
