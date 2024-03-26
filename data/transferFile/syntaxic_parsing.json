@@ -12,8 +12,18 @@
             "use_name_attribute": "id"
         }
     ],
-    "conditions": "NULL",
-    "status": true,
-    "error": "NULL"
-
+    "conditions": [
+        {
+            "left": "id",
+            "op": "<",
+            "right": "2",
+            "linker": "AND"
+        },
+        {
+            "left": "id",
+            "op": ">=",
+            "right": "5",
+            "linker": "OR"
+        }
+    ]
 }
