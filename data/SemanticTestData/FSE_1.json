@@ -1,1 +1,50 @@
-{"tables":{"PERSONNE":{"use_name_table":"P","columns":[]},"PERSONNE2":{"use_name_table":"PERSONNE2","columns":[{"attribute_name":"NOM","use_name_attribute":"NOM"}]}},"aggregates":[{"use_name_table":"P","attribute_name":"ID","use_name_attribute":"COUNT(ID)","aggregate_type":"COUNT","attribute_type":"INT"}],"conditions":null}
+{
+  "tables": {
+    "PERSONNE": {
+      "use_name_table": "P",
+      "columns": [
+        {
+          "attribute_name": "NOM",
+          "use_name_attribute": "NOM"
+        }
+      ]
+    }
+  },
+  "aggregates": [],
+  "conditions": {
+    "type": "logical",
+    "operator": "AND",
+
+    "left": {
+      "type": "condition",
+      "condition": "=",
+      "datatype": "INT",
+      "left": {
+        "type": "attribute",
+        "use_name_table": "P",
+        "attribute_name": "ID"
+      },
+      "right": {
+        "type": "constant",
+        "value": "6"
+      }
+    },
+
+    "right": {
+      "type": "checker",
+      "check_type": "IN",
+      "left": {
+        "type": "subquery",
+        "query": {
+          . . .
+        }
+      },
+      "right": {
+        "type": "subquery",
+        "query": {
+          . . .
+        }
+      }
+    }
+  }
+}
