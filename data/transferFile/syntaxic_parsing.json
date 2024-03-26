@@ -1,27 +1,29 @@
 {
     "table_name": [
         {
-            "table_name": "PERSONNE",
-            "use_name_table": "P"
-        },
-        {
-            "table_name": "PERSONNE2",
-            "use_name_table": "PERSONNE2"
+            "table_name": "personne",
+            "use_name_table": "personne"
         }
     ],
     "columns": [
         {
-            "use_name_table": "P",
-            "attribute_name": "COUNT,ID",
-            "use_name_attribute": "COUNT(ID)"
-        },
-        {
-            "use_name_table": "PERSONNE2",
-            "attribute_name": "NOM",
-            "use_name_attribute": "NOM"
+            "use_name_table": "personne",
+            "attribute_name": "id",
+            "use_name_attribute": "id"
         }
     ],
-    "conditions": "NULL",
-    "status": true,
-    "error": "NULL"
+    "conditions": [
+        {
+            "left": "id",
+            "op": "<",
+            "right": "2",
+            "linker": "AND"
+        },
+        {
+            "left": "id",
+            "op": ">=",
+            "right": "5",
+            "linker": "OR"
+        }
+    ]
 }

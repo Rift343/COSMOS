@@ -12,9 +12,7 @@ def is_valid_sql(query):
         result = {
             "table_name": [],
             "columns": [],
-            "conditions": "",
-            "status": True,
-            "error": ""
+            "conditions": []
         }
 
         if model.relations:
@@ -100,11 +98,39 @@ def is_valid_sql(query):
                     #    result["conditions"] = "distinct" + columns["use_name_attribute"]
 
 
-        # Conditions are not handled for the time being
-        result["conditions"] = "NULL"
+        # Conditions
+        if model.whereClause :
+            structCondition = {
+                "left" : "",
+                "op" : "",
+                "right" : "",
+                "linker" : ""
+            }
 
-        # "error" field is null
-        result["error"] = "NULL"
+            cond = model.whereClause.conditions.condition
+            structCondition["left"] = cond.left
+            structCondition["op"] = str(cond.op)
+            structCondition["right"] = str(cond.right)
+            structCondition["linker"] = 'AND'
+
+            result["conditions"].append(structCondition)
+
+            if model.whereClause.conditions.linked_condition :
+                structCondition = {
+                    "left" : "",
+                    "op" : "",
+                    "right" : "",
+                    "linker" : ""
+                }
+                for condition in model.whereClause.conditions.linked_condition :
+                    structCondition["left"] = condition.left
+                    structCondition["op"] = str(condition.op)
+                    structCondition["right"] = str(condition.right)
+                    structCondition["linker"] = condition.linker
+
+                    result["conditions"].append(structCondition)
+
+
 
         # Convert the dict to Json string
         json_result = json.dumps(result, indent=4)
