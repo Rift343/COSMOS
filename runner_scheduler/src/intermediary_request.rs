@@ -162,6 +162,36 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
                     let data_out = data_in2.sum(&attribute, &data_in1["attribute_type"].to_string());
                     return data_out;//return of the sum
                 }
+                else if data_in1["aggregate_type"].to_string() == "AVG".to_string()//statement for the SUM
+                {
+                    //println!("thread::{:?}",thread::current().id());
+                    let mut attribute =data_in1["use_name_table"].to_string().clone();//The attribute need to be relation.attribute form
+                    attribute.push('.');
+                    attribute.push_str(&data_in1["attribute_name"].to_string());
+                    //println!("{}",data_in1["attribute_type"].to_string());
+                    let data_out = data_in2.avg(&attribute, &data_in1["attribute_type"].to_string());
+                    return data_out;//return of the sum
+                }
+                else if data_in1["aggregate_type"].to_string() == "MIN".to_string()//statement for the SUM
+                {
+                    //println!("thread::{:?}",thread::current().id());
+                    let mut attribute =data_in1["use_name_table"].to_string().clone();//The attribute need to be relation.attribute form
+                    attribute.push('.');
+                    attribute.push_str(&data_in1["attribute_name"].to_string());
+                    //println!("{}",data_in1["attribute_type"].to_string());
+                    let data_out = data_in2.min(&attribute, &data_in1["attribute_type"].to_string());
+                    return data_out;//return of the sum
+                }
+                else if data_in1["aggregate_type"].to_string() == "MAX".to_string()//statement for the SUM
+                {
+                    //println!("thread::{:?}",thread::current().id());
+                    let mut attribute =data_in1["use_name_table"].to_string().clone();//The attribute need to be relation.attribute form
+                    attribute.push('.');
+                    attribute.push_str(&data_in1["attribute_name"].to_string());
+                    //println!("{}",data_in1["attribute_type"].to_string());
+                    let data_out = data_in2.max(&attribute, &data_in1["attribute_type"].to_string());
+                    return data_out;//return of the sum
+                }
                 //println!("{}", data_in1.dump());  // we can use the data here!
                 let data_out: Vec<String> = Vec::new();
                 
