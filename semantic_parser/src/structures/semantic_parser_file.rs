@@ -24,10 +24,84 @@ pub struct AggregateHashmap{
     pub attribute_type: String
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Constant {
+    pub etype: String,
+    pub value: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Attribute {
+    pub etype: String,
+    pub use_name_table: String,
+    pub attribute_name: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SubQuery {
+    pub etype: String,
+    pub query: Box<SemanticParserFile>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum ConditionAllowType {
+    Attribute(Attribute),
+    Constant(Constant),
+    SubQuery(SubQuery)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Condition{
+    pub etype: String,
+    pub condition: String,
+    pub datatype: String,
+    pub left: ConditionAllowType,
+    pub right: ConditionAllowType
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DataList {
+    pub etype: String,
+    pub value: Vec<String>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CheckerAllowType {
+    DataList(DataList),
+    SubQuery(SubQuery)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Checker {
+    pub etype: String,
+    pub check_type: String,
+    pub datatype: String,
+    pub left: SubQuery,
+    pub right: CheckerAllowType
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum LogicalAllowType {
+    Condition(Condition),
+    Logical(Box<Logical>),
+    Checker(Checker)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Logical {
+    pub etype: String,
+    pub operator: String,
+    pub left: LogicalAllowType,
+    pub right: LogicalAllowType
+}
+
 /// Structure representing the contents of the Semantic Parser File, being a dictionary with four keys : tables, conditions, status and error
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SemanticParserFile {
     pub tables: HashMap<String, TableHashmap>,
     pub aggregates: Vec<AggregateHashmap>,
-    pub conditions: Option<String>,
+    pub conditions: Logical,
 }
