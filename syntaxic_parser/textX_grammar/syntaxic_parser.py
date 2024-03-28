@@ -37,10 +37,16 @@ def is_valid_sql(query):
             # If the attribute is a "*"
             if model.attributes.attribute==['*']:
                 columns = {
-                    "use_name_table": result["table_name"][0]["use_name_table"],
+                    "use_name_table": "",
                     "attribute_name": "*",
-                    "use_name_attribute": "*"
+                    "use_name_attribute": ""
                 }
+
+                if model.attributes.table :
+                    columns["use_name_table"] = model.attributes.table.upper()
+
+                if model.attributes.alias :
+                    columns["use_name_attribute"] = model.attributes.alias
 
                 result["columns"].append(columns)
 
@@ -60,13 +66,9 @@ def is_valid_sql(query):
                         if attribute.aggregate.table :
                             columns["use_name_table"] = attribute.aggregate.table
 
-                        # If the aggregate is a COUNT(*)
-                        if attribute.aggregate.aggregateName == "COUNT(*)" :
-                            columns["attribute_name"] = 'COUNT,*'
 
-                        # If it is any other aggregate function
-                        else :
-                            columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
+                        columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
+
 
                         # If the attribute is renamed with AS
                         if attribute.alias :
@@ -100,33 +102,25 @@ def is_valid_sql(query):
 
         # Conditions
         if model.whereClause :
-            structCondition = {
-                "left" : "",
-                "op" : "",
-                "right" : "",
-                "linker" : ""
-            }
-
             cond = model.whereClause.conditions.condition
-            structCondition["left"] = cond.left
-            structCondition["op"] = str(cond.op)
-            structCondition["right"] = str(cond.right)
-            structCondition["linker"] = 'AND'
+
+            structCondition = {
+                "left" : cond.left,
+                "op" : str(cond.op),
+                "right" : str(cond.right),
+                "linker" : 'AND'
+            }
 
             result["conditions"].append(structCondition)
 
             if model.whereClause.conditions.linked_condition :
-                structCondition = {
-                    "left" : "",
-                    "op" : "",
-                    "right" : "",
-                    "linker" : ""
-                }
                 for condition in model.whereClause.conditions.linked_condition :
-                    structCondition["left"] = condition.left
-                    structCondition["op"] = str(condition.op)
-                    structCondition["right"] = str(condition.right)
-                    structCondition["linker"] = condition.linker
+                    structCondition = {
+                        "left": condition.left,
+                        "op": str(condition.op),
+                        "right": str(condition.right),
+                        "linker": condition.linker
+                    }
 
                     result["conditions"].append(structCondition)
 
