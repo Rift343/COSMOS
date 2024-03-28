@@ -1,1 +1,57 @@
-[{"table_name":"Personne","columns":[{"column_name":"ID","column_type":"INT"},{"column_name":"NOM","column_type":"VARCHAR(20)"},{"column_name":"PRENOM","column_type":"VARCHAR(20)"}],"constraints":[{"constraint_name":"PK_Personne","constraint_type":"PrimaryKey","attribute_list":["ID"],"foreign_key":null,"check":null}]},{"table_name":"PersonneClonee","columns":[{"column_name":"ID2","column_type":"INT"},{"column_name":"NOM","column_type":"VARCHAR(20)"},{"column_name":"PRENOM","column_type":"VARCHAR(20)"}],"constraints":[{"constraint_name":"PK_Personne","constraint_type":"PrimaryKey","attribute_list":["ID"],"foreign_key":null,"check":null}]},{"table_name":"communal","columns":[{"column_name":"population","column_type":"INT"},{"column_name":"superficie","column_type":"INT"},{"column_name":"duree_de_vie","column_type":"VARCHAR(255)"}],"constraints":[{"constraint_name":"populationPRIMARY KEY","constraint_type":"PRIMARY KEY","attribute_list":["PRIMARY KEY"],"foreign_key":null,"check":null}]},{"table_name":"c","columns":[{"column_name":"pop","column_type":"INT"},{"column_name":"super","column_type":"INT"}],"constraints":[{"constraint_name":"popPRIMARY KEY","constraint_type":"PRIMARY KEY","attribute_list":["PRIMARY KEY"],"foreign_key":null,"check":null}]},{"table_name":"f","columns":[{"column_name":"ppppp","column_type":"INT"},{"column_name":"dqzdqz","column_type":"INT"}],"constraints":[{"constraint_name":"pppppPRIMARY KEY","constraint_type":"PRIMARY KEY","attribute_list":["PRIMARY KEY"],"foreign_key":null,"check":null}]},{"table_name":"hhhhh","columns":[{"column_name":"pfsef","column_type":"INT"},{"column_name":"fsefsfs","column_type":"INT"}],"constraints":[{"constraint_name":"pfsefPRIMARY KEY","constraint_type":"PRIMARY KEY","attribute_list":["pfsef"],"foreign_key":null,"check":null}]}]
+[
+    {
+        "table_name": "Personne",
+        "columns": [
+            {
+                "column_name": "ID",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "NOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "PRENOM",
+                "column_type": "VARCHAR(20)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_Personne",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "ID"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    {
+        "table_name": "PersonneClonee",
+        "columns": [
+            {
+                "column_name": "ID2",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "NOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "PRENOM",
+                "column_type": "VARCHAR(20)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_Personne",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "ID"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    }]
