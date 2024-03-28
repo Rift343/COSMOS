@@ -174,7 +174,7 @@ def ldd_parser(query):
                 print("we enter the insert statement")
                 table_name = model.tableName
                 print("we define the table name :", table_name)
-                columns = [column for column in model.columnNames.columnName]
+                columns = [column.upper() for column in model.columnNames.columnName]
                 print("we define the columns :", columns)
                 values = [value for value in model.values.value]
                 print("we define the values :", values)
@@ -195,7 +195,6 @@ def ldd_parser(query):
 
 def is_valid_sql(query):
     # Get grammar file
-    print("we enter the lbd_parser")
     # we check query length
     #if the first word of the query is SELECT,we use the lbd_parser function
     print(type(query))
