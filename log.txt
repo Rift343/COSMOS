@@ -75,3 +75,19 @@ create table hhhhh (pfsef INT PRIMARY KEY, fsefsfs INT);
 
 create table f (ppppp INT PRIMARY KEY, dqzdqz INT);
 
+create table politique (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255));
+
+To run your Rust server in the background even after you logout of SSH, you can use a tool called `screen` or `tmux`. These tools allow you to create a separate session that can keep running even after you disconnect. Here's how you can do it with `screen`:
+
+create table politique (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) FOREIGN KEY);
+
+create table politique (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table polgg2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table poljjjgg2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+

@@ -86,13 +86,33 @@ for table_metadata in &table_metadata_as_struct {
                     for constraint in &column.constraints{
                         let mut attribute_list = Vec::new();
                         attribute_list.push(column.name.clone());
+                        // if we want to add a primary key
+                        if constraint.clone() == "PRIMARY KEY".to_string() {
+                        //we test if a constraint for the primary key already exist
+                        let mut already_primary = false;
+                        for c in &mut result.constraints {
+                            if c.constraint_type.clone() == "PrimaryKey".to_string(){
+                                already_primary = true;
+                                c.attribute_list.push(column.name.clone())
+                            }
+                        }
+                        if !already_primary{
+                            result.constraints.push(Constraint {
+                                constraint_name: column.name.clone() + &constraint,
+                                constraint_type: "PrimaryKey".to_string(),
+                                attribute_list: attribute_list.clone(),
+                                foreign_key: None,
+                                check: None,
+                            });
+                        }}else{
+                    
                         result.constraints.push(Constraint {
                             constraint_name: column.name.clone() + &constraint,
                             constraint_type: constraint.clone(),
-                            attribute_list,
+                            attribute_list:attribute_list.clone(),
                             foreign_key: None,
                             check: None,
-                        });
+                        });}
                         }
                     }
 
@@ -164,7 +184,6 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
 
     // Temporary variable to store what will be returned in the file
     // Done now due to the vector requiring allocating
-    // TODO : Find a better name for this variable
     if (syntaxic_file_content_as_struct.action=="create"){
         println!("parser create");
         return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);

@@ -1,21 +1,28 @@
 {
     "table_name": [
         {
-            "table_name": "f"
+            "table_name": "poljjjgg2"
         }
     ],
     "columns": [
         {
-            "name": "ppppp",
-            "datatype": "INT",
+            "name": "nom",
+            "datatype": "VARCHAR(50)",
             "constraints": [
                 "PRIMARY KEY"
             ]
         },
         {
-            "name": "dqzdqz",
+            "name": "adherents",
             "datatype": "INT",
             "constraints": []
+        },
+        {
+            "name": "affinite",
+            "datatype": "VARCHAR(255)",
+            "constraints": [
+                "PRIMARY KEY"
+            ]
         }
     ],
     "status": true,
