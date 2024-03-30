@@ -1,0 +1,19 @@
+{
+    "table_name": [
+        {
+            "table_name": "nom table créé ou inséré"
+        }
+    ],
+    "columns": [#pour chaque colonne dans le insert into ou table créée
+        {
+            "attribute_name": "*",
+            "data" : donné a inséré si utile,
+            "datatype" : "type of data",
+            "constraint" : contraite a metter du la colonne en cas de création
+        }
+    ],
+    "action" :  "create" | "insert",
+    "conditions": "NULL",
+    "status": true,
+    "error": "NULL"
+}
