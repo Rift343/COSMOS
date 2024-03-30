@@ -12,7 +12,7 @@ DistinctOption: 'DISTINCT';
 AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME) ')' | aggregateName='COUNT(*)';
 AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
-ID_NAME: /[a-zA-Z][a-zA-Z0-9_]*/;
+ID_NAME: !KEYWORDS STRING;
 STRING: /'[^']*'/ | /"[^"]*"/;
 STATIC_ATTRIBUTE: STRING | INT;
 
@@ -22,9 +22,12 @@ RELATION_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
 SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
-ConditionList: condition=Condition ('AND' condition=Condition)*;
-Condition: left=ATTRIBUTE_NAME op=Operator right=VALUE;
-Operator: '=' | '<>' | '<' | '>' | '<=' | '>=';
-VALUE: /(("([^"]|\\")*"|'([^']|\\')*')|\d+)/;  // Permettre des chaînes avec " ou ' et des nombres
+ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
+Condition: left=ATTRIBUTE_NAME op=OPERATOR right=STATIC_ATTRIBUTE;
+LinkedCondition: linker=LINKER left=ATTRIBUTE_NAME op=OPERATOR right=STATIC_ATTRIBUTE;
+OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
+LINKER: 'AND' | 'OR';
 
 ATTRIBUTE_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
+
+KEYWORDS: 'SELECT' | 'FROM' | 'WHERE' | 'AS';

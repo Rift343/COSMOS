@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Read;
-use semantic_parser::semantic_parser;
+use semantic_parser::lmd::semantic_parser;
 
 /// Main function of the semantic parser, allows testing of the library as a binary
 fn main() {

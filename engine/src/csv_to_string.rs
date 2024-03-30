@@ -6,7 +6,8 @@ use std::string::String;
 
 use syntaxic_parser::syntaxic_parser;
 use runner_scheduler::scheduler;
-use semantic_parser::{semantic_parser, semantic_parser_ldd};
+use semantic_parser::lmd::semantic_parser;
+use semantic_parser::ldd::semantic_parser_ldd;
 //use engine::csv_to_string;
 
 use std::fs;
