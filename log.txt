@@ -1,0 +1,26 @@
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+create table poljjjgg2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+select * from personne;
+
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table politique (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) FOREIGN KEY);
+
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table f (ppppp INT PRIMARY KEY, dqzdqz INT);
+
+Err("semantic parser not initialized".into());
+
+create table hhhhh (pfsef INT PRIMARY KEY, fsefsfs INT);
+
+create table ccccccccccccccccc (pop INT PRIMARY KEY, super INT);
+
+select * from personne
+
+select * from personne;
+
+select * from personne;
+

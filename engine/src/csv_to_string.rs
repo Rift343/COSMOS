@@ -9,7 +9,7 @@ use runner_scheduler::scheduler;
 use semantic_parser::lmd::semantic_parser;
 use semantic_parser::ldd::semantic_parser_ldd;
 //use engine::csv_to_string;
-
+use runner_scheduler::call_create::call_create;
 use std::fs;
 //use csv::Reader;
 /* 
@@ -148,13 +148,17 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
    //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
    // Get the outputted semantic file.
-   let semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
+   let mut is_ldd_req = false;
+   let mut semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
     if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())){
-
-        let semantic_parser_res = semantic_parser_ldd(syntaxic_parsing_handle);
+        is_ldd_req = true;
+        let ldd_result = semantic_parser_ldd(syntaxic_parsing_handle);
+        //println!("ldd result: {:?}", ldd_result);
+        semantic_parser_res = ldd_result;
     }else{
 
-        let semantic_parser_res = semantic_parser(syntaxic_parsing_handle);
+        let lmd_result = semantic_parser(syntaxic_parsing_handle);
+        semantic_parser_res = lmd_result;
     }
    
 
@@ -177,7 +181,14 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // ------------------ Runner_scheduler ------------------
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
+    if (is_ldd_req) {
+        let res = call_create(semantic_parser_res.unwrap());
 
+
+
+
+
+    }
     let csv_file_returned = scheduler(&semantic_file);
     match csv_file_returned {//First match on the result of the runner_scheduler.
         Ok(content) => {
