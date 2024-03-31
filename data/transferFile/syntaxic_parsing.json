@@ -1,0 +1,16 @@
+{
+    "table_name": [
+        {
+            "table_name": "PERSONNE",
+            "use_name_table": "PERSONNE"
+        }
+    ],
+    "columns": [
+        {
+            "use_name_table": "PERSONNE",
+            "attribute_name": "*",
+            "use_name_attribute": "*"
+        }
+    ],
+    "conditions": []
+}
