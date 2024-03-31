@@ -7,7 +7,7 @@ use std::fs::File;
 use serde_json;
 use std::io::Read;
 use serde_json::Value;
-pub fn call_create(sub_requet:File)->Result<i8,Box<dyn Error>>
+pub fn call_create(sub_requet:&File)->Result<i8,Box<dyn Error>>
 {
     //let mut req = String::new();
     //sub_requet.read_to_string(&mut req).expect("Error: Unable to read syntaxic parsing file");

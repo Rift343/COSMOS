@@ -182,7 +182,7 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
     if (is_ldd_req) {
-        let res = call_create(semantic_parser_res.unwrap());
+        let res = call_create(&semantic_file);
 
 
 
