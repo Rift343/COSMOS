@@ -2,82 +2,88 @@ import textx
 import json
 #from pprint import pprint
 def lmd_parser(query):
-        print("we enter the lbd_parser")
-        sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
-        try:
-            # Analyse SQL query
-            model = sql_meta.model_from_str(query)
+ # Get grammar file
+    sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
+    try:
+        # Analyse SQL query
+        model = sql_meta.model_from_str(query)
 
-            # If the syntax is correct, create the dict structure in which the elements of the query will be stored
-            result = {
-                "table_name": [],
-                "columns": [],
-                "conditions": "",
-                "status": True,
-                "error": ""
-            }
+        # If the syntax is correct, create the dict structure in which the elements of the query will be stored
+        result = {
+            "table_name": [],
+            "columns": [],
+            "conditions": []
+        }
 
-            if model.relations:
-                # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
-                for relation in model.relations.relation:
-                    table_name = {
-                        "table_name": relation.relationName,
-                        "use_name_table": ""
-                    }
+        if model.relations:
+            # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
+            for relation in model.relations.relation:
+                table_name = {
+                    "table_name": relation.relationName.upper(),
+                    "use_name_table": ""
+                }
 
-                    if relation.alias :
-                        table_name["use_name_table"] = relation.alias
-                    else :
-                        table_name["use_name_table"] = relation.relationName
+                if relation.alias :
+                    table_name["use_name_table"] = relation.alias
+                else :
+                    table_name["use_name_table"] = table_name["table_name"]
 
-                    result["table_name"].append(table_name)
+                result["table_name"].append(table_name)
 
 
 
-            if model.attributes:
+        if model.attributes:
 
-                # If the attribute is a "*"
-                if model.attributes.attribute==['*']:
+            # If the attribute is a "*"
+            if model.attributes.attribute==['*']:
+                columns = {
+                    "use_name_table": result["table_name"][0]["use_name_table"],
+                    "attribute_name": "*",
+                    "use_name_attribute": "*"
+                }
+
+                result["columns"].append(columns)
+
+            else:
+                # If there is a list of attributes
+                for attribute in model.attributes.attribute:
+
                     columns = {
-                        "use_name_table": result["table_name"][0]["use_name_table"],
-                        "attribute_name": "*",
-                        "use_name_attribute": "*"
+                        "use_name_table": "",
+                        "attribute_name": "",
+                        "use_name_attribute": ""
                     }
 
-                    result["columns"].append(columns)
+                    # if the attribute is an aggregate function
+                    if attribute.aggregate :
+                        # If the table is specified
+                        if attribute.aggregate.table :
+                            columns["use_name_table"] = attribute.aggregate.table
 
-                else:
-                    # If there is a list of attributes
-                    for attribute in model.attributes.attribute:
+                        # If the aggregate is a COUNT(*)
+                        if attribute.aggregate.aggregateName == "COUNT(*)" :
+                            columns["attribute_name"] = 'COUNT,*'
 
-                        columns = {
-                            "use_name_table": "",
-                            "attribute_name": "",
-                            "use_name_attribute": ""
-                        }
-
-                        # if the attribute is an aggregate function
-                        if attribute.aggregate :
-                            columns["use_name_table"] = result["table_name"][0]["use_name_table"]
-
-                            if attribute.aggregate.aggregateName == "COUNT(*)" :
-                                columns["attribute_name"] = '*'
-                                #columns["attribute_name"] = attribute.aggregate.aggregateName
-                            else :
-                                columns["attribute_name"] = attribute.aggregate.attributeName
-                                #columns["attribute_name"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName +')'
-
-
-                        # if the attribute is a regular attribute
+                        # If it is any other aggregate function
                         else :
-                            columns["attribute_name"] = attribute.attributeName
+                            columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
+
+                        # If the attribute is renamed with AS
+                        if attribute.alias :
+                            columns["use_name_attribute"] = attribute.alias
+                        else :
+                            columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
+
+
+                    # if the attribute is a regular attribute
+                    else :
+                        columns["attribute_name"] = attribute.attributeName.upper()
 
 
                         # If the table the attribute belongs to is specified
                         if attribute.table :
-                            columns["use_name_table"] = attribute.table
-                        else :
-                            columns["use_name_table"] = result["table_name"][0]["use_name_table"]
+                            columns["use_name_table"] = attribute.table.upper()
+
 
                         # If the attribute is renamed with AS
                         if attribute.alias :
@@ -86,30 +92,58 @@ def lmd_parser(query):
                             columns["use_name_attribute"] = columns["attribute_name"]
 
 
-                        result["columns"].append(columns)
+                    result["columns"].append(columns)
 
-                        #if attribute.distinctOption == "DISTINCT":
-                        #    result["conditions"] = "distinct" + columns["use_name_attribute"]
-
-
-            # Conditions are not handled for the time being
-            result["conditions"] = "NULL"
-
-            # "error" field is null
-            result["error"] = "NULL"
-            result["action"] = "select"
-            # Convert the dict to Json string
-            json_result = json.dumps(result, indent=4)
+                    #if attribute.distinctOption == "DISTINCT":
+                    #    result["conditions"] = "distinct" + columns["use_name_attribute"]
 
 
-            return json_result
+        # Conditions
+        if model.whereClause :
+            structCondition = {
+                "left" : "",
+                "op" : "",
+                "right" : "",
+                "linker" : ""
+            }
 
-        except textx.exceptions.TextXSyntaxError as e:
-            # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
+            cond = model.whereClause.conditions.condition
+            structCondition["left"] = cond.left
+            structCondition["op"] = str(cond.op)
+            structCondition["right"] = str(cond.right)
+            structCondition["linker"] = 'AND'
 
-            error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
+            result["conditions"].append(structCondition)
 
-            return error
+            if model.whereClause.conditions.linked_condition :
+                structCondition = {
+                    "left" : "",
+                    "op" : "",
+                    "right" : "",
+                    "linker" : ""
+                }
+                for condition in model.whereClause.conditions.linked_condition :
+                    structCondition["left"] = condition.left
+                    structCondition["op"] = str(condition.op)
+                    structCondition["right"] = str(condition.right)
+                    structCondition["linker"] = condition.linker
+
+                    result["conditions"].append(structCondition)
+
+
+
+        # Convert the dict to Json string
+        json_result = json.dumps(result, indent=4)
+
+
+        return json_result
+
+    except textx.exceptions.TextXSyntaxError as e:
+        # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
+
+        error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
+
+        return error
 
 
 def ldd_parser(query):
