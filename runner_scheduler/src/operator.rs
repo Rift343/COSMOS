@@ -30,8 +30,40 @@ pub struct CSVFile{
 
 impl CSVFile {
 
-
-
+#[doc = "Method to check if a list of attribute are in list of value. Change the self value"]
+pub fn in_interpratation(&mut self, check_element : Vec<String>,to_chek: Vec<Vec<String>>)
+{
+    let mut lst_index:Vec<usize> = Vec::new();
+    for i in 0..self.descriptor[0].len()
+    {
+        for y in 0..check_element.len()
+        {
+            if check_element[y] == self.descriptor[0][i]
+            {
+                lst_index.push(i);
+            }
+        }
+    }
+    let mut res_vec:Vec<Vec<String>> =Vec::new();
+    for ligne in 1..self.descriptor.len()
+    {
+        let mut lst_compare:Vec<String> = Vec::new();
+        for indice in 0..lst_index.len()
+        {
+            let index = lst_index[indice];
+            lst_compare.push(self.descriptor[ligne][index].clone())
+        }
+        for element in 0..to_chek.len()
+        {
+            if to_chek[element] == lst_compare
+            {
+                res_vec.push(lst_compare.clone());
+                break;
+            }
+        }
+    }
+    self.descriptor = res_vec;
+}
 
 #[doc = "Methode to shedule a boolean predicat. That methode choose the good function to use depending of the value of tje WhereElement"]
 pub fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)

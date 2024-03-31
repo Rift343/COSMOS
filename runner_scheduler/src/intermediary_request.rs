@@ -217,6 +217,32 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     Ok(a1)
 }
 
+
+pub fn intermediary_request_for_const(query:&JsonValue) -> Result<String,Box<dyn Error>>
+{
+    let res = match intermediary_request(query){
+        Ok(e) => e,
+        Err(e) => return Err(Box::from(e)),
+    };
+
+    let res_value = &res.descriptor[1][0];//We need a const of a select count(*) from personne query (the query use is a exemple)
+    Ok(res_value.to_string())
+
+}
+
+pub fn intermediary_request_for_value_list (query:&JsonValue) -> Result<Vec<Vec<String>>,Box<dyn Error>>
+{
+    let res = match intermediary_request(query){
+        Ok(e) => e,
+        Err(e) => return Err(Box::from(e)),
+    };
+    let res_value:&Vec<Vec<String>> = &res.descriptor;
+    let mut returned_value:Vec<Vec<String>> = res_value.to_vec();
+    returned_value.remove(0);
+    Ok(returned_value)
+}
+
+
 mod tests {
     
 

@@ -1,0 +1,50 @@
+{
+    "tables": {
+      "PERSONNE": {
+        "use_name_table": "personneTest",
+        "columns": [
+          {
+            "attribute_name": "NOM",
+            "use_name_attribute": "NOM"
+          }
+        ]
+      }
+    },
+    "aggregates": [],
+    "conditions": {
+      "type": "logical",
+      "operator": "AND",
+  
+      "left": {
+        "type": "condition",
+        "condition": "=",
+        "datatype": "INT",
+        "left": {
+          "type": "attribute",
+          "use_name_table": "personneTest",
+          "attribute_name": "ID"
+        },
+        "right": {
+          "type": "constant",
+          "value": "6"
+        }
+      },
+  
+      "right": {
+        "type": "checker",
+        "check_type": "IN",
+        "left": {
+          "type": "subquery",
+          "query": {
+            
+          }
+        },
+        "right": {
+          "type": "subquery",
+          "query": {
+            
+          }
+        }
+      }
+    }
+  }
