@@ -24,3 +24,7 @@ select * from personne;
 
 select * from personne;
 
+select * from personne;
+
+select * from personne;
+
