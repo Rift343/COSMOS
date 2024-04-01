@@ -7,9 +7,9 @@
     ],
     "columns": [
         {
-            "use_name_table": "PERSONNE",
-            "attribute_name": "*",
-            "use_name_attribute": "*"
+            "use_name_table": "",
+            "attribute_name": "SUM,ID",
+            "use_name_attribute": "SUM(ID)"
         }
     ],
     "conditions": []

@@ -1,6 +1,6 @@
 {
     "tables": {
-      "PERSONNE": {
+      "PersonneTest": {
         "use_name_table": "personneTest",
         "columns": [
           {
@@ -12,8 +12,14 @@
     },
     "aggregates": [],
     "conditions": {
+        "type":"logical",
+        "operator": "NOT",
+        
+        "right":{},
+        "left":{
+        
       "type": "logical",
-      "operator": "AND",
+      "operator": "OR",
   
       "left": {
         "type": "condition",
@@ -26,25 +32,24 @@
         },
         "right": {
           "type": "constant",
-          "value": "6"
+          "value": "4"
         }
       },
   
       "right": {
-        "type": "checker",
-        "check_type": "IN",
+        "type": "condition",
+        "condition": "=",
+        "datatype": "INT",
         "left": {
-          "type": "subquery",
-          "query": {
-            
-          }
+          "type": "attribute",
+          "use_name_table": "personneTest",
+          "attribute_name": "ID"
         },
         "right": {
-          "type": "subquery",
-          "query": {
-            
-          }
+          "type": "constant",
+          "value": "5"
         }
       }
     }
-  }
+    }
+}

@@ -4,7 +4,7 @@ use crate::{logical_statement::logical_execution, operator::CSVFile, operator::W
 
 pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
 {
-    println!("{}",where_value["type"].to_string());
+    //println!("{}",where_value["type"].to_string());
     if where_value["type"].to_string() == "logical".to_string()
     {
         println!("ok-->logical_execution(a1,where_value)");
@@ -12,7 +12,7 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
     }
     else if where_value["type"].to_string() == "condition".to_string() 
     {
-        println!("ok");
+        //println!("ok");
         let left = convert_json_to_where_element(&where_value["left"]);
         let right = convert_json_to_where_element(&where_value["right"]);
         println!("{}",a1.to_string());
@@ -21,7 +21,17 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
         println!("{}",a1.to_string());
         return a1.clone();
     }
-    else 
+    else if where_value["type"].to_string() == "checker".to_string() 
+    {
+        //println!("ok");
+        match where_value["check_type"].to_string().as_str() {
+            "IN" => todo!(),
+            "EXIST" => todo!(),
+            _ => todo!(),
+            
+        }
+    }
+    else  
     {
         todo!()
     }
@@ -53,6 +63,24 @@ pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
     }
 }
 
+pub fn convert_json_to_vec_string(value:&JsonValue)
+{
+    match value["type"].to_string().as_str() {
+        "datalist"=>todo!(),
+        "subquery"=>todo!(),
+        _=>todo!(),
+        
+    }
+}
+
+pub fn convert_json_to_vec_vec_string(value:&JsonValue)
+{
+    
+}
+
+
+
+
 
 #[cfg(test)]
 mod tests {
@@ -74,8 +102,13 @@ mod tests {
             str_json.push(i as char);
         }
         let parse_json=json::parse(&str_json.to_string()).unwrap();
+        //parse_json["conditions"] = "higyuv".into();
+        //println!("{}",parse_json["conditions"].to_string());
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
-        where_statement(&mut table1, &parse_json["conditions"]);
+        let a1 = where_statement(&mut table1, &parse_json["conditions"]);
+        println!("FINAL RESULT :\n{}",a1.to_string());
     }
+
+    
 
 }

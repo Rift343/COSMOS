@@ -30,40 +30,34 @@ pub struct CSVFile{
 
 impl CSVFile {
 
-#[doc = "Method to check if a list of attribute are in list of value. Change the self value"]
-pub fn in_interpratation(&mut self, check_element : Vec<String>,to_chek: Vec<Vec<String>>)
+#[doc = "Method to check if a list of attribute are not in list of value. Change the self value"]
+pub fn exclude(&mut self,to_chek: Vec<Vec<String>>)
 {
-    let mut lst_index:Vec<usize> = Vec::new();
-    for i in 0..self.descriptor[0].len()
-    {
-        for y in 0..check_element.len()
-        {
-            if check_element[y] == self.descriptor[0][i]
-            {
-                lst_index.push(i);
-            }
-        }
-    }
     let mut res_vec:Vec<Vec<String>> =Vec::new();
+    res_vec.push(self.descriptor[0].clone());
     for ligne in 1..self.descriptor.len()
     {
-        let mut lst_compare:Vec<String> = Vec::new();
-        for indice in 0..lst_index.len()
-        {
-            let index = lst_index[indice];
-            lst_compare.push(self.descriptor[ligne][index].clone())
-        }
+        let mut bool_ligne = true;
+        let lst_compare = self.descriptor[ligne].clone();
         for element in 0..to_chek.len()
         {
             if to_chek[element] == lst_compare
             {
-                res_vec.push(lst_compare.clone());
+                bool_ligne = false;
                 break;
             }
+        }
+        if bool_ligne == true
+        {
+            res_vec.push(lst_compare);
         }
     }
     self.descriptor = res_vec;
 }
+
+
+
+
 
 #[doc = "Methode to shedule a boolean predicat. That methode choose the good function to use depending of the value of tje WhereElement"]
 pub fn predicat_interpretation (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:WhereElement)
@@ -88,8 +82,8 @@ pub fn predicat_interpretation (&mut self, operation : String, type_expression: 
 In a first place we need to match the operation then the type.Finaly whe check the condition line by line. If possible the cast operation was done before the for statement"]
 pub fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
 {
-    println!("1");
-    println!("{}{}{}",element_1,operation,element_2.where_value);
+    //println!("1");
+    //println!("{}{}{}",element_1,operation,element_2.where_value);
     let mut index;
     let mut i = 0 ;
     let mut final_vec:Vec<Vec<String>>= Vec::new();
@@ -98,7 +92,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
         i = i + 1;       
     }
     index = i;
-    println!("here : {}",index);
+    //println!("here : {}",index);
     if operation == "=".to_string()
     {
         if type_expression == "FLOAT".to_string()
@@ -450,8 +444,8 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
 #[doc = "Methode use for the interpretation of a boolean statement. Need one constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)"]
 pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
 {
-    println!("2");
-    println!("{}{}{}",element_1.where_value,operation,element_2);
+    //println!("2");
+    //println!("{}{}{}",element_1.where_value,operation,element_2);
 
     let mut index;
     let mut i = 0 ;
@@ -461,7 +455,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
         i = i + 1;       
     }
     index = i;
-    println!("here : {}",index);
+    //println!("here : {}",index);
     if operation == "=".to_string()
     {
         if type_expression == "FLOAT".to_string()
