@@ -4,30 +4,28 @@ Model: SelectStatement;
 SelectStatement: 'SELECT' attributes=AttributeList 'FROM' relations=RelationList whereClause=WhereClause? ';';
 
 
-AttributeList: attribute=Attribute (',' attribute=Attribute)* | attribute= '*';
-Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | staticAttribute=STATIC_ATTRIBUTE | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME ('AS' alias=IDENTIFIER)?;
+AttributeList: attribute=Attribute (',' attribute=Attribute)* | (table=ID_NAME '.')? attribute= '*' ('AS' alias=IDENTIFIER)?;
+Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | staticAttribute=STATIC_ATTRIBUTE | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=NAME ('AS' alias=IDENTIFIER)?;
 IDENTIFIER: ID_NAME| STRING;
 DistinctOption: 'DISTINCT';
 
-AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=ATTRIBUTE_NAME) ')' | aggregateName='COUNT(*)';
+AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? (attributeName='*' | attributeName=NAME)) ')';
 AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
-ID_NAME: !KEYWORDS STRING;
+ID_NAME: (!KEYWORDS) NAME;
 STRING: /'[^']*'/ | /"[^"]*"/;
 STATIC_ATTRIBUTE: STRING | INT;
 
 RelationList: relation=Relation (',' relation=Relation)*;
-Relation: relationName=RELATION_NAME (space=SPACE alias=ID_NAME)?;
-RELATION_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
+Relation: relationName=NAME (space=SPACE alias=ID_NAME)?;
 SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
-ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
-Condition: left=ATTRIBUTE_NAME op=OPERATOR right=STATIC_ATTRIBUTE;
-LinkedCondition: linker=LINKER left=ATTRIBUTE_NAME op=OPERATOR right=STATIC_ATTRIBUTE;
-OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
-LINKER: 'AND' | 'OR';
+ConditionList: condition=Condition ('AND' condition=Condition)*;
+Condition: left=NAME op=Operator right=VALUE;
+Operator: '=' | '<>' | '<' | '>' | '<=' | '>=';
+VALUE: /(("([^"]|\\")*"|'([^']|\\')*')|\d+)/;  // Permettre des chaînes avec " ou ' et des nombres
 
-ATTRIBUTE_NAME: /[A-Za-z_][A-Za-z_0-9]*/;
+NAME: /[A-Za-z_][A-Za-z_0-9]*/;
 
 KEYWORDS: 'SELECT' | 'FROM' | 'WHERE' | 'AS';
