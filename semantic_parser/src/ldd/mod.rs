@@ -45,7 +45,7 @@ fn semantic_parser_create(syntaxic_file_content_as_struct : SyntaxicParserFileLd
     let mut new_table_name = syntaxic_file_content_as_struct.table_name;
     let mut table_metadata_as_struct = table_metadata_as_struct;
     //We are supposed to get only one table, we only take the first element
-    let unwraped_new_table_new =new_table_name.remove(0).table_name;
+    let unwraped_new_table_new =new_table_name.remove(0).table_name.to_uppercase();
     println!("on check primary key");
 for (table_name,_table_metadata) in &table_metadata_as_struct {
             if table_name.to_lowercase() == unwraped_new_table_new.to_lowercase() {
@@ -76,12 +76,12 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
                 };
                 for column in &syntaxic_file_content_as_struct.columns {
                     result.columns.push(ColumnNameTypeCouple {
-                        column_name: column.name.clone(),
+                        column_name: column.name.clone().to_uppercase(),
                         column_type: column.datatype.clone(),
                     });
                     for constraint in &column.constraints{
                         let mut attribute_list = Vec::new();
-                        attribute_list.push(column.name.clone());
+                        attribute_list.push(column.name.clone().to_uppercase());
                         // if we want to add a primary key
                         if constraint.clone() == "PRIMARY KEY".to_string() {
                         //we test if a constraint for the primary key already exist
