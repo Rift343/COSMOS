@@ -186,7 +186,7 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
         return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);
         
     }else{
-        return Err(Box::from("PAS IMPLEMENTER".to_string()));
+        return Err(Box::from("PAS IMPLEMENTE".to_string()));
 
     }
 }
