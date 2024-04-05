@@ -28,3 +28,7 @@ select * from personne;
 
 select * from personne;
 
+CREATE TABLE commfffffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+create table test2 (id1 INT PRIMARY KEY);
+

@@ -1,16 +1,19 @@
 {
     "table_name": [
         {
-            "table_name": "PERSONNE",
-            "use_name_table": "PERSONNE"
+            "table_name": "test2"
         }
     ],
     "columns": [
         {
-            "use_name_table": "PERSONNE",
-            "attribute_name": "*",
-            "use_name_attribute": "*"
+            "name": "id1",
+            "datatype": "INT",
+            "constraints": [
+                "PRIMARY KEY"
+            ]
         }
     ],
-    "conditions": []
+    "status": true,
+    "error": "",
+    "action": "create"
 }

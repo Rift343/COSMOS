@@ -183,7 +183,17 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
     // Done now due to the vector requiring allocating
     if (syntaxic_file_content_as_struct.action=="create"){
         println!("parser create");
-        return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);
+        match semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct) {
+            Ok(content) => {
+                Ok(content)
+            }
+            Err(error) => {
+                println!("{}?", error);
+                return Err(
+                Box::try_from(error).unwrap());}
+        }
+        
+        //return syntaxic_file
         
     }else{
         return Err(Box::from("PAS IMPLEMENTE".to_string()));
