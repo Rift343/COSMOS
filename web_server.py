@@ -59,4 +59,4 @@ def handle_message():
 
 
 if __name__ == '__main__':
-    app.run(host= '51.75.26.110', port=8000, debug=True)
+    app.run(host= '51.75.26.110', port=80, debug=True)
