@@ -1,0 +1,55 @@
+{
+    "tables": {
+      "PersonneTest": {
+        "use_name_table": "personneTest",
+        "columns": [
+          {
+            "attribute_name": "NOM",
+            "use_name_attribute": "NOM"
+          }
+        ]
+      }
+    },
+    "aggregates": [],
+    "conditions": {
+        "type":"logical",
+        "operator": "NOT",
+        
+        "right":{},
+        "left":{
+        
+      "type": "logical",
+      "operator": "OR",
+  
+      "left": {
+        "type": "condition",
+        "condition": "=",
+        "datatype": "INT",
+        "left": {
+          "type": "attribute",
+          "use_name_table": "personneTest",
+          "attribute_name": "ID"
+        },
+        "right": {
+          "type": "constant",
+          "value": "4"
+        }
+      },
+  
+      "right": {
+        "type": "condition",
+        "condition": "=",
+        "datatype": "INT",
+        "left": {
+          "type": "attribute",
+          "use_name_table": "personneTest",
+          "attribute_name": "ID"
+        },
+        "right": {
+          "type": "constant",
+          "value": "5"
+        }
+      }
+    }
+    }
+}

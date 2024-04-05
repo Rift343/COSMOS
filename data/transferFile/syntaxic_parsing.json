@@ -1,29 +1,16 @@
 {
     "table_name": [
         {
-            "table_name": "communal"
+            "table_name": "PERSONNE",
+            "use_name_table": "PERSONNE"
         }
     ],
     "columns": [
         {
-            "name": "population",
-            "datatype": "INT",
-            "constraints": [
-                "PRIMARY KEY"
-            ]
-        },
-        {
-            "name": "superficie",
-            "datatype": "INT",
-            "constraints": []
-        },
-        {
-            "name": "duree_de_vie",
-            "datatype": "VARCHAR(255)",
-            "constraints": []
+            "use_name_table": "",
+            "attribute_name": "SUM,ID",
+            "use_name_attribute": "SUM(ID)"
         }
     ],
-    "status": true,
-    "error": "",
-    "action": "create"
+    "conditions": []
 }
