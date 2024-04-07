@@ -39,6 +39,12 @@ fn get_metadata(metadata_file_path: String) -> HashMap<String, TableMetadata> {
         Err(error) => {panic!("Error : {}", error)}
     }
 }
+///Semantic parser function for the create statement
+/// input : SyntaxicParserFileLdd,HashMap<String, TableMetadata>
+/// output :  Result<File, Box<dyn Error>>
+/// This function is the function does :
+/// verify that the new table has a unique name, at least one primary key
+/// if those checks pass, it creates the entry in the metadata file
 fn semantic_parser_create(syntaxic_file_content_as_struct : SyntaxicParserFileLdd,table_metadata_as_struct : HashMap<String, TableMetadata> ) -> Result<File, Box<dyn Error>> {
     println!("debut create");
     
@@ -145,7 +151,12 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
             return Ok(synt_parsing_file);
             }
 
-
+///This function is the main function of the LDD semantic processing
+/// Inputs : File
+/// Output :  Result<File, Box<dyn Error>>
+/// this function works reads the syntaxic file provided, 
+/// stores the content as a struct, does the same for the metadata, verify the instruction and
+/// calls the appropriate function
 pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> {
     // Extract the file contents to a structure
     let syntaxic_file_content_as_struct: SyntaxicParserFileLdd = {
@@ -184,8 +195,8 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
     if (syntaxic_file_content_as_struct.action=="create"){
         println!("parser create");
         match semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct) {
-            Ok(content) => {
-                Ok(content)
+            Ok(_) => {
+                Ok(syntaxic_file)
             }
             Err(error) => {
                 println!("{}?", error);

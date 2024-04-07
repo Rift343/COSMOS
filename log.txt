@@ -32,3 +32,23 @@ CREATE TABLE commfffffunal (population INT PRIMARY KEY, superficie INT, duree_de
 
 create table test2 (id1 INT PRIMARY KEY);
 
+e
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));[1;3D
+
+create table fsesfsf (pop INT PRIMARY KEY, super INT);
+
+CREATE TABLE coedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsedffdssunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+create table polgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table polgddgsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table polqdqdfsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
