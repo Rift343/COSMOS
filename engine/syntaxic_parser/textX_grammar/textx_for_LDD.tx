@@ -1,0 +1,41 @@
+Grammar: Statement;
+
+Statement: CreateStatement | InsertStatement;
+
+CreateStatement:
+    'CREATE' 'TABLE' tableName=ID_NAME '('
+    columnDefinitions=ColumnDefinitionList
+    ')' ';';
+
+ColumnDefinitionList:
+    columnDefinition=ColumnDefinition (',' columnDefinition=ColumnDefinition)*;
+
+ColumnDefinition:
+    columnName=ID_NAME columnType=ColumnType_name columnConstraints=ColumnConstraintList?;
+
+ColumnType_name:
+    'INT' | 'VARCHAR' '(' length=INT ')' | 'DATE';
+
+ColumnConstraintList:
+    columnConstraint=ColumnConstraint (',' columnConstraint=ColumnConstraint)*;
+
+ColumnConstraint:
+    'PRIMARY KEY' | 'NOT NULL' | 'UNIQUE';
+
+InsertStatement:
+    'INSERT' 'INTO' tableName=ID_NAME
+    '(' columnNames=ColumnNameList ')'
+    'VALUES' '(' values=ValueList ')' ';';
+
+ColumnNameList:
+    columnName=ID_NAME (',' columnName=ID_NAME)*;
+
+ValueList:
+    value=Value (',' value=Value)*;
+
+Value:
+    STRING | INT | 'NULL';
+
+STRING: /(("([^"]|\\")*"|'([^']|\\')*'))/;
+INT: /\d+/;
+ID_NAME: /[a-zA-Z_][a-zA-Z0-9_]*/;
