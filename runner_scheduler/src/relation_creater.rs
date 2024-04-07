@@ -25,8 +25,16 @@ pub(crate) fn relation_creater(table_name:&String,attribute_list :&Vec<String>)-
     let _a = file.write_all(string_prototype_csv.as_bytes())?;
     let mut vector: Vec<String> = Vec::new();
     vector.push(table_name.to_string());
-    let meta_table = "ALL_TABLE".to_string();
+    let meta_table = "ALL_TABLES".to_string();
     relation_insert(&meta_table, &vector);
+    for i in 0..attribute_list.len()
+    {
+        let mut insert_vec = Vec::new();
+        insert_vec.push(table_name.to_string());
+        insert_vec.push(attribute_list[i].clone());
+        relation_insert(&"ALL_COLUMNS".to_string(), &insert_vec);
+        drop(insert_vec);
+    }
     Ok(0)
 }
 
