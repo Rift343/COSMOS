@@ -16,13 +16,14 @@ def is_valid_sql(query):
         }
 
         if model.relations:
-            # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
+            # For every table, add it to the list of tables
             for relation in model.relations.relation:
                 table_name = {
                     "table_name": relation.relationName.upper(),
                     "use_name_table": ""
                 }
 
+                # If the table is renamed
                 if relation.alias :
                     table_name["use_name_table"] = relation.alias
                 else :
@@ -42,9 +43,11 @@ def is_valid_sql(query):
                     "use_name_attribute": ""
                 }
 
+                # If the table is specified
                 if model.attributes.table :
                     columns["use_name_table"] = model.attributes.table.upper()
 
+                # If the '*' attribute is renamed with AS
                 if model.attributes.alias :
                     columns["use_name_attribute"] = model.attributes.alias
 
@@ -77,7 +80,7 @@ def is_valid_sql(query):
                             columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
 
 
-                    # if the attribute is a regular attribute
+                    # If the attribute is a regular attribute
                     else :
                         columns["attribute_name"] = attribute.attributeName.upper()
 
@@ -102,6 +105,7 @@ def is_valid_sql(query):
 
         # Conditions
         if model.whereClause :
+            # If there is only one condition
             cond = model.whereClause.conditions.condition
 
             structCondition = {
@@ -113,6 +117,7 @@ def is_valid_sql(query):
 
             result["conditions"].append(structCondition)
 
+            # If there are several
             if model.whereClause.conditions.linked_condition :
                 for condition in model.whereClause.conditions.linked_condition :
                     structCondition = {
@@ -133,7 +138,7 @@ def is_valid_sql(query):
         return json_result
 
     except textx.exceptions.TextXSyntaxError as e:
-        # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
+        # If the syntax is incorrect, return the error and its location
 
         error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
 
