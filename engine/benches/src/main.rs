@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::mem::replace;
-use std::thread::available_parallelism;
+use std::thread::{available_parallelism, sleep};
 use engine::engine;
 
 use criterion::{
@@ -10,7 +10,7 @@ use criterion::{
 };
 use csv::Writer;
 use sysinfo::{System};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 struct Bench{
     temps : f64,
@@ -63,7 +63,7 @@ fn engine_benchmark_custom(request : String) -> Bench{
     //init before refresh
     let mut sum_cpu  = 0f32;
     let mut sum_ram = 0;
-    let nb_iter = 6;
+    let nb_iter = 4;
     //refresh before bench
     sys.refresh_all();
     sys.refresh_all();
@@ -72,38 +72,73 @@ fn engine_benchmark_custom(request : String) -> Bench{
 
     // start timer
     let now = Instant::now();
-    //bench
 
-    let mut threads = Vec::new();
+
+
+
+    //test
+    engine(request.clone()).expect("Erreur engine");
+    let time = now.elapsed().as_nanos() as u32;
+    let half_time = time/ 2u32;
+
+
+    let now = Instant::now();
+    for _i in 0..nb_iter{
+        let mut threads = Vec::new();
+
+        let cloned_request = request.clone();
+        threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
+        sleep(Duration::new(0,half_time));
+        sys.refresh_all();
+        for p in sys.processes_by_name("src-aa2a"){
+            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
+            sum_cpu += p.cpu_usage();
+            sum_ram += p.virtual_memory();
+        }
+        for thread in threads {
+
+            thread.join().expect("Thread Join Issue");
+
+        }
+    }
+
+
+
+    //bench
+    //let mut threads = Vec::new();
+
     //start all threads
+/*
     for _i in 0..nb_iter{
         let cloned_request = request.clone();
         println!("CLONED REQUEST {}",cloned_request);
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
         threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
+        sys.refresh_all();
+        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+        sys.refresh_all();
+        for p in sys.processes_by_name("src-aa2a"){
+            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
+            sum_cpu += p.cpu_usage();
+        }
 
     }
 
+
+    println!("*\
+    ------------------------------------\
+    ");
     for _i in 0..nb_iter{
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_all();
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_all();
         std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
         sys.refresh_all();
         std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
         sys.refresh_all();
         for p in sys.processes_by_name("src-aa2a"){
-
             println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
-            sum_cpu += p.cpu_usage();
             sum_ram += p.virtual_memory();
         }
+        std::thread::sleep(Duration::new(1,0));
     }
 
-    println!("*\
-    ------------------------------------\
-    ");
 
     for thread in threads {
 
@@ -111,6 +146,9 @@ fn engine_benchmark_custom(request : String) -> Bench{
 
     }
 
+
+
+ */
 
     //end timer
     let mut time = now.elapsed().as_micros() as f64;
