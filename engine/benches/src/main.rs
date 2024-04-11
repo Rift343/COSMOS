@@ -31,12 +31,12 @@ fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>){
     let mut res_cpu;
     let mut res_ram;
     for i in 0..=res.len()-1{
-        res_cpu = (res[i].cpu*100.0).round().to_string();
+        res_cpu = (res[i].cpu).round().to_string();
         res_ram = (res[i].ram /1e6 as u64).to_string();
         w1.write_record(&[requete.clone().to_string() + &*" ".to_string() + &*db_size.clone().to_string()+ s + &*res[i].temps.round().to_string() + s + &*res_cpu+ s + &*res_ram + s]).expect("Bench Error Write Data");
     }
     let taille =(res.len() +1).to_string();
-    w1.write_record(&[" Average :; ;=MOYENNE(C2:C".to_owned() + &*taille +") ;=MOYENNE(D2:D"+ &*taille +")/100;=MOYENNE(E2:E"+ &*taille +");"]).expect("Bench Error write csv output");
+    w1.write_record(&[" Average :; ;=MOYENNE(C2:C".to_owned() + &*taille +") ;=MOYENNE(D2:D"+ &*taille +");=MOYENNE(E2:E"+ &*taille +");"]).expect("Bench Error write csv output");
     //wtr.write_record(&[id_string,first_name,last_name,age_str])?;
 
     w1.flush().expect("Bench Error Flush Writer");
@@ -181,21 +181,69 @@ fn engine_benchmark_thread(request: String){
     engine(request).expect("Benchmark : Engine Panic");
 }
 fn engine_benchmark(c: &mut Criterion) {
-    let nb_test = 10;
+    let nb_test = 100;
     let db_size= 10000;
     let request = "Select ID From Personne;".to_string();
 
     //tab result
 
     let mut res : Vec<Bench> = Vec::new();
+    let mut cpu_v = 0f32;
+    let mut ram_v :u64 = 0;
+    //TEST ICI
+    //init
+    let mut sys = System::new_all();
+    //refresh before bench
+    sys.refresh_all();
+    sys.refresh_all();
+
+    //let nb_cpu = sys.cpus().iter().count() as f32;
+
+    // start timer
+    let now = Instant::now();
+
+    //test
+    engine(request.clone()).expect("Erreur engine");
+    let time = now.elapsed().as_nanos() as u32;
+    let half_time = time/ 2u32;
+
+    while res.len()<nb_test {
+        let mut threads = Vec::new();
+        let cloned_request = request.clone();
+        let now = Instant::now();
+        threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
+        sleep(Duration::new(0,half_time));
+        sys.refresh_all();
+        for p in sys.processes_by_name("src-aa2a"){
+            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
+            cpu_v = p.cpu_usage();
+            ram_v = p.virtual_memory();
+        }
+        for thread in threads {
+
+            thread.join().expect("Thread Join Issue");
+
+        }
+        let time = now.elapsed().as_micros() as f64;
+        if (cpu_v > 0. && cpu_v < 100.){
+            let ben : Bench = Bench {
+                temps : time,
+                cpu : cpu_v,
+                ram : ram_v,
+            };
+            res.push(ben);
+        }
+    }
 
 
-
+/*
     for _i in 0..=nb_test{
         res.push(engine_benchmark_custom(request.clone()));
     }
 
 
+
+ */
     bench_to_csv(request.clone(),db_size,res);
 
 
