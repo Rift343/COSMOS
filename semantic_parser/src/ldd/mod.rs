@@ -39,13 +39,19 @@ fn get_metadata(metadata_file_path: String) -> HashMap<String, TableMetadata> {
         Err(error) => {panic!("Error : {}", error)}
     }
 }
+///Semantic parser function for the create statement
+/// input : SyntaxicParserFileLdd,HashMap<String, TableMetadata>
+/// output :  Result<File, Box<dyn Error>>
+/// This function is the function does :
+/// verify that the new table has a unique name, at least one primary key
+/// if those checks pass, it creates the entry in the metadata file
 fn semantic_parser_create(syntaxic_file_content_as_struct : SyntaxicParserFileLdd,table_metadata_as_struct : HashMap<String, TableMetadata> ) -> Result<File, Box<dyn Error>> {
     println!("debut create");
     
     let mut new_table_name = syntaxic_file_content_as_struct.table_name;
     let mut table_metadata_as_struct = table_metadata_as_struct;
     //We are supposed to get only one table, we only take the first element
-    let unwraped_new_table_new =new_table_name.remove(0).table_name;
+    let unwraped_new_table_new =new_table_name.remove(0).table_name.to_uppercase();
     println!("on check primary key");
 for (table_name,_table_metadata) in &table_metadata_as_struct {
             if table_name.to_lowercase() == unwraped_new_table_new.to_lowercase() {
@@ -76,12 +82,12 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
                 };
                 for column in &syntaxic_file_content_as_struct.columns {
                     result.columns.push(ColumnNameTypeCouple {
-                        column_name: column.name.clone(),
+                        column_name: column.name.clone().to_uppercase(),
                         column_type: column.datatype.clone(),
                     });
                     for constraint in &column.constraints{
                         let mut attribute_list = Vec::new();
-                        attribute_list.push(column.name.clone());
+                        attribute_list.push(column.name.clone().to_uppercase());
                         // if we want to add a primary key
                         if constraint.clone() == "PRIMARY KEY".to_string() {
                         //we test if a constraint for the primary key already exist
@@ -145,7 +151,12 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
             return Ok(synt_parsing_file);
             }
 
-
+///This function is the main function of the LDD semantic processing
+/// Inputs : File
+/// Output :  Result<File, Box<dyn Error>>
+/// this function works reads the syntaxic file provided, 
+/// stores the content as a struct, does the same for the metadata, verify the instruction and
+/// calls the appropriate function
 pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> {
     // Extract the file contents to a structure
     let syntaxic_file_content_as_struct: SyntaxicParserFileLdd = {
@@ -183,10 +194,20 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
     // Done now due to the vector requiring allocating
     if (syntaxic_file_content_as_struct.action=="create"){
         println!("parser create");
-        return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);
+        match semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct) {
+            Ok(_) => {
+                Ok(syntaxic_file)
+            }
+            Err(error) => {
+                println!("{}?", error);
+                return Err(
+                Box::try_from(error).unwrap());}
+        }
+        
+        //return syntaxic_file
         
     }else{
-        return Err(Box::from("PAS IMPLEMENTER".to_string()));
+        return Err(Box::from("PAS IMPLEMENTE".to_string()));
 
     }
 }

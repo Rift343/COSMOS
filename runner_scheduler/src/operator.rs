@@ -1625,7 +1625,7 @@ pub fn max(self,attribut: &String,type_attr: &String)->Vec<String>
 pub(crate)fn avg(self,attribut: &String,type_attr:&String)->Vec<String>
 {
     let mut result_vec = Vec::new();
-    result_vec.push("SUM(".to_string()+attribut+")");
+    result_vec.push("AVG(".to_string()+attribut+")");
     let mut sum = 0;
     let mut sum2 : f64 = 0.0;
     let mut index: usize = 0;
@@ -1711,7 +1711,7 @@ pub fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub fn projection(&mut self,list_attribute:Vec<String>){
-    //println!("{:?}",self.to_string());
+    println!("{:?}",self.to_string());
     //println!("{:?}",list_attribute);
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){

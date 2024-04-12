@@ -12,41 +12,41 @@
     },
     "aggregates": [],
     "conditions": {
-        "type":"logical",
+        "etype":"logical",
         "operator": "NOT",
         
         "right":{},
         "left":{
         
-      "type": "logical",
+      "etype": "logical",
       "operator": "OR",
   
       "left": {
-        "type": "condition",
+        "etype": "condition",
         "condition": "=",
         "datatype": "INT",
         "left": {
-          "type": "attribute",
+          "etype": "attribute",
           "use_name_table": "personneTest",
           "attribute_name": "ID"
         },
         "right": {
-          "type": "constant",
+          "etype": "constant",
           "value": "4"
         }
       },
   
       "right": {
-        "type": "condition",
+        "etype": "condition",
         "condition": "=",
         "datatype": "INT",
         "left": {
-          "type": "attribute",
+          "etype": "attribute",
           "use_name_table": "personneTest",
           "attribute_name": "ID"
         },
         "right": {
-          "type": "constant",
+          "etype": "constant",
           "value": "5"
         }
       }

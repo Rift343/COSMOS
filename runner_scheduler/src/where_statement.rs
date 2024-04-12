@@ -4,13 +4,13 @@ use crate::{logical_statement::logical_execution, operator::CSVFile, operator::W
 
 pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
 {
-    //println!("{}",where_value["type"].to_string());
-    if where_value["type"].to_string() == "logical".to_string()
+    println!("{}",where_value["etype"].to_string());
+    if where_value["etype"].to_string() == "logical".to_string()
     {
         println!("ok-->logical_execution(a1,where_value)");
         return logical_execution(a1, where_value);
     }
-    else if where_value["type"].to_string() == "condition".to_string() 
+    else if where_value["etype"].to_string() == "condition".to_string() 
     {
         //println!("ok");
         let left = convert_json_to_where_element(&where_value["left"]);
@@ -21,7 +21,7 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
         println!("{}",a1.to_string());
         return a1.clone();
     }
-    else if where_value["type"].to_string() == "checker".to_string() 
+    else if where_value["etype"].to_string() == "checker".to_string() 
     {
         //println!("ok");
         match where_value["check_type"].to_string().as_str() {
@@ -39,12 +39,12 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
 
 pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
 {
-    if value["type"].to_string() == "CONSTANT".to_string().to_lowercase()
+    if value["etype"].to_string() == "CONSTANT".to_string().to_lowercase()
     {
         let return_value = WhereElement{where_value:value["value"].to_string(),boolean_value:false};
         return_value
     }
-    else if value["type"].to_string() == "ATTRIBUTE".to_string().to_lowercase() {
+    else if value["etype"].to_string() == "ATTRIBUTE".to_string().to_lowercase() {
         let mut attribute_str = "".to_string();
         attribute_str.push_str(&value["use_name_table"].to_string());
         attribute_str.push('.');
@@ -52,20 +52,20 @@ pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
         let return_value = WhereElement{where_value:attribute_str,boolean_value:true};
         return_value
     }
-    else if value["type"].to_string() == "SUBQUERY".to_string().to_lowercase() 
+    else if value["etype"].to_string() == "SUBQUERY".to_string().to_lowercase() 
     {
-        println!("HERE");
+        println!("HERE1");
         todo!()    
     }
     else {
-        println!("HERE");
+        println!("HERE2");
         todo!()
     }
 }
 
 pub fn convert_json_to_vec_string(value:&JsonValue)
 {
-    match value["type"].to_string().as_str() {
+    match value["etype"].to_string().as_str() {
         "datalist"=>todo!(),
         "subquery"=>todo!(),
         _=>todo!(),

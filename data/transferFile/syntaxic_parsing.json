@@ -8,9 +8,9 @@
     "columns": [
         {
             "use_name_table": "",
-            "attribute_name": "SUM,ID",
-            "use_name_attribute": "SUM(ID)"
+            "attribute_name": "AVG,ID",
+            "use_name_attribute": "AVG(ID)"
         }
     ],
-    "conditions": []
+    "conditions": "NULL"
 }

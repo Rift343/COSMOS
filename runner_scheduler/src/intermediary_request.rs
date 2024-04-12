@@ -1,3 +1,4 @@
+use std::thread::JoinHandle;
 use std::{collections::HashMap, error::Error, thread};
 
 use json::JsonValue;
@@ -71,6 +72,19 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     let mut final_proj:Vec<String>= Vec::new();//list of all the 
     let mut dictionnary: HashMap<String, crate::operator::CSVFile> = HashMap::new();
     let mut as_hashmap: HashMap<String,String> = HashMap::new();
+    let mut thread_hashmap : HashMap<String,JoinHandle<CSVFile>> = HashMap::new();
+
+    for (key,value) in parse_json["subquery_hasmap"].entries()
+    {
+        let val = value.clone();
+        thread_hashmap.insert(key.to_string(), thread::spawn(move||
+            {
+                let mut json_subquery = val.clone();
+                let mut res = intermediary_request(&json_subquery).expect("ERROR");
+                return  res;
+            }));
+    }
+
     for (key,value) in parse_json["tables"].entries(){
         println!("key : {:?}", key);
         let mut intermediary_vector:Vec<String>=Vec::new();
@@ -292,7 +306,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     //println!("{}",a1.to_string());
     //println!("{:?}",final_proj);
     //println!("{:?}",as_hashmap);
-    println!("{}",a1.to_string());
+    //println!("{}",a1.to_string());
     a1.projection(final_proj);
     a1.replace_as(&as_hashmap);
     Ok(a1)
