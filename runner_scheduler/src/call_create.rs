@@ -20,7 +20,7 @@ pub fn call_create(mut sub_request: &File) -> Result<i8, Box<dyn Error>> {
     println!("{}", parse_json.to_string());
     // Convert to a serde_json Value type
     //let parsing_value : Value = serde_json::from_str(&*req).expect("Error: Unable to turn JSON file into Value type");
-    let mut r = 1;
+    //let mut r = 1;
     //let parse_json = parsing_value;
     let table_name = parse_json["table_name"][0]["table_name"]
         .to_string()
