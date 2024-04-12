@@ -23,11 +23,11 @@ SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
 ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
-Condition: left=NAME op=OPERATOR (right=STATIC_ATTRIBUTE | rightSubquery='(' subquery=SelectStatementSubquery ')');
-LinkedCondition: linker=LINKER (left=NAME op=OPERATOR (right=STATIC_ATTRIBUTE | rightSubquery='(' subquery=SelectStatementSubquery ')') | openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+Condition: ((left=NAME|left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE|right=NAME) | rightSubquery='(' subquery=SelectStatementSubquery ')')) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+LinkedCondition: linker=LINKER ((left=NAME|left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE|right=NAME) | rightSubquery='(' subquery=SelectStatementSubquery ')') | openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
 OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
 LINKER: 'AND' | 'OR';
 
 NAME: /[A-Za-z_][A-Za-z_0-9]*/;
 
-KEYWORDS: 'SELECT' | 'FROM' | 'WHERE' | 'AS' | 'EXIT';
+KEYWORDS: 'SELECT' | 'FROM' | 'WHERE' | 'AS' | 'EXIT' | 'AND' | 'OR';

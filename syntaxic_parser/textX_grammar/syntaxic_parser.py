@@ -102,10 +102,9 @@ def handle_select_statement(model):
                 else:
                     columns["attribute_name"] = attribute.attributeName.upper()
 
-                    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     # If the table is specified
                     if attribute.table:
-                        columns["use_name_table"] = attribute.table.upper()
+                        columns["use_name_table"] = attribute.table
 
                     # If the attribute is renamed with AS
                     if attribute.alias:
@@ -137,20 +136,24 @@ def handle_conditions(condition_list_path):
     if condition_list_path.condition:
         cond = condition_list_path.condition
 
-        structCondition = {
-            "left": cond.left,
-            "op": str(cond.op),
-            "right": None,
-        }
-
-        # If the right side is a subquery, call handle_select_statement with the textX object containing the subquery
-        if cond.rightSubquery:
-            structCondition["right"] = handle_select_statement(cond.subquery)
+        # If it is a condition list between brackets, call handle_conditions again
+        if cond.prioritised_conditions:
+            conditions["conditions"].append(handle_conditions(cond.prioritised_conditions))
         else:
-            structCondition["right"] = cond.right
-        conditions["conditions"].append(structCondition)
+            structCondition = {
+                "left": cond.left,
+                "op": str(cond.op),
+                "right": None,
+            }
 
-        # Linkers list is empty for single condition
+            # If the right side is a subquery, call handle_select_statement with the textX object containing the subquery
+            if cond.rightSubquery:
+                structCondition["right"] = handle_select_statement(cond.subquery)
+            else:
+                structCondition["right"] = cond.right
+            conditions["conditions"].append(structCondition)
+
+            # Linkers list is empty for single condition
 
     # Following conditions
     if condition_list_path.linked_condition:
