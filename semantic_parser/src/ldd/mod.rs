@@ -186,14 +186,30 @@ fn check_types(
         let value = row_data
             .get(column.column_name.as_str())
             .unwrap_or(&r);
+        if column.column_type=="DATE"{
+            return Err(Box::from("you tried inserting data in a table with a date type, this type is not implemented yet".to_string()));
+        }
+        if column.column_type=="INT"{
 
+            if (! row_data.get(column.column_name.as_str()).unwrap_or(&r).parse::<i32>().is_ok()){
+
+                return Err(Box::from(format!(
+                    "Type mismatch for column '{}': expected INT', found '{}'",
+                    column.column_name, value)));
+            }
+        
+        
+        }
+        }
+        /*
         if column.column_type != value.to_uppercase() {
             return Err(Box::from(format!(
                 "Type mismatch for column '{}': expected '{}', found '{}'",
                 column.column_name, column.column_type, value
             )));
+
         }
-    }
+    }*/
 
     Ok(())
 }
