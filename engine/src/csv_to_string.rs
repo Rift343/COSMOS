@@ -1,18 +1,20 @@
-use std::{fs::File, io::{BufReader, Read, Seek}};
-use std::error::Error;
 use serde_json::Value;
+use std::error::Error;
 use std::string::String;
+use std::{
+    fs::File,
+    io::{BufReader, Read, Seek},
+};
 
-
-use syntaxic_parser::syntaxic_parser;
 use runner_scheduler::scheduler;
-use semantic_parser::lmd::semantic_parser;
 use semantic_parser::ldd::semantic_parser_ldd;
+use semantic_parser::lmd::semantic_parser;
+use syntaxic_parser::syntaxic_parser;
 //use engine::csv_to_string;
 use runner_scheduler::call_create::call_create;
 use std::fs;
 //use csv::Reader;
-/* 
+/*
 pub fn engine_main(file_name : String) ->  Result<String, Box<dyn std::error::Error>> {
 
     //A CHANGER EN file_name DES QU ON PREND LE RES DE O/E
@@ -49,14 +51,14 @@ fn is_ldd(file_path: String) -> bool {
     }
 }
 
-pub fn csv_to_string(mut file_name : &File) -> Result<String, Box<dyn std::error::Error>> {
+pub fn csv_to_string(mut file_name: &File) -> Result<String, Box<dyn std::error::Error>> {
     //string resultat
     file_name.rewind()?;
-    
+
     let mut buf = String::new();
     let mut my_buffreader = BufReader::new(file_name);
     my_buffreader.read_to_string(&mut buf).expect("error)");
-    /* 
+    /*
     let mut res = String::new();
     //ouverture du reader
     let mut rdr = Reader::from_path(file_name)?;
@@ -96,16 +98,16 @@ pub fn csv_to_string(mut file_name : &File) -> Result<String, Box<dyn std::error
     Ok(buf)
 }
 
-
-pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::error::Error + 'static)>> {
-
+pub fn engine(
+    request: String,
+) -> Result<std::string::String, Box<(dyn std::error::Error + 'static)>> {
     // -----------------------------------------------------
     // ------------------ Syntaxic Parser ------------------
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
 
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
-    let mut syntaxic_parsing_handle : File = match syntaxic_parser(request){
+    let mut syntaxic_parsing_handle: File = match syntaxic_parser(request) {
         Ok(file) => file,
         Err(error) => {
             println!("{}", error.to_string());
@@ -115,20 +117,25 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
 
     // Read the file and put its contents into a String
     let mut syntaxic_parsing_content: std::string::String = Default::default();
-    syntaxic_parsing_handle.read_to_string(&mut syntaxic_parsing_content).expect("Error: Unable to read syntaxic parsing file");
+    syntaxic_parsing_handle
+        .read_to_string(&mut syntaxic_parsing_content)
+        .expect("Error: Unable to read syntaxic parsing file");
 
     // Convert to a serde_json Value type
-    let parsing_value : Value = serde_json::from_str(&*syntaxic_parsing_content).expect("Error: Unable to turn JSON String into Value type");
+    let parsing_value: Value = serde_json::from_str(&*syntaxic_parsing_content)
+        .expect("Error: Unable to turn JSON String into Value type");
 
     // Show "status" and "error" fields
-    println!("Status : {}\nError : {}\n",parsing_value["status"], parsing_value["error"]);
-    if parsing_value["status"]=="false" {
+    println!(
+        "Status : {}\nError : {}\n",
+        parsing_value["status"], parsing_value["error"]
+    );
+    if parsing_value["status"] == "false" {
         // Print for now, should send to the view later (result_printer)
-        println!("{}",parsing_value["error"]);
-    }
-    else {
+        println!("{}", parsing_value["error"]);
+    } else {
         // Print for now, should be given to the semantic parser later
-        println!("{:?}",syntaxic_parsing_handle);
+        println!("{:?}", syntaxic_parsing_handle);
     }
 
     syntaxic_parsing_handle.rewind().expect("Aled");
@@ -143,36 +150,35 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
 
-   // Mock syntaxic file, replace these variables when done
-   //let syntaxic_file_name = "data/SemanticTestData/FS_1.json".to_string();
-   //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
+    // Mock syntaxic file, replace these variables when done
+    //let syntaxic_file_name = "data/SemanticTestData/FS_1.json".to_string();
+    //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
-   // Get the outputted semantic file.
-   let mut is_ldd_req = false;
-   let mut semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
-    if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())){
+    // Get the outputted semantic file.
+    let mut is_ldd_req = false;
+    let mut semantic_parser_res: Result<File, Box<dyn Error>> =
+        Err("semantic parser not initialized".into());
+    if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())) {
         is_ldd_req = true;
         let ldd_result = semantic_parser_ldd(syntaxic_parsing_handle);
         //println!("ldd result: {:?}", ldd_result);
         semantic_parser_res = ldd_result;
-    }else{
-
+    } else {
         let lmd_result = semantic_parser(syntaxic_parsing_handle);
         semantic_parser_res = lmd_result;
     }
-   
 
-   let semantic_file : File;
-   
-   match semantic_parser_res {
-       Ok(contenu) => semantic_file = contenu,
-       Err(err) => {
-           println!("{}",err.to_string());
-           return Ok("Erreur semantic parser".to_string());
-       }
-   }
+    let semantic_file: File;
 
-   // -----------------------------------------------------
+    match semantic_parser_res {
+        Ok(contenu) => semantic_file = contenu,
+        Err(err) => {
+            println!("{}", err.to_string());
+            return Ok("Erreur semantic parser : ".to_string()+&err.to_string());
+        }
+    }
+
+    // -----------------------------------------------------
     // ------------------ Semantic Parser ------------------
     // ------------------------ End ------------------------
     // -----------------------------------------------------
@@ -182,27 +188,34 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
     if (is_ldd_req) {
-        let res = call_create(&semantic_file);
 
+                let res = call_create(&semantic_file);
+                match res {
+                    Ok(_) => return Ok("table created".to_string()),
+                    Err(err) => {
+                        println!("{}", err.to_string());
+                        return Ok("Erreur runner schedulder".to_string()+&err.to_string());
+                    }
+                };
+            
 
+    } else {
+        let csv_file_returned = scheduler(&semantic_file);
+        match csv_file_returned {
+            //First match on the result of the runner_scheduler.
+            Ok(content) => {
+                let printable_string: Result<String, Box<dyn Error>>;
+                printable_string = csv_to_string(&content);
+                match printable_string {
+                    //Seconde math when the result string from the CSV File
+                    Ok(content) => {
+                        //println!("{}",content);
+                        return Ok(content);
+                    }
 
-
-
-    }
-    let csv_file_returned = scheduler(&semantic_file);
-    match csv_file_returned {//First match on the result of the runner_scheduler.
-        Ok(content) => {
-            let printable_string : Result<String, Box<dyn Error>>;
-            printable_string=csv_to_string(&content);
-            match printable_string {//Seconde math when the result string from the CSV File
-                Ok(content) => {
-                    //println!("{}",content);
-                    return Ok(content);
-                },
-
-
-                Err(e) => {
-                    println!("
+                    Err(e) => {
+                        println!(
+                            "
                     -----------------------------------------------------
                     ---------------------Engine--------------------------
                     ---------------------Error 1--------------------------
@@ -211,23 +224,24 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
                     Please check the data/CSV directory
                     Error Message  : {}
 
-                   ",e);
-                    return Ok("
+                   ",
+                            e
+                        );
+                        return Ok("
                     -----------------------------------------------------
                     ---------------------Engine--------------------------
                     ---------------------Error 1--------------------------
                     -----------------------------------------------------
                     Maybe CSV file is already used or not existe anymore.
                     Please check the data/CSV directory
-                    ".to_string());
+                    "
+                        .to_string());
+                    } //error message of csv_to_string return an error
                 }
-                   //error message of csv_to_string return an error
-            }
-
-
-        },//Case 1, we have a CSV file so CSV_to_string then result_printer
-        Err(e) => {
-            println!("
+            } //Case 1, we have a CSV file so CSV_to_string then result_printer
+            Err(e) => {
+                println!(
+                    "
         -----------------------------------------------------
         -----------------Runner_scheduler--------------------
         ---------------------Error 2-------------------------
@@ -235,15 +249,20 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
         Maybe CSV file is already used or not existe anymore.
         Please check the data/CSV directory
         Error Message : {}
-       ",e);
-            return Ok("
+       ",
+                    e
+                );
+                return Ok("
         -----------------------------------------------------
         -----------------Runner_scheduler--------------------
         ---------------------Error 2-------------------------
         -----------------------------------------------------
         Maybe CSV file is already used or not existe anymore.
         Please check the data/CSV directory
-        ".to_string());},//Case2, print there is a error on a file for the runner_scheduler
+        "
+                .to_string());
+            } //Case2, print there is a error on a file for the runner_scheduler
+        }
     }
     // -----------------------------------------------------
     // ------------------ Runner_scheduler ------------------
