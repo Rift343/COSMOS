@@ -80,11 +80,8 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         thread_hashmap.insert(key.to_string(), thread::spawn(move||
             {
                 let mut json_subquery = val.clone();
-                let mut res = intermediary_request(&json_subquery);
-                
-
-
-                return  CSVFile{ name: todo!(), descriptor: todo!() };
+                let mut res = intermediary_request(&json_subquery).expect("ERROR");
+                return  res;
             }));
     }
 
