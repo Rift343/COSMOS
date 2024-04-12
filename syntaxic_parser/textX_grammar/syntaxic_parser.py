@@ -1,8 +1,8 @@
 import textx
 import json
-#from pprint import pprint
+
 def lmd_parser(query):
- # Get grammar file
+    # Get grammar file
     sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/grammar_file.tx", ignore_case = True)
     try:
         # Analyse SQL query
@@ -16,15 +16,16 @@ def lmd_parser(query):
         }
 
         if model.relations:
-            # for every table, add it to the list of tables demanded, and as the first item of each "columns" list
+            # For every table, add it to the list of tables
             for relation in model.relations.relation:
                 table_name = {
                     "table_name": relation.relationName.upper(),
                     "use_name_table": ""
                 }
 
+                # If the table is renamed
                 if relation.alias :
-                    table_name["use_name_table"] = relation.alias
+                    table_name["use_name_table"] = relation.alias.upper()
                 else :
                     table_name["use_name_table"] = table_name["table_name"]
 
@@ -37,10 +38,18 @@ def lmd_parser(query):
             # If the attribute is a "*"
             if model.attributes.attribute==['*']:
                 columns = {
-                    "use_name_table": result["table_name"][0]["use_name_table"],
+                    "use_name_table": "",
                     "attribute_name": "*",
-                    "use_name_attribute": "*"
+                    "use_name_attribute": ""
                 }
+
+                # If the table is specified
+                if model.attributes.table :
+                    columns["use_name_table"] = model.attributes.table.upper()
+
+                # If the '*' attribute is renamed with AS
+                if model.attributes.alias :
+                    columns["use_name_attribute"] = model.attributes.alias
 
                 result["columns"].append(columns)
 
@@ -54,19 +63,13 @@ def lmd_parser(query):
                         "use_name_attribute": ""
                     }
 
-                    # if the attribute is an aggregate function
+                    # If the attribute is an aggregate function
                     if attribute.aggregate :
                         # If the table is specified
                         if attribute.aggregate.table :
                             columns["use_name_table"] = attribute.aggregate.table
 
-                        # If the aggregate is a COUNT(*)
-                        if attribute.aggregate.aggregateName == "COUNT(*)" :
-                            columns["attribute_name"] = 'COUNT,*'
-
-                        # If it is any other aggregate function
-                        else :
-                            columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
+                        columns["attribute_name"] = attribute.aggregate.aggregateName + ',' + attribute.aggregate.attributeName.upper()
 
                         # If the attribute is renamed with AS
                         if attribute.alias :
@@ -75,7 +78,8 @@ def lmd_parser(query):
                             columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
 
 
-                    # if the attribute is a regular attribute
+
+                    # If the attribute is a regular attribute
                     else :
                         columns["attribute_name"] = attribute.attributeName.upper()
 
@@ -98,45 +102,15 @@ def lmd_parser(query):
                     #    result["conditions"] = "distinct" + columns["use_name_attribute"]
 
 
-        # Conditions
-        if model.whereClause :
-            structCondition = {
-                "left" : "",
-                "op" : "",
-                "right" : "",
-                "linker" : ""
-            }
 
-            cond = model.whereClause.conditions.condition
-            structCondition["left"] = cond.left
-            structCondition["op"] = str(cond.op)
-            structCondition["right"] = str(cond.right)
-            structCondition["linker"] = 'AND'
-
-            result["conditions"].append(structCondition)
-
-            if model.whereClause.conditions.linked_condition :
-                structCondition = {
-                    "left" : "",
-                    "op" : "",
-                    "right" : "",
-                    "linker" : ""
-                }
-                for condition in model.whereClause.conditions.linked_condition :
-                    structCondition["left"] = condition.left
-                    structCondition["op"] = str(condition.op)
-                    structCondition["right"] = str(condition.right)
-                    structCondition["linker"] = condition.linker
-
-                    result["conditions"].append(structCondition)
-
-
+        # Conditions are not handled for the time being
+        result["conditions"] = "NULL"
 
         # Convert the dict to Json string
         json_result = json.dumps(result, indent=4)
 
-
         return json_result
+
 
     except textx.exceptions.TextXSyntaxError as e:
         # If the syntax is incorrect, fill in the "status" and "error" fields accordingly
@@ -205,13 +179,8 @@ def ldd_parser(query):
 
 
 def is_valid_sql(query):
-    # Get grammar file
-    # we check query length
-    #if the first word of the query is SELECT,we use the lbd_parser function
-    print(type(query))
-    if len(query) < 6:
-        return "Query is too short"
-    elif query[0:6].upper() == "SELECT":
+    #if the first word of the query is SELECT,we use the lmd_parser function
+    if query[0:6].upper() == "SELECT":
         return lmd_parser(query)
     else:
         return ldd_parser(query)

@@ -7,12 +7,14 @@ use std::error::Error;
 
 use intermediary_request::intermediary_request;
 
+pub mod where_statement;
 pub mod operator;
 pub mod relation_creater;
 pub mod relation_insert;
 pub mod relation_drop;
 pub mod intermediary_request;
 pub mod call_create;
+pub mod logical_statement;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right

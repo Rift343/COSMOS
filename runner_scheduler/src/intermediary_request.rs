@@ -3,6 +3,62 @@ use std::{collections::HashMap, error::Error, thread};
 use json::JsonValue;
 
 use crate::operator::{self, CSVFile};
+use crate::where_statement::where_statement;
+
+pub fn add_attribute_if_in_condition(condition:&JsonValue,intermediary_projection:&Vec<String>)->Vec<String>
+{
+    match condition["type"].to_string().as_str()
+    {
+        "logical"=> {
+            let mut lright = add_attribute_if_in_condition(&condition["right"],&intermediary_projection);
+            let lleft= add_attribute_if_in_condition(&condition["left"],&intermediary_projection);
+            for i in 0..lleft.len()
+            {
+                if !(lright.contains(&lleft[i]))
+                {
+                    lright.push(lleft[i].clone());
+                }
+            }
+            return  lright
+    
+        } ,
+        "condition"=> {
+            let mut lright = add_attribute_if_in_condition(&condition["right"],&intermediary_projection);
+            let lleft= add_attribute_if_in_condition(&condition["left"],&intermediary_projection);
+            for i in 0..lleft.len()
+            {
+                if !(lright.contains(&lleft[i]))
+                {
+                    lright.push(lleft[i].clone());
+                }
+            }
+            return  lright
+    
+        } ,
+        "constant"=> return [].to_vec(),
+        "attribute"=>{
+            let mut attribute_str = "".to_string();
+            attribute_str.push_str(&condition["use_name_table"].to_string());
+            attribute_str.push('.');
+            attribute_str.push_str(&condition["attribute_name"].to_string());
+            
+            if !(intermediary_projection.contains(&attribute_str))
+            {
+                println!("{}",attribute_str);
+                return [attribute_str].to_vec()
+            }
+            else {
+                return  [].to_vec()
+            }
+        }
+
+        _=>return [].to_vec(),
+
+    };
+}
+
+
+
 
 
 #[doc = "This function is use for the query and subquery. Need in input a reference of a JsonValue of the Semantic parser. Return a CSVFile or error. Can crash if the date of the CSV are corructped
@@ -38,6 +94,19 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         //println!("{}",parse_json["tables"][i]["table"]["table_name"].to_string());
         //println!("{:?}",as_hashmap);
         let mut open_file:CSVFile = operator::open_relation(key.to_string(), &value["use_name_table"].to_string())?;//.expect("error");//We open each relation
+        if parse_json["conditions"].to_string()!="null".to_string()
+        {
+            let condition_element =add_attribute_if_in_condition(&parse_json["conditions"], &intermediary_vector);
+            println!("condition_element ={:?}",condition_element);
+            for i in 0..condition_element.len()
+                {
+                    if !(intermediary_vector.contains(&condition_element[i]))
+                    {
+                        intermediary_vector.push(condition_element[i].clone());
+                    }
+                }
+        }
+        
         if intermediary_vector.len()!=0
         {
             open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
@@ -102,9 +171,11 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     //println!("crash");
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&keylst[0]].clone();
-    
     //println!("{:?}",as_hashmap);
-    
+    if parse_json["conditions"].to_string()!="null".to_string()
+    {
+        a1 = where_statement(& mut a1, &parse_json["conditions"]);
+    }
 
     let mut tab_agregate_fun:Vec<JsonValue> = Vec::new();//Vector for the agregation function
     for i in 0..parse_json["aggregates"].len()
@@ -113,10 +184,18 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         let mut str1 = parse_json["aggregates"][i]["aggregate_type"].to_string();
         str1.push('(');
         let mut str2 = str1.clone();
-        str2.push_str(&parse_json["aggregates"][i]["use_name_table"].to_string());
-        str2.push('.');
-        str2.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
+        if parse_json["aggregates"][i]["attribute_name"].to_string() == "*".to_string()
+        {
+            str2.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
+        }
+        else 
+        {
+            str2.push_str(&parse_json["aggregates"][i]["use_name_table"].to_string());
+            str2.push('.');
+            str2.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
+        }
         str2.push(')');
+        println!("{}",str2);
         final_proj.push(str2.clone());
         as_hashmap.insert(str2,parse_json["aggregates"][i]["use_name_attribute"].to_string() );
         //println!("{}",parse_json["aggregates"][i].dump());
@@ -137,6 +216,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
                     if data_in1["attribute_name"].to_string() =="*".to_string() // Need to select betwenn * or a attribute.
                     {
                         //println!("{}",&data_in1["attribute_name"].to_string());
+                        //println!("ok");
                         let data_out1 = data_in2.count(&data_in1["attribute_name"].to_string());//start the count function
                         return data_out1;//return the count result
 
@@ -212,10 +292,37 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     //println!("{}",a1.to_string());
     //println!("{:?}",final_proj);
     //println!("{:?}",as_hashmap);
+    println!("{}",a1.to_string());
     a1.projection(final_proj);
     a1.replace_as(&as_hashmap);
     Ok(a1)
 }
+
+
+pub fn intermediary_request_for_const(query:&JsonValue) -> Result<String,Box<dyn Error>>
+{
+    let res = match intermediary_request(query){
+        Ok(e) => e,
+        Err(e) => return Err(Box::from(e)),
+    };
+
+    let res_value = &res.descriptor[1][0];//We need a const of a select count(*) from personne query (the query use is a exemple)
+    Ok(res_value.to_string())
+
+}
+
+pub fn intermediary_request_for_value_list (query:&JsonValue) -> Result<Vec<Vec<String>>,Box<dyn Error>>
+{
+    let res = match intermediary_request(query){
+        Ok(e) => e,
+        Err(e) => return Err(Box::from(e)),
+    };
+    let res_value:&Vec<Vec<String>> = &res.descriptor;
+    let mut returned_value:Vec<Vec<String>> = res_value.to_vec();
+    returned_value.remove(0);
+    Ok(returned_value)
+}
+
 
 mod tests {
     
@@ -228,6 +335,24 @@ mod tests {
     fn test_intermediary_request()
     {
         let mut json_file:std::fs::File = std::fs::File::open("semantique.json").expect("Error ==> Can't read the JSON file");
+        let mut buffer = Vec::new();
+        std::io::Read::read_to_end(&mut json_file, &mut buffer).expect("error"); //.expect("Read to end error");
+        let mut str_json  : String = String::new();
+        for i in buffer{
+            str_json.push(i as char);
+        }
+        let parse_json=json::parse(&str_json.to_string()).unwrap();
+        let _a = match intermediary_request(&parse_json)  {
+            Ok(a) => print!("{}",a.to_string()),
+            Err(e) => println!("{}",e),
+        };
+
+    }
+
+    #[test]
+    fn test_intermediary_request_2()
+    {
+        let mut json_file:std::fs::File = std::fs::File::open("semantique2.json").expect("Error ==> Can't read the JSON file");
         let mut buffer = Vec::new();
         std::io::Read::read_to_end(&mut json_file, &mut buffer).expect("error"); //.expect("Read to end error");
         let mut str_json  : String = String::new();

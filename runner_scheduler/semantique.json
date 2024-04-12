@@ -22,6 +22,7 @@
         "use_name_table": "personne",
         "attribute_name": "ID",
         "use_name_attribute": "SUM(ID)",
+        "attribute_type":"INT",
         "aggregate_type": "SUM"
       },
       {
