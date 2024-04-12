@@ -52,3 +52,9 @@ create table polgddgsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite
 
 create table polqdqdfsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
 
+CREATE TABLE coedsesseedffdssunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsesefsfeedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsesefsfeedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+

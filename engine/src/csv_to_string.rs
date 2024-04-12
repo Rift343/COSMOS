@@ -174,7 +174,7 @@ pub fn engine(
         Ok(contenu) => semantic_file = contenu,
         Err(err) => {
             println!("{}", err.to_string());
-            return Ok("Erreur semantic parser".to_string());
+            return Ok("Erreur semantic parser : ".to_string()+&err.to_string());
         }
     }
 
@@ -194,7 +194,7 @@ pub fn engine(
                     Ok(_) => return Ok("table created".to_string()),
                     Err(err) => {
                         println!("{}", err.to_string());
-                        return Ok("Erreur semantic parser".to_string());
+                        return Ok("Erreur runner schedulder".to_string()+&err.to_string());
                     }
                 };
             

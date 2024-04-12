@@ -1,16 +1,26 @@
 {
     "table_name": [
         {
-            "table_name": "test2"
+            "table_name": "coedsesefsfeedffunal"
         }
     ],
     "columns": [
         {
-            "name": "id1",
+            "name": "population",
             "datatype": "INT",
             "constraints": [
                 "PRIMARY KEY"
             ]
+        },
+        {
+            "name": "superficie",
+            "datatype": "INT",
+            "constraints": []
+        },
+        {
+            "name": "duree_de_vie",
+            "datatype": "VARCHAR(255)",
+            "constraints": []
         }
     ],
     "status": true,
