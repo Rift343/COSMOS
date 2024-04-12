@@ -1,1 +1,12 @@
 Requete; Taille CSV Input; Temps (Microsecondes) ; CPU %; RAM Kilobytes;
+Select ID From Personne; 10000; 1194646; 88; 128; 
+Select ID From Personne; 10000; 1215831; 95; 127; 
+Select ID From Personne; 10000; 1225954; 91; 132; 
+Select ID From Personne; 10000; 1223410; 87; 130; 
+Select ID From Personne; 10000; 1818927; 92; 130; 
+Select ID From Personne; 10000; 1212533; 93; 130; 
+Select ID From Personne; 10000; 1216340; 90; 131; 
+Select ID From Personne; 10000; 1219408; 86; 132; 
+Select ID From Personne; 10000; 1278148; 91; 133; 
+Select ID From Personne; 10000; 1230588; 96; 131; 
+ Average :; ;=MOYENNE(C2:C11) ;=MOYENNE(D2:D11);=MOYENNE(E2:E11);

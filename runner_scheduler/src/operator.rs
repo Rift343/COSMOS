@@ -682,7 +682,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
                 }
             }
             self.descriptor = final_vec;
-            println!("{:?}",self.descriptor);
+            //println!("{:?}",self.descriptor);
             
             }
         }//end section
@@ -1711,7 +1711,7 @@ pub fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub fn projection(&mut self,list_attribute:Vec<String>){
-    println!("{:?}",self.to_string());
+    //println!("{:?}",self.to_string());
     //println!("{:?}",list_attribute);
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){

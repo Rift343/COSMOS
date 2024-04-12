@@ -181,7 +181,7 @@ fn engine_benchmark_thread(request: String){
     engine(request).expect("Benchmark : Engine Panic");
 }
 fn engine_benchmark(c: &mut Criterion) {
-    let nb_test = 100;
+    let nb_test = 10;
     let db_size= 10000;
     let request = "Select ID From Personne;".to_string();
 
@@ -208,13 +208,14 @@ fn engine_benchmark(c: &mut Criterion) {
     let half_time = time/ 2u32;
 
     while res.len()<nb_test {
+        println!("BOUCLEEEEEEEEE {}", res.len());
         let mut threads = Vec::new();
         let cloned_request = request.clone();
         let now = Instant::now();
         threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
         sleep(Duration::new(0,half_time));
         sys.refresh_all();
-        for p in sys.processes_by_name("src-aa2a"){
+        for p in sys.processes_by_name("src-"){
             println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
             cpu_v = p.cpu_usage();
             ram_v = p.virtual_memory();
@@ -225,15 +226,15 @@ fn engine_benchmark(c: &mut Criterion) {
 
         }
         let time = now.elapsed().as_micros() as f64;
-        if (cpu_v > 0. && cpu_v < 100.){
-            let ben : Bench = Bench {
-                temps : time,
-                cpu : cpu_v,
-                ram : ram_v,
-            };
+        let ben : Bench = Bench {
+            temps: time,
+            cpu: cpu_v,
+            ram: ram_v,
+        };
+
             res.push(ben);
-        }
     }
+
 
 
 /*

@@ -121,13 +121,15 @@ def lmd_parser(query):
 
 
 def ldd_parser(query):
-        print("test")
+        """
+        this function handles the syntax of LDD requests
+        it takes a string as an input and use a textx grammar to verify syntax and extract fields of interest
+        
+        """
         sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
         try:
-            print("enter try")
             # Analyse SQL query
             model = sql_meta.model_from_str(query)
-            print("model good")
             # If the syntax is correct, create the dict structure in which the elements of the query will be stored
             result = {
                 "table_name": [],
@@ -135,29 +137,6 @@ def ldd_parser(query):
                 "status": True,
                 "error": ""
             }
-            print("result initialized")
-            """
-{
-    "table_name": [
-        {
-            "table_name": "nom table créé ou inséré"
-        }
-    ],
-    "columns": [#pour chaque colonne dans le insert into ou table créée
-        {
-            "attribute_name": "*",
-            "data" : donné a inséré si utile,
-            "datatype" : "type of data",
-            "constraint" : contraite a metter du la colonne en cas de création
-        }
-    ],
-    "action" :  "create" | "insert",
-    "conditions": "NULL",
-    "status": true,
-    "error": "NULL"
-}
-"""
-
             # Handle CREATE TABLE statement
             if model.__class__.__name__ == "CreateStatement":
                 print("we enter the create statement")
@@ -174,7 +153,6 @@ def ldd_parser(query):
                     }
                     print("we define the column : ", column)
                     columns.append(column)
-                print("we define the result")
                 result["table_name"].append({"table_name": table_name})
                 result["columns"] = columns
                 result["action"] = "create"
@@ -191,7 +169,6 @@ def ldd_parser(query):
                 result["columns"] = [{"attribute_name": column,"data": value} for column,value in zip(columns,values)]
                 result["conditions"] = "NULL"
                 result["action"] = "insert"
-                print("we define the result")
             json_result = json.dumps(result, indent=4)
             return json_result
 
@@ -206,7 +183,6 @@ def is_valid_sql(query):
     if query[0:6].upper() == "SELECT":
         return lmd_parser(query)
     else:
-        print("we go good way")
         return ldd_parser(query)
 
 
