@@ -11,6 +11,8 @@ use crate::structures::syntaxic_parser_file_ldd::SyntaxicParserFileLdd;
 
 use crate::structures::table_metadata::{ColumnNameTypeCouple, Constraint, TableMetadata};
 
+//use crate::structures::column_table_name_triple_ldd::ColumnTableNameTripleLdd;
+//use super::structures::table_name_ldd::TableNameLdd;
 
 
 
@@ -146,6 +148,176 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
             }
 
 
+fn create_row_data(syntaxic_file_content: &SyntaxicParserFileLdd, table_name: &str) -> Option<HashMap<String, String>> {
+    let table_columns = syntaxic_file_content.columns.iter()
+        .filter(|col| col.name == table_name)
+        .map(|col| (col.name.clone(), col.datatype.clone(), col.data.clone()))
+        .collect::<Vec<_>>();
+
+    let mut row_data = HashMap::new();
+
+    for (name, datatype, data) in table_columns {
+        match datatype.as_str() {
+            "INT" => {
+                let value = data.as_ref()?.get(0).cloned()?;
+                let int_value = value.parse::<i32>().ok()?;
+                row_data.insert(name, int_value.to_string());
+            }
+            "VARCHAR" => {
+                let value = data.as_ref()?.get(0).cloned()?;
+                row_data.insert(name, value);
+            }
+            // AUTRES TYPES DE DONNEES
+            _ => return None,
+        }
+    }
+
+    Some(row_data)
+}
+            
+
+
+fn check_types(
+    row_data: &HashMap<String, String>,
+    columns: &Vec<ColumnNameTypeCouple>,
+) -> Result<(), Box<dyn Error>> {
+    let r = "NULL".to_string();
+    for column in columns {
+        let value = row_data
+            .get(column.column_name.as_str())
+            .unwrap_or(&r);
+
+        if column.column_type != value.to_uppercase() {
+            return Err(Box::from(format!(
+                "Type mismatch for column '{}': expected '{}', found '{}'",
+                column.column_name, column.column_type, value
+            )));
+        }
+    }
+
+    Ok(())
+}
+
+fn check_constraints(
+    row_data: &HashMap<String, String>,
+    constraints: &Vec<Constraint>,
+) -> Result<(), Box<dyn Error>> {
+    for constraint in constraints {
+        let mut valid = false;
+        for column_name in &constraint.attribute_list {
+            let r = "NULL".to_string();
+            let value = row_data
+                .get(column_name.as_str())
+                .unwrap_or(&r);
+
+            match &constraint.constraint_type[..] {
+                "NOT NULL" => {
+                    if value == "NULL" {
+                        return Err(Box::from(format!(
+                            "NOT NULL constraint violated for column '{}'",
+                            column_name
+                        )));
+                    }
+                }
+                "UNIQUE" => {
+                    // Check if the value is unique
+                    // ...
+                }
+                "PRIMARY KEY" => {
+                    // Check if the value is not null
+                    if value == "NULL" {
+                        return Err(Box::from(format!(
+                            "PRIMARY KEY constraint violated for column '{}'",
+                            column_name
+                        )));
+                    }
+                }
+                _ => {
+                    // Check other constraints
+                    // ...
+                }
+            }
+
+            // If the constraint is valid for this column, set the flag to true
+            valid = true;
+        }
+
+        // If the constraint is not valid for any column, return an error
+        if !valid {
+            return Err(Box::from(format!(
+                "Constraint '{}' violated",
+                constraint.constraint_name
+            )));
+        }
+    }
+
+    Ok(())
+}
+
+fn semantic_parser_insert(
+    table_metadata: HashMap<String, TableMetadata>,
+    syntaxic_file_content: SyntaxicParserFileLdd,
+    table_name: String,
+) -> Result<File, Box<dyn Error>> {
+    // Check if the table exists
+    let table_meta = table_metadata.get(&table_name).ok_or("Table not found")?;
+
+    // Create a new RowData instance based on the provided columns
+    let row_data = create_row_data(&syntaxic_file_content, &table_name).ok_or("Primary key not filled")?;
+
+    // Check if the primary key is filled in
+    let primary_key_column = table_meta
+        .constraints
+        .iter()
+        .find(|c| c.constraint_type == "PrimaryKey")
+        .and_then(|c| c.attribute_list.get(0))
+        .ok_or("Primary key not filled")?;
+    if !row_data.contains_key(primary_key_column) {
+        return Err(Box::from(format!("Primary key '{}' not filled", primary_key_column)));
+    }
+
+    // Check that the types are correct
+    check_types(&row_data, &table_meta.columns)?;
+
+    // Check that the constraints are valid
+    check_constraints(&row_data, &table_meta.constraints)?;
+
+    // Perform the actual insertion
+    // ...
+
+    let json_string = match to_string(&table_metadata) {
+        Ok(result) => result,
+        Err(error) => return Err(Box::from(format!("Unable to serialize struct to JSON: {}\n", error)))
+    };
+    let mut synt_parsing_file : File = match File::options().read(true).write(true).truncate(true).create(true).open("data/SemanticTestData/FM_1.json"){
+        Ok(result) => result,
+        Err(error) => return Err(Box::from(format!("Unable to open or create file : {}\n", error)))
+    };
+    println!("write all");
+    // Write the contents of res_textx in the file
+    match synt_parsing_file.write_all(json_string.as_bytes()){
+        Ok(_) => (),
+        Err(error) => {
+            println!("{}?",error);
+            return Err(Box::from(format!("Unable to write in file : {}\n", error)));}
+    };
+
+    // Set the offset to the beginning of the file
+    match synt_parsing_file.seek(SeekFrom::Start(0)){
+        Ok(_) => (),
+        Err(error) => {
+            println!("{}?",error);
+        return Err(Box::from(format!("Unable to seek from start : {}\n", error)));}
+        //return Err(Box::from(&("Error, Unable to seek from start".to_string() + error_str))) to get rid of type str_err
+    };
+    println!("fin create");
+    return Ok(synt_parsing_file);
+}
+
+
+
+
+            
 pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> {
     // Extract the file contents to a structure
     let syntaxic_file_content_as_struct: SyntaxicParserFileLdd = {
@@ -181,13 +353,20 @@ pub fn semantic_parser_ldd(mut syntaxic_file: File) -> Result<File, Box<dyn Erro
 
     // Temporary variable to store what will be returned in the file
     // Done now due to the vector requiring allocating
-    if (syntaxic_file_content_as_struct.action=="create"){
+    if syntaxic_file_content_as_struct.action=="create"{
         println!("parser create");
         return semantic_parser_create(syntaxic_file_content_as_struct,table_metadata_as_struct);
         
-    }else{
-        return Err(Box::from("PAS IMPLEMENTER".to_string()));
+    }else if syntaxic_file_content_as_struct.action=="insert"{
+        println!("parser insert");
+        // Extract the table name from the SyntaxicParserFileLdd struct
+        let table_name = syntaxic_file_content_as_struct.table_name[0].table_name.clone();
 
+        //faire le get du nom de la table voulue
+        return semantic_parser_insert(table_metadata_as_struct, syntaxic_file_content_as_struct, table_name);
+
+    } else {
+        return Err(Box::from("NOT IMPLEMENTED".to_string()));
     }
 }
 
