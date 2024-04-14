@@ -8,7 +8,7 @@ use crate::where_statement::where_statement;
 
 pub fn add_attribute_if_in_condition(condition:&JsonValue,intermediary_projection:&Vec<String>)->Vec<String>
 {
-    match condition["type"].to_string().as_str()
+    match condition["etype"].to_string().as_str()
     {
         "logical"=> {
             let mut lright = add_attribute_if_in_condition(&condition["right"],&intermediary_projection);
@@ -45,7 +45,7 @@ pub fn add_attribute_if_in_condition(condition:&JsonValue,intermediary_projectio
             
             if !(intermediary_projection.contains(&attribute_str))
             {
-                println!("{}",attribute_str);
+                //println!("{}",attribute_str);
                 return [attribute_str].to_vec()
             }
             else {
@@ -86,7 +86,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     }
 
     for (key,value) in parse_json["tables"].entries(){
-        println!("key : {:?}", key);
+        //println!("key : {:?}", key);
         let mut intermediary_vector:Vec<String>=Vec::new();
         for y in 0..value["columns"].len()
         {
@@ -111,7 +111,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
         if parse_json["conditions"].to_string()!="null".to_string()
         {
             let condition_element =add_attribute_if_in_condition(&parse_json["conditions"], &intermediary_vector);
-            println!("condition_element ={:?}",condition_element);
+            //println!("condition_element ={:?}",condition_element);
             for i in 0..condition_element.len()
                 {
                     if !(intermediary_vector.contains(&condition_element[i]))
@@ -121,10 +121,16 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
                 }
         }
         
+        //println!("{:?}",intermediary_vector);
+
+        println!("begin projection");
+
         if intermediary_vector.len()!=0
         {
             open_file.projection(intermediary_vector);//We made a first projection to keep only the date we use for the request
         }
+
+        println!("end projection");
         dictionnary.insert(value["use_name_table"].to_string(),open_file);//We insert the projected file in a dictionnary
     }
 
@@ -186,10 +192,13 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     //After the cartesian product, we need to close de file. For this we create a file of first open file (so the first entry create in the dictionnary)
     let mut a1 = dictionnary[&keylst[0]].clone();
     //println!("{:?}",as_hashmap);
+    println!("begin cond");
     if parse_json["conditions"].to_string()!="null".to_string()
     {
-        a1 = where_statement(& mut a1, &parse_json["conditions"]);
+        a1 = where_statement(& mut a1, &parse_json["conditions"],&mut thread_hashmap);
     }
+
+    println!("end cond");
 
     let mut tab_agregate_fun:Vec<JsonValue> = Vec::new();//Vector for the agregation function
     for i in 0..parse_json["aggregates"].len()
@@ -209,7 +218,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
             str2.push_str(&parse_json["aggregates"][i]["attribute_name"].to_string());
         }
         str2.push(')');
-        println!("{}",str2);
+        //println!("{}",str2);
         final_proj.push(str2.clone());
         as_hashmap.insert(str2,parse_json["aggregates"][i]["use_name_attribute"].to_string() );
         //println!("{}",parse_json["aggregates"][i].dump());

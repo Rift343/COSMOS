@@ -31,27 +31,25 @@ pub struct CSVFile{
 impl CSVFile {
 
 #[doc = "Method to check if a list of attribute are not in list of value. Change the self value"]
-pub fn exclude(&mut self,to_chek: Vec<Vec<String>>)
+pub fn exclude(&mut self,mut to_chek: Vec<Vec<String>>)
 {
     let mut res_vec:Vec<Vec<String>> =Vec::new();
     res_vec.push(self.descriptor[0].clone());
-    for ligne in 1..self.descriptor.len()
+    let mut test_hashmap: HashMap<Vec<String>, i8> = HashMap::new();
+    for i in 0..to_chek.len()
     {
-        let mut bool_ligne = true;
-        let lst_compare = self.descriptor[ligne].clone();
-        for element in 0..to_chek.len()
+        test_hashmap.insert(to_chek[i].clone(), 1);
+    }
+    drop(to_chek);
+
+    for i in 1..self.descriptor.len()
+    {
+        if !(test_hashmap.contains_key(&self.descriptor[i]))
         {
-            if to_chek[element] == lst_compare
-            {
-                bool_ligne = false;
-                break;
-            }
-        }
-        if bool_ligne == true
-        {
-            res_vec.push(lst_compare);
+            res_vec.push(self.descriptor[i].clone());
         }
     }
+    
     self.descriptor = res_vec;
 }
 
@@ -682,7 +680,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
                 }
             }
             self.descriptor = final_vec;
-            println!("{:?}",self.descriptor);
+            //println!("{:?}",self.descriptor);
             
             }
         }//end section
@@ -1711,7 +1709,7 @@ pub fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub fn projection(&mut self,list_attribute:Vec<String>){
-    println!("{:?}",self.to_string());
+    //println!("{:?}",self.to_string());
     //println!("{:?}",list_attribute);
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){

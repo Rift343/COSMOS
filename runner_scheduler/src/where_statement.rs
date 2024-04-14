@@ -1,24 +1,27 @@
+use std::{collections::HashMap, os::windows::{io::AsHandle, thread}, thread::JoinHandle};
+
 use json::JsonValue;
 
 use crate::{logical_statement::logical_execution, operator::CSVFile, operator::WhereElement};
 
-pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
+pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : &mut HashMap<String,JoinHandle<CSVFile>>) -> CSVFile
 {
-    println!("{}",where_value["etype"].to_string());
+    //println!("{}",where_value["etype"].to_string());
     if where_value["etype"].to_string() == "logical".to_string()
     {
-        println!("ok-->logical_execution(a1,where_value)");
-        return logical_execution(a1, where_value);
+        //println!("ok-->logical_execution(a1,where_value)");
+        return logical_execution(a1, where_value,thread_hashmap);
     }
     else if where_value["etype"].to_string() == "condition".to_string() 
     {
         //println!("ok");
-        let left = convert_json_to_where_element(&where_value["left"]);
-        let right = convert_json_to_where_element(&where_value["right"]);
-        println!("{}",a1.to_string());
-        println!("-----------------------------------------------------------------");
+        let left = convert_json_to_where_element(&where_value["left"],thread_hashmap);
+        let right = convert_json_to_where_element(&where_value["right"],thread_hashmap);
+        //println!("{}",a1.to_string());
+        //println!("-----------------------------------------------------------------");
         a1.predicat_interpretation(where_value["condition"].to_string(), where_value["datatype"].to_string(), left, right);
-        println!("{}",a1.to_string());
+        println!("condition");
+        //println!("{}",a1.to_string());
         return a1.clone();
     }
     else if where_value["etype"].to_string() == "checker".to_string() 
@@ -37,7 +40,7 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue) -> CSVFile
     }
 }
 
-pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
+pub fn convert_json_to_where_element (value:&JsonValue,thread_hashmap : &mut HashMap<String,JoinHandle<CSVFile>>) -> WhereElement
 {
     if value["etype"].to_string() == "CONSTANT".to_string().to_lowercase()
     {
@@ -54,8 +57,20 @@ pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
     }
     else if value["etype"].to_string() == "SUBQUERY".to_string().to_lowercase() 
     {
-        println!("HERE1");
-        todo!()    
+        let thread_handle = thread_hashmap.remove(&value["subquery".to_string()].to_string());//remove the JoinHandle of the hashmap
+        let res = match thread_handle {
+            Some(x)=> x,
+            None => todo!(),
+        };
+
+        let res = match res.join() {//join the thread
+            Ok(e) => e,
+            Err(_) => panic!("Thread error"),
+        };
+        
+        
+        let return_value = WhereElement{where_value:res.descriptor[1][0].to_string(),boolean_value:false};//We need only the first element of the result
+        return_value 
     }
     else {
         println!("HERE2");
@@ -63,7 +78,7 @@ pub fn convert_json_to_where_element (value:&JsonValue) -> WhereElement
     }
 }
 
-pub fn convert_json_to_vec_string(value:&JsonValue)
+pub fn convert_json_to_vec_string(value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
 {
     match value["etype"].to_string().as_str() {
         "datalist"=>todo!(),
@@ -73,7 +88,7 @@ pub fn convert_json_to_vec_string(value:&JsonValue)
     }
 }
 
-pub fn convert_json_to_vec_vec_string(value:&JsonValue)
+pub fn convert_json_to_vec_vec_string(value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
 {
     
 }
@@ -86,6 +101,7 @@ pub fn convert_json_to_vec_vec_string(value:&JsonValue)
 mod tests {
     use std::fs::File;
     use std::io::Read;
+    use std::os::windows::thread;
 
     use crate::operator::open_relation;
 
@@ -105,7 +121,8 @@ mod tests {
         //parse_json["conditions"] = "higyuv".into();
         //println!("{}",parse_json["conditions"].to_string());
         let mut table1 = open_relation("personneTest".to_string(), &"personneTest".to_string()).expect("Error");
-        let a1 = where_statement(&mut table1, &parse_json["conditions"]);
+        let mut thread_hashmap = HashMap::new();
+        let a1 = where_statement(&mut table1, &parse_json["conditions"],&mut thread_hashmap);
         println!("FINAL RESULT :\n{}",a1.to_string());
     }
 
