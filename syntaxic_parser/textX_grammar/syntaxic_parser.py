@@ -1,6 +1,5 @@
 import textx
 import json
-import pprint
 
 
 def is_valid_sql(query):
@@ -94,6 +93,7 @@ def handle_select_statement(model):
 
                     # If the attribute is renamed with AS
                     if attribute.alias:
+                        print(attribute.alias)
                         columns["use_name_attribute"] = attribute.alias
                     else:
                         columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
@@ -141,16 +141,37 @@ def handle_conditions(condition_list_path):
             conditions["conditions"].append(handle_conditions(cond.prioritised_conditions))
         else:
             structCondition = {
-                "left": cond.left,
+                "left": None,
                 "op": str(cond.op),
                 "right": None,
             }
 
-            # If the right side is a subquery, call handle_select_statement with the textX object containing the subquery
+            # If it's a static value
+            if cond.left:
+                structCondition["left"] = cond.left
+
+            else:
+                # If it's an attribute and the table is specified
+                if cond.leftAttribute.table:
+                    structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+                else:
+                    structCondition["left"] = cond.leftAttribute.attr
+
+            # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
             if cond.rightSubquery:
                 structCondition["right"] = handle_select_statement(cond.subquery)
+
             else:
-                structCondition["right"] = cond.right
+                # If it's a static value
+                if cond.right:
+                    structCondition["right"] = cond.right
+
+                else:
+                    # If it's an attribute and the table is specified
+                    if cond.rightAttribute.table:
+                        structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
+                    else:
+                        structCondition["right"] = cond.rightAttribute.attr
             conditions["conditions"].append(structCondition)
 
             # Linkers list is empty for single condition
@@ -167,16 +188,37 @@ def handle_conditions(condition_list_path):
 
             else:
                 structCondition = {
-                    "left": cond.left,
+                    "left": None,
                     "op": str(cond.op),
                     "right": None,
                 }
 
-                # If the right side is a subquery, call handle_select_statement with the textX object containing the subquery
+                # If it's a static value
+                if cond.left:
+                    structCondition["left"] = cond.left
+
+                else:
+
+                    # If it's an attribute and the table is specified
+                    if cond.leftAttribute.table:
+                        structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+                    else:
+                        structCondition["left"] = cond.leftAttribute.attr
+
+                # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
                 if cond.rightSubquery:
                     structCondition["right"] = handle_select_statement(cond.subquery)
-                else:
-                    structCondition["right"] = cond.right
-                conditions["conditions"].append(structCondition)
 
+                else:
+                    # If it's a static value
+                    if cond.right:
+                        structCondition["right"] = cond.right
+
+                    else:
+                        # If it's an attribute and the table is specified
+                        if cond.rightAttribute.table:
+                            structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
+                        else:
+                            structCondition["right"] = cond.rightAttribute.attr
+                conditions["conditions"].append(structCondition)
     return conditions

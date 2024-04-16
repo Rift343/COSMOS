@@ -7,15 +7,15 @@ SelectStatementSubquery: 'SELECT' attributes=AttributeList 'FROM' relations=Rela
 
 AttributeList: attribute=Attribute (',' attribute=Attribute)* | (table=ID_NAME '.')? attribute='*' ('AS' alias=IDENTIFIER)?;
 Attribute: aggregate=AggregateFunc ('AS' alias=IDENTIFIER)? | staticAttribute=STATIC_ATTRIBUTE | distinctOption=DistinctOption? (table=ID_NAME '.')? attributeName=NAME ('AS' alias=IDENTIFIER)?;
-IDENTIFIER: ID_NAME | STRING;
+IDENTIFIER: ID_NAME | String;
 DistinctOption: 'DISTINCT';
 
 AggregateFunc: aggregateName=AGGREGATE_NAME '(' (distinctOption=DistinctOption? (table=ID_NAME '.')? (attributeName='*' | attributeName=NAME)) ')';
 AGGREGATE_NAME: 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX';
 
 ID_NAME: (!KEYWORDS) NAME;
-STRING: /'[^']*'/ | /"[^"]*"/;
-STATIC_ATTRIBUTE: STRING | INT;
+String: /'[^']*'/ | /"[^"]*"/;
+STATIC_ATTRIBUTE: String | INT;
 
 RelationList: relation=Relation (',' relation=Relation)*;
 Relation: relationName=NAME (space=SPACE alias=ID_NAME)?;
@@ -23,8 +23,9 @@ SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
 ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
-Condition: ((left=NAME|left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE|right=NAME) | rightSubquery='(' subquery=SelectStatementSubquery ')')) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
-LinkedCondition: linker=LINKER ((left=NAME|left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE|right=NAME) | rightSubquery='(' subquery=SelectStatementSubquery ')') | openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+Condition: ((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery='(' subquery=SelectStatementSubquery ')')) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+LinkedCondition: linker=LINKER ((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery='(' subquery=SelectStatementSubquery ')') | openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+ConditionAttribute: (table=ID_NAME '.')? attr=NAME;
 OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
 LINKER: 'AND' | 'OR';
 
