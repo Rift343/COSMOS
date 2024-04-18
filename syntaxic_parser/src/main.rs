@@ -7,7 +7,7 @@ use syntaxic_parser;
 
 pub fn main() {
     // Call the syntaxic parser and get file handle for the syntaxic parsing file
-    let mut syntaxic_parsing_handle : File = syntaxic_parser::syntaxic_parser("SELECT * FROM Personne;".to_string());
+    let mut syntaxic_parsing_handle : File = syntaxic_parser::syntaxic_parser("SELECT * FROM Personne;".to_string()).expect("woops");
 
     println!("Handle : {:?}",syntaxic_parsing_handle);
 
