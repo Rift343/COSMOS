@@ -23,9 +23,10 @@ SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
 ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
-Condition: ((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery='(' subquery=SelectStatementSubquery ')')) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
-LinkedCondition: linker=LINKER ((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery='(' subquery=SelectStatementSubquery ')') | openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+Condition: (((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) | leftSubquery=SubQuery) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery=SubQuery)) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+LinkedCondition: linker=LINKER condition=Condition;
 ConditionAttribute: (table=ID_NAME '.')? attr=NAME;
+SubQuery: '(' subquery=SelectStatementSubquery ')';
 OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
 LINKER: 'AND' | 'OR';
 

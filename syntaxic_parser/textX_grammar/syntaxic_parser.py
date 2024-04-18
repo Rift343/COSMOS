@@ -132,7 +132,7 @@ def handle_conditions(condition_list_path):
         "linkers": []
     }
 
-    # The first condition, it has no linker attached to it
+    # The first condition in a ConditionList, it has no linker attached to it
     if condition_list_path.condition:
         cond = condition_list_path.condition
 
@@ -140,41 +140,9 @@ def handle_conditions(condition_list_path):
         if cond.prioritised_conditions:
             conditions["conditions"].append(handle_conditions(cond.prioritised_conditions))
         else:
-            structCondition = {
-                "left": None,
-                "op": str(cond.op),
-                "right": None,
-            }
+            conditions["conditions"].append(single_condition(cond))
 
-            # If it's a static value
-            if cond.left:
-                structCondition["left"] = cond.left
-
-            else:
-                # If it's an attribute and the table is specified
-                if cond.leftAttribute.table:
-                    structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
-                else:
-                    structCondition["left"] = cond.leftAttribute.attr
-
-            # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
-            if cond.rightSubquery:
-                structCondition["right"] = handle_select_statement(cond.subquery)
-
-            else:
-                # If it's a static value
-                if cond.right:
-                    structCondition["right"] = cond.right
-
-                else:
-                    # If it's an attribute and the table is specified
-                    if cond.rightAttribute.table:
-                        structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
-                    else:
-                        structCondition["right"] = cond.rightAttribute.attr
-            conditions["conditions"].append(structCondition)
-
-            # Linkers list is empty for single condition
+    # Linkers list is empty for single condition
 
     # Following conditions
     if condition_list_path.linked_condition:
@@ -183,42 +151,52 @@ def handle_conditions(condition_list_path):
             conditions["linkers"].append(cond.linker)
 
             # If it is a condition list between brackets, call handle_conditions again
-            if cond.prioritised_conditions:
-                conditions["conditions"].append(handle_conditions(cond.prioritised_conditions))
-
+            if cond.condition.prioritised_conditions:
+                conditions["conditions"].append(handle_conditions(cond.condition.prioritised_conditions))
+            # Else, call single_condition
             else:
-                structCondition = {
-                    "left": None,
-                    "op": str(cond.op),
-                    "right": None,
-                }
-
-                # If it's a static value
-                if cond.left:
-                    structCondition["left"] = cond.left
-
-                else:
-
-                    # If it's an attribute and the table is specified
-                    if cond.leftAttribute.table:
-                        structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
-                    else:
-                        structCondition["left"] = cond.leftAttribute.attr
-
-                # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
-                if cond.rightSubquery:
-                    structCondition["right"] = handle_select_statement(cond.subquery)
-
-                else:
-                    # If it's a static value
-                    if cond.right:
-                        structCondition["right"] = cond.right
-
-                    else:
-                        # If it's an attribute and the table is specified
-                        if cond.rightAttribute.table:
-                            structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
-                        else:
-                            structCondition["right"] = cond.rightAttribute.attr
-                conditions["conditions"].append(structCondition)
+                conditions["conditions"].append(single_condition(cond.condition))
     return conditions
+
+
+def single_condition(single_condition_path):
+    cond = single_condition_path
+    structCondition = {
+        "left": None,
+        "op": str(cond.op),
+        "right": None,
+    }
+
+    # LEFT
+    # If the left side is a subquery, call handle_select_statement with the textX object that is the subquery
+    if cond.leftSubquery:
+        structCondition["left"] = handle_select_statement(cond.leftSubquery.subquery)
+    else:
+        # If it's a static value
+        if cond.left:
+            structCondition["left"] = cond.left
+
+        else:
+            # If it's an attribute and the table is specified
+            if cond.leftAttribute.table:
+                structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+            else:
+                structCondition["left"] = cond.leftAttribute.attr
+
+    # RIGHT
+    # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
+    if cond.rightSubquery:
+        structCondition["right"] = handle_select_statement(cond.rightSubquery.subquery)
+
+    else:
+        # If it's a static value
+        if cond.right:
+            structCondition["right"] = cond.right
+
+        else:
+            # If it's an attribute and the table is specified
+            if cond.rightAttribute.table:
+                structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
+            else:
+                structCondition["right"] = cond.rightAttribute.attr
+    return structCondition

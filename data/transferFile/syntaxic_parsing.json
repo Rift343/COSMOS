@@ -2,21 +2,48 @@
     "table_name": [
         {
             "table_name": "PERSONNE",
-            "use_name_table": "PERSONNE"
+            "use_name_table": "P"
         }
     ],
     "columns": [
         {
-            "use_name_table": "",
+            "use_name_table": "P",
             "attribute_name": "ID",
             "use_name_attribute": "ID"
+        },
+        {
+            "use_name_table": "P",
+            "attribute_name": "PRENOM",
+            "use_name_attribute": "\"des prenoms\""
         }
     ],
     "where_clause": {
         "conditions": [
             {
+                "left": "P.id",
+                "op": ">",
+                "right": 2
+            },
+            {
+                "conditions": [
+                    {
+                        "left": "\"rene\"",
+                        "op": "=",
+                        "right": "P.prenom"
+                    },
+                    {
+                        "left": 6,
+                        "op": "=",
+                        "right": "id"
+                    }
+                ],
+                "linkers": [
+                    "OR"
+                ]
+            },
+            {
                 "left": "id",
-                "op": "=",
+                "op": "<",
                 "right": {
                     "table_name": [
                         {
@@ -27,14 +54,56 @@
                     "columns": [
                         {
                             "use_name_table": "",
-                            "attribute_name": "MAX,ID",
-                            "use_name_attribute": "MAX(ID)"
+                            "attribute_name": "ID",
+                            "use_name_attribute": "ID"
                         }
                     ],
-                    "where_clause": null
+                    "where_clause": {
+                        "conditions": [
+                            {
+                                "left": "prenom",
+                                "op": "=",
+                                "right": "\"hehe\""
+                            }
+                        ],
+                        "linkers": []
+                    }
                 }
+            },
+            {
+                "left": {
+                    "table_name": [
+                        {
+                            "table_name": "PERSONNE",
+                            "use_name_table": "PERSONNE"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "use_name_table": "",
+                            "attribute_name": "PRENOM",
+                            "use_name_attribute": "PRENOM"
+                        }
+                    ],
+                    "where_clause": {
+                        "conditions": [
+                            {
+                                "left": "id",
+                                "op": "=",
+                                "right": 6
+                            }
+                        ],
+                        "linkers": []
+                    }
+                },
+                "op": "=",
+                "right": "P.id"
             }
         ],
-        "linkers": []
+        "linkers": [
+            "AND",
+            "AND",
+            "OR"
+        ]
     }
 }

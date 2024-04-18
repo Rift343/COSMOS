@@ -1,1 +1,1 @@
-{"tables":{"PERSONNE":{"use_name_table":"PERSONNE","columns":[{"attribute_name":"ID","use_name_attribute":"ID"}]}},"aggregates":[],"conditions":null}
+{"tables":{"PERSONNE":{"use_name_table":"P","columns":[{"attribute_name":"ID","use_name_attribute":"ID"},{"attribute_name":"PRENOM","use_name_attribute":"\"des prenoms\""}]}},"aggregates":[],"conditions":null}
