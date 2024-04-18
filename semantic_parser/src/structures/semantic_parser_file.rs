@@ -1,4 +1,7 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
+use std::rc::Rc;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -40,15 +43,33 @@ pub struct Attribute {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SubQuery {
     pub etype: String,
-    pub query: Box<SemanticParserFile>
+    pub query: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum ConditionAllowType {
-    Attribute(Attribute),
-    Constant(Constant),
-    SubQuery(SubQuery)
+    Attr(Attribute),
+    Const(Constant),
+    SubQ(SubQuery)
+}
+
+impl Display for ConditionAllowType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConditionAllowType::Attr(inners) => {
+                write!(f, "{}.{}", &inners.use_name_table, &inners.attribute_name)
+            }
+            ConditionAllowType::Const(inners) => {
+                write!(f, "{}", inners.value)
+            }
+            ConditionAllowType::SubQ(_) => {
+                // We shouldn't be trying to display / format a SubQ in our code,
+                // If we do, we have reached an unexpected state.
+                unimplemented!()
+            }
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -85,9 +106,10 @@ pub struct Checker {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum LogicalAllowType {
-    Condition(Condition),
-    Logical(Box<Logical>),
-    Checker(Checker)
+    Cond(Rc<RefCell<Condition>>),
+    Logi(Box<Logical>),
+    Not(Box<LogicalNot>),
+    Check(Checker)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -98,10 +120,18 @@ pub struct Logical {
     pub right: LogicalAllowType
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct LogicalNot {
+    pub etype: String,
+    pub operator: String,
+    pub left: LogicalAllowType
+}
+
 /// Structure representing the contents of the Semantic Parser File, being a dictionary with four keys : tables, conditions, status and error
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SemanticParserFile {
     pub tables: HashMap<String, TableHashmap>,
     pub aggregates: Vec<AggregateHashmap>,
-    pub conditions: Logical,
+    pub conditions: LogicalAllowType,
+    pub subquery_hashmap: HashMap<String, SemanticParserFile>
 }
