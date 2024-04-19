@@ -89,7 +89,15 @@ pub struct DataList {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum CheckerAllowType {
+pub enum CheckerLeftAllowType {
+    DataList(DataList),
+    Attr(Attribute),
+    Const(Constant),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CheckerRightAllowType {
     DataList(DataList),
     SubQuery(SubQuery)
 }
@@ -99,8 +107,8 @@ pub struct Checker {
     pub etype: String,
     pub check_type: String,
     pub datatype: String,
-    pub left: SubQuery,
-    pub right: CheckerAllowType
+    pub left: CheckerLeftAllowType,
+    pub right: CheckerRightAllowType
 }
 
 #[derive(Serialize, Deserialize, Debug)]
