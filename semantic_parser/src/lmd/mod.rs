@@ -1,15 +1,13 @@
 mod r#where;
 
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
-use std::rc::Rc;
 
 use crate::lmd::r#where::{Check, handle_where};
 
-use crate::structures::semantic_parser_file::{AggregateHashmap, ColumnNameCouple, Condition, LogicalAllowType, SemanticParserFile, TableHashmap};
+use crate::structures::semantic_parser_file::{AggregateHashmap, ColumnNameCouple, LogicalAllowType, SemanticParserFile, TableHashmap};
 
 use crate::structures::syntaxic_parser_file::{SyntaxicParserFile, TableNameCouple};
 
@@ -184,9 +182,9 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
 
     let mut requested_subqueries: HashMap<String, &SyntaxicParserFile> = HashMap::new();
     let mut subquery_hashmap: HashMap<String, SemanticParserFile> = HashMap::new();
-    let mut subquery_checking: Vec<(String, Check, Rc<RefCell<Condition>>)> = vec![];
+    let mut subquery_checking: Vec<(String, Check, r#where::SubQHashMapAllowType)> = vec![];
 
-    let (_, _, where_clause_as_struct): (usize, usize, LogicalAllowType) = handle_where(&syntaxic_file_content_as_struct.where_clause.conditions, &syntaxic_file_content_as_struct.where_clause.linkers, 0, syntaxic_file_content_as_struct.where_clause.linkers.len() - 1, &table_metadata_as_struct, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name, &mut requested_subqueries, &mut subquery_checking)?;
+    let (_, _, where_clause_as_struct): (isize, isize, LogicalAllowType) = handle_where(&syntaxic_file_content_as_struct.where_clause.conditions, &syntaxic_file_content_as_struct.where_clause.linkers, 0, syntaxic_file_content_as_struct.where_clause.linkers.len() as isize - 1, &table_metadata_as_struct, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name, &mut requested_subqueries, &mut subquery_checking)?;
 
     println!("\n\nSubqueries requiring checking : {:?} !\n\n", subquery_checking);
 
@@ -212,7 +210,15 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
             return Err(Box::from(format!("parse_syntaxic_struct : mismatched datatypes (subquery involved): {} - {}", left_datatype, right_datatype)));
         }
 
-        (*to_edit_condition).borrow_mut().datatype = left_datatype;
+        match to_edit_condition {
+            r#where::SubQHashMapAllowType::Checker(check) => {
+                (*check).borrow_mut().datatype = left_datatype;
+            }
+
+            r#where::SubQHashMapAllowType::Cond(cond) => {
+                (*cond).borrow_mut().datatype = left_datatype;
+            }
+        }
     }
 
     let semantic_parser_file_as_struct = SemanticParserFile {
