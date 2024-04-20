@@ -82,24 +82,65 @@ pub struct Condition{
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DataList {
-    pub etype: String,
-    pub value: Vec<String>
-}
-
-#[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum CheckerLeftAllowType {
-    DataList(DataList),
+pub enum DatalistAllowType {
     Attr(Attribute),
     Const(Constant),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct DataList {
+    pub etype: String,
+    pub value: Vec<DatalistAllowType>
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CheckerLeftAllowType {
+    SubQ(SubQuery),
+    Attr(Attribute),
+    Const(Constant),
+}
+
+impl Display for CheckerLeftAllowType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CheckerLeftAllowType::Attr(inners) => {
+                write!(f, "{}.{}", &inners.use_name_table, &inners.attribute_name)
+            }
+            CheckerLeftAllowType::Const(inners) => {
+                write!(f, "{}", inners.value)
+            }
+            CheckerLeftAllowType::SubQ(_) => {
+                // We shouldn't be trying to display / format a SubQ in our code,
+                // If we do, we have reached an unexpected state.
+                unimplemented!()
+            }
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
 pub enum CheckerRightAllowType {
-    DataList(DataList),
-    SubQuery(SubQuery)
+    DataLi(DataList),
+    SubQ(SubQuery)
+}
+
+impl Display for CheckerRightAllowType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CheckerRightAllowType::DataLi(inners) => {
+                // TODO : Get rid of :?
+                write!(f, "{:?}", &inners.value)
+            }
+            CheckerRightAllowType::SubQ(_) => {
+                // We shouldn't be trying to display / format a SubQ in our code,
+                // If we do, we have reached an unexpected state.
+                unimplemented!()
+            }
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -117,7 +158,7 @@ pub enum LogicalAllowType {
     Cond(Rc<RefCell<Condition>>),
     Logi(Box<Logical>),
     Not(Box<LogicalNot>),
-    Check(Checker)
+    Check(Rc<RefCell<Checker>>)
 }
 
 #[derive(Serialize, Deserialize, Debug)]

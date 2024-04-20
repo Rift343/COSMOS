@@ -13,16 +13,30 @@ pub struct TableNameCouple {
 #[serde(untagged)]
 pub enum ConditionsAllowType{
     Cond(Condition),
-    SubCond(WhereClause)
+    SubCond(WhereClause),
+    Check(Checker)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(untagged)]
-pub enum ConditionAllowType{
+pub enum ConditionAllowType {
     Str(String),
     SubQuery(Box<SyntaxicParserFile>)
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CheckerLeftAllowType {
+    Str(String),
+    SubQuery(Box<SyntaxicParserFile>)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum CheckerRightAllowType {
+    DataLi(Vec<String>),
+    SubQuery(Box<SyntaxicParserFile>)
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Condition {
@@ -31,6 +45,13 @@ pub struct Condition {
     pub right: ConditionAllowType,
 }
 
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Checker {
+    pub left: CheckerLeftAllowType,
+    pub op: String,
+    pub right: CheckerRightAllowType,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WhereClause {
