@@ -124,11 +124,21 @@
         "left": "ID",
         "op": "__",
         "right": "0"
+      },
+      {
+        "left": "ID",
+        "op": "IN",
+        "right": [
+          "9",
+          "8",
+          "0"
+        ]
       }
     ],
     "linkers": [
       "AND",
       "AND",
+      "OR",
       "OR"
     ]
   }
