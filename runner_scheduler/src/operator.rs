@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs::OpenOptions;
+use std::ptr::null;
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -1783,11 +1784,18 @@ pub fn replace_as (&mut self,dico:&HashMap<String,String>)
 #[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
 pub fn union(&mut self,union_csv:&CSVFile)
 {
+    println!("{:?}",self.descriptor);
+    println!("{:?}",union_csv.descriptor);
+    let mut hash_map:HashMap<Vec<String>, _> = HashMap::new();
+    for i in 1..self.descriptor.len()
+    {
+        hash_map.insert(self.descriptor[i].clone(), 1);
+    }
     let mut result_operation : &mut Vec<Vec<String>> = &mut self.descriptor;
     let mut union_value = &union_csv.descriptor;
     for i in 1..union_value.len()
     {
-        if (result_operation[i]!=union_value[i])
+        if (/*result_operation[i]!=union_value[i]*/ !(hash_map.contains_key(&union_value[i])))
         {
             let val = &union_value[i];
             result_operation.push(val.to_vec());

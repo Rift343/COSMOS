@@ -74,7 +74,7 @@ pub fn intermediary_request(sub_requet:&JsonValue)->Result<CSVFile,Box<dyn Error
     let mut as_hashmap: HashMap<String,String> = HashMap::new();
     let mut thread_hashmap : HashMap<String,JoinHandle<CSVFile>> = HashMap::new();
 
-    for (key,value) in parse_json["subquery_hasmap"].entries()
+    for (key,value) in parse_json["subquery_hashmap"].entries()
     {
         let val = value.clone();
         thread_hashmap.insert(key.to_string(), thread::spawn(move||
@@ -376,6 +376,25 @@ mod tests {
     fn test_intermediary_request_2()
     {
         let mut json_file:std::fs::File = std::fs::File::open("semantique2.json").expect("Error ==> Can't read the JSON file");
+        let mut buffer = Vec::new();
+        std::io::Read::read_to_end(&mut json_file, &mut buffer).expect("error"); //.expect("Read to end error");
+        let mut str_json  : String = String::new();
+        for i in buffer{
+            str_json.push(i as char);
+        }
+        let parse_json=json::parse(&str_json.to_string()).unwrap();
+        let _a = match intermediary_request(&parse_json)  {
+            Ok(a) => print!("{}",a.to_string()),
+            Err(e) => println!("{}",e),
+        };
+
+    }
+
+
+    #[test]
+    fn test_intermediary_request_3()
+    {
+        let mut json_file:std::fs::File = std::fs::File::open("semantique3.json").expect("Error ==> Can't read the JSON file");
         let mut buffer = Vec::new();
         std::io::Read::read_to_end(&mut json_file, &mut buffer).expect("error"); //.expect("Read to end error");
         let mut str_json  : String = String::new();

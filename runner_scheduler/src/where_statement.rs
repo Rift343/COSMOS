@@ -57,7 +57,9 @@ pub fn convert_json_to_where_element (value:&JsonValue,thread_hashmap : &mut Has
     }
     else if value["etype"].to_string() == "SUBQUERY".to_string().to_lowercase() 
     {
-        let thread_handle = thread_hashmap.remove(&value["subquery".to_string()].to_string());//remove the JoinHandle of the hashmap
+        println!("{:?}",thread_hashmap.keys());
+        println!("{}",&value["query".to_string()].to_string());
+        let thread_handle = thread_hashmap.remove(&value["query".to_string()].to_string());//remove the JoinHandle of the hashmap
         let res = match thread_handle {
             Some(x)=> x,
             None => todo!(),
