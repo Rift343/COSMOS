@@ -93,7 +93,6 @@ def handle_select_statement(model):
 
                     # If the attribute is renamed with AS
                     if attribute.alias:
-                        print(attribute.alias)
                         columns["use_name_attribute"] = attribute.alias
                     else:
                         columns["use_name_attribute"] = attribute.aggregate.aggregateName + '(' + attribute.aggregate.attributeName.upper() + ')'
@@ -133,14 +132,16 @@ def handle_conditions(condition_list_path):
     }
 
     # The first condition in a ConditionList, it has no linker attached to it
-    if condition_list_path.condition:
+    if condition_list_path.in_condition:
+        conditions["conditions"].append(handle_in_condition(condition_list_path.in_condition))
+    elif condition_list_path.condition:
         cond = condition_list_path.condition
 
         # If it is a condition list between brackets, call handle_conditions again
         if cond.prioritised_conditions:
             conditions["conditions"].append(handle_conditions(cond.prioritised_conditions))
         else:
-            conditions["conditions"].append(single_condition(cond))
+            conditions["conditions"].append(handle_single_condition(cond))
 
     # Linkers list is empty for single condition
 
@@ -150,18 +151,20 @@ def handle_conditions(condition_list_path):
             # Add the linker to the list
             conditions["linkers"].append(cond.linker)
 
+            if cond.in_condition:
+                conditions["conditions"].append(handle_in_condition(cond.in_condition))
             # If it is a condition list between brackets, call handle_conditions again
-            if cond.condition.prioritised_conditions:
+            elif cond.condition.prioritised_conditions:
                 conditions["conditions"].append(handle_conditions(cond.condition.prioritised_conditions))
             # Else, call single_condition
             else:
-                conditions["conditions"].append(single_condition(cond.condition))
+                conditions["conditions"].append(handle_single_condition(cond.condition))
     return conditions
 
 
-def single_condition(single_condition_path):
+def handle_single_condition(single_condition_path):
     cond = single_condition_path
-    structCondition = {
+    struct_condition = {
         "left": None,
         "op": str(cond.op),
         "right": None,
@@ -170,33 +173,52 @@ def single_condition(single_condition_path):
     # LEFT
     # If the left side is a subquery, call handle_select_statement with the textX object that is the subquery
     if cond.leftSubquery:
-        structCondition["left"] = handle_select_statement(cond.leftSubquery.subquery)
+        struct_condition["left"] = handle_select_statement(cond.leftSubquery.subquery)
     else:
         # If it's a static value
         if cond.left:
-            structCondition["left"] = cond.left
+            struct_condition["left"] = cond.left
 
         else:
             # If it's an attribute and the table is specified
             if cond.leftAttribute.table:
-                structCondition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+                struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
             else:
-                structCondition["left"] = cond.leftAttribute.attr
+                struct_condition["left"] = cond.leftAttribute.attr
 
     # RIGHT
     # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
     if cond.rightSubquery:
-        structCondition["right"] = handle_select_statement(cond.rightSubquery.subquery)
+        struct_condition["right"] = handle_select_statement(cond.rightSubquery.subquery)
 
     else:
         # If it's a static value
         if cond.right:
-            structCondition["right"] = cond.right
+            struct_condition["right"] = cond.right
 
         else:
             # If it's an attribute and the table is specified
             if cond.rightAttribute.table:
-                structCondition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
+                struct_condition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
             else:
-                structCondition["right"] = cond.rightAttribute.attr
-    return structCondition
+                struct_condition["right"] = cond.rightAttribute.attr
+    return struct_condition
+
+
+def handle_in_condition(in_condition_path):
+    cond = in_condition_path
+    struct_condition = {
+        "left": cond.leftAttribute.attr,
+        "op": 'IN',
+        "right": [],
+    }
+
+    if cond.leftAttribute.table:
+        struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+
+    if cond.notOption:
+        struct_condition["op"] = 'NOT ' + struct_condition["op"]
+
+    for right in cond.right:
+        struct_condition["right"].append(right)
+    return struct_condition

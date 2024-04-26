@@ -22,13 +22,15 @@ Relation: relationName=NAME (space=SPACE alias=ID_NAME)?;
 SPACE: /\s*/;
 
 WhereClause: 'WHERE' conditions=ConditionList;
-ConditionList: condition=Condition (linked_condition=LinkedCondition)*;
-Condition: (((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) | leftSubquery=SubQuery) op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery=SubQuery)) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
-LinkedCondition: linker=LINKER condition=Condition;
+ConditionList: (condition=Condition | in_condition=INCondition) (linked_condition=LinkedCondition)*;
+Condition: (((leftAttribute=ConditionAttribute | left=STATIC_ATTRIBUTE) | leftSubquery=SubQuery) notOption=NOTOption? op=OPERATOR ((right=STATIC_ATTRIBUTE | rightAttribute=ConditionAttribute) | rightSubquery=SubQuery)) | (openBracket='(' prioritised_conditions=ConditionList closedBracket=')');
+INCondition: leftAttribute=ConditionAttribute notOption=NOTOption? 'IN (' right=STATIC_ATTRIBUTE (',' right=STATIC_ATTRIBUTE)* ')';
+LinkedCondition: linker=LINKER (condition=Condition | in_condition=INCondition);
 ConditionAttribute: (table=ID_NAME '.')? attr=NAME;
 SubQuery: '(' subquery=SelectStatementSubquery ')';
 OPERATOR: '=' | '<>' | '<=' | '>=' | '<' | '>';
 LINKER: 'AND' | 'OR';
+NOTOption: 'NOT';
 
 NAME: /[A-Za-z_][A-Za-z_0-9]*/;
 
