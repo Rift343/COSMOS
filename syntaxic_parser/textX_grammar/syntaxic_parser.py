@@ -30,7 +30,10 @@ def handle_select_statement(model):
     result = {
         "table_name": [],
         "columns": [],
-        "where_clause": None
+        "where_clause": {
+            "conditions": [],
+            "linkers": []
+        }
     }
 
     # TABLES

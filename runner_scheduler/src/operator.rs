@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs::OpenOptions;
+use std::ptr::null;
 use std::{fs::File, io::Read};
 use std::error::Error;
 use std::io::{BufReader, Seek, Write};
@@ -30,6 +31,30 @@ pub struct CSVFile{
 
 impl CSVFile {
 
+#[doc = "Method to check if a list of attribute are not in list of value. Change the self value"]
+pub fn exclude(&mut self,mut to_chek: Vec<Vec<String>>)
+{
+    let mut res_vec:Vec<Vec<String>> =Vec::new();
+    res_vec.push(self.descriptor[0].clone());
+    let mut test_hashmap: HashMap<Vec<String>, i8> = HashMap::new();
+    for i in 0..to_chek.len()
+    {
+        test_hashmap.insert(to_chek[i].clone(), 1);
+    }
+    drop(to_chek);
+
+    for i in 1..self.descriptor.len()
+    {
+        if !(test_hashmap.contains_key(&self.descriptor[i]))
+        {
+            res_vec.push(self.descriptor[i].clone());
+        }
+    }
+    
+    self.descriptor = res_vec;
+}
+
+
 
 
 
@@ -56,8 +81,8 @@ pub fn predicat_interpretation (&mut self, operation : String, type_expression: 
 In a first place we need to match the operation then the type.Finaly whe check the condition line by line. If possible the cast operation was done before the for statement"]
 pub fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
 {
-    println!("1");
-    println!("{}{}{}",element_1,operation,element_2.where_value);
+    //println!("1");
+    //println!("{}{}{}",element_1,operation,element_2.where_value);
     let mut index;
     let mut i = 0 ;
     let mut final_vec:Vec<Vec<String>>= Vec::new();
@@ -66,7 +91,7 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
         i = i + 1;       
     }
     index = i;
-    println!("here : {}",index);
+    //println!("here : {}",index);
     if operation == "=".to_string()
     {
         if type_expression == "FLOAT".to_string()
@@ -418,8 +443,8 @@ pub fn predicat_interpretation_with_one_const (&mut self, operation : String, ty
 #[doc = "Methode use for the interpretation of a boolean statement. Need one constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)"]
 pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, type_expression: String, element_1 : WhereElement,element_2:String) 
 {
-    println!("2");
-    println!("{}{}{}",element_1.where_value,operation,element_2);
+    //println!("2");
+    //println!("{}{}{}",element_1.where_value,operation,element_2);
 
     let mut index;
     let mut i = 0 ;
@@ -429,7 +454,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
         i = i + 1;       
     }
     index = i;
-    println!("here : {}",index);
+    //println!("here : {}",index);
     if operation == "=".to_string()
     {
         if type_expression == "FLOAT".to_string()
@@ -656,7 +681,7 @@ pub fn predicat_interpretation_with_one_const_2 (&mut self, operation : String, 
                 }
             }
             self.descriptor = final_vec;
-            println!("{:?}",self.descriptor);
+            //println!("{:?}",self.descriptor);
             
             }
         }//end section
@@ -1599,7 +1624,7 @@ pub fn max(self,attribut: &String,type_attr: &String)->Vec<String>
 pub(crate)fn avg(self,attribut: &String,type_attr:&String)->Vec<String>
 {
     let mut result_vec = Vec::new();
-    result_vec.push("SUM(".to_string()+attribut+")");
+    result_vec.push("AVG(".to_string()+attribut+")");
     let mut sum = 0;
     let mut sum2 : f64 = 0.0;
     let mut index: usize = 0;
@@ -1759,11 +1784,18 @@ pub fn replace_as (&mut self,dico:&HashMap<String,String>)
 #[doc = "methode for the union betwen two CSVFile. Need in input anoter CSVFile. Return nothing because the result of the union is save on the struct."]
 pub fn union(&mut self,union_csv:&CSVFile)
 {
+    println!("{:?}",self.descriptor);
+    println!("{:?}",union_csv.descriptor);
+    let mut hash_map:HashMap<Vec<String>, _> = HashMap::new();
+    for i in 1..self.descriptor.len()
+    {
+        hash_map.insert(self.descriptor[i].clone(), 1);
+    }
     let mut result_operation : &mut Vec<Vec<String>> = &mut self.descriptor;
     let mut union_value = &union_csv.descriptor;
     for i in 1..union_value.len()
     {
-        if (result_operation[i]!=union_value[i])
+        if (/*result_operation[i]!=union_value[i]*/ !(hash_map.contains_key(&union_value[i])))
         {
             let val = &union_value[i];
             result_operation.push(val.to_vec());

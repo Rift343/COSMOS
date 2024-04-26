@@ -1,31 +1,60 @@
-select * from Personne;
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
 
-test
+create table poljjjgg2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
 
-exit
+select * from personne;
 
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
 
-exit
+create table politique (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) FOREIGN KEY);
 
+create table pol2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
 
-exit
+create table f (ppppp INT PRIMARY KEY, dqzdqz INT);
 
-exit
+Err("semantic parser not initialized".into());
 
-exit
+create table hhhhh (pfsef INT PRIMARY KEY, fsefsfs INT);
 
-exit
+create table ccccccccccccccccc (pop INT PRIMARY KEY, super INT);
 
-exit
+select * from personne
 
-exit
+select * from personne;
 
-exit
+select * from personne;
 
-exit
+select * from personne;
 
-exit
+select * from personne;
 
+CREATE TABLE commfffffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
 
-exit
+create table test2 (id1 INT PRIMARY KEY);
+
+e
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE commfffedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));[1;3D
+
+create table fsesfsf (pop INT PRIMARY KEY, super INT);
+
+CREATE TABLE coedsedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsedffdssunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+create table polgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table polgddgsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+create table polqdqdfsgdsf2 (nom VARCHAR(50) PRIMARY KEY, adherents INT, affinite VARCHAR(255) PRIMARY KEY);
+
+CREATE TABLE coedsesseedffdssunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsesefsfeedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE coedsesefsfeedffunal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
 
