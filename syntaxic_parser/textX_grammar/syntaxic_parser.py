@@ -177,14 +177,14 @@ def handle_single_condition(single_condition_path):
     else:
         # If it's a static value
         if cond.left:
-            struct_condition["left"] = cond.left
+            struct_condition["left"] = str(cond.left)
 
         else:
             # If it's an attribute and the table is specified
             if cond.leftAttribute.table:
-                struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+                struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr.upper()
             else:
-                struct_condition["left"] = cond.leftAttribute.attr
+                struct_condition["left"] = cond.leftAttribute.attr.upper()
 
     # RIGHT
     # If the right side is a subquery, call handle_select_statement with the textX object that is the subquery
@@ -194,27 +194,27 @@ def handle_single_condition(single_condition_path):
     else:
         # If it's a static value
         if cond.right:
-            struct_condition["right"] = cond.right
+            struct_condition["right"] = str(cond.right)
 
         else:
             # If it's an attribute and the table is specified
             if cond.rightAttribute.table:
-                struct_condition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr
+                struct_condition["right"] = cond.rightAttribute.table + '.' + cond.rightAttribute.attr.upper()
             else:
-                struct_condition["right"] = cond.rightAttribute.attr
+                struct_condition["right"] = cond.rightAttribute.attr.upper()
     return struct_condition
 
 
 def handle_in_condition(in_condition_path):
     cond = in_condition_path
     struct_condition = {
-        "left": cond.leftAttribute.attr,
+        "left": cond.leftAttribute.attr.upper(),
         "op": 'IN',
         "right": [],
     }
 
     if cond.leftAttribute.table:
-        struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr
+        struct_condition["left"] = cond.leftAttribute.table + '.' + cond.leftAttribute.attr.upper()
 
     if cond.notOption:
         struct_condition["op"] = 'NOT ' + struct_condition["op"]
