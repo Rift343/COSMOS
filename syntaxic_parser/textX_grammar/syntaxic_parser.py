@@ -136,28 +136,6 @@ def ldd_parser(query):
                 "error": ""
             }
             print("result initialized")
-            """
-{
-    "table_name": [
-        {
-            "table_name": "nom table créé ou inséré"
-        }
-    ],
-    "columns": [#pour chaque colonne dans le insert into ou table créée
-        {
-            "attribute_name": "*",
-            "data" : donné a inséré si utile,
-            "datatype" : "type of data",
-            "constraint" : contraite a metter du la colonne en cas de création
-        }
-    ],
-    "action" :  "create" | "insert",
-    "conditions": "NULL",
-    "status": true,
-    "error": "NULL"
-}
-"""
-
             # Handle CREATE TABLE statement
             if model.__class__.__name__ == "CreateStatement":
                 print("we enter the create statement")
@@ -188,7 +166,7 @@ def ldd_parser(query):
                 print("we define the values :", values)
 
                 result["table_name"].append({"table_name": table_name})
-                result["columns"] = [{"attribute_name": column,"data": value} for column,value in zip(columns,values)]
+                result["columns"] = [{"name": column,"data": [str(value)], "constraints" : [""], "datatype" : ""} for column,value in zip(columns,values)]
                 result["conditions"] = "NULL"
                 result["action"] = "insert"
                 print("we define the result")
@@ -206,7 +184,7 @@ def is_valid_sql(query):
     if query[0:6].upper() == "SELECT":
         return lmd_parser(query)
     else:
-        print("we go good way")
+        print("it is an LDD request")
         return ldd_parser(query)
 
 
@@ -215,3 +193,5 @@ def is_valid_sql(query):
 if __name__ == "__main__":
     print(is_valid_sql("CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));"))
     print(is_valid_sql("INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');"))
+    #INSERT INTO PERSONNE ("ID", "NOM", "PRENOM", "AGE") VALUES (15,"dd","ddg",999);
+    #INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);

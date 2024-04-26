@@ -28,3 +28,67 @@ select * from personne;
 
 select * from personne;
 
+INSERT INTO PERSONNE VALUES (15,"dd","ddg",999);
+
+INSERT INTO PERSONNE (15,"dd","ddg",999);
+
+INSERT INTO PERSONNE ("ID", "NOM", "PRENOM", "AGE") VALUES (15,"dd","ddg",999);
+
+INSERT INTO PERSONNE ("ID", "NOM", "PRENOM", "AGE") VALUES (15,"dd","ddg",999);
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);*
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+

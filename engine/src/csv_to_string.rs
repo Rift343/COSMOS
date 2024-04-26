@@ -23,13 +23,13 @@ pub fn engine_main(file_name : String) ->  Result<String, Box<dyn std::error::Er
     return result;
 }*/
 
-fn is_ldd(file_path: String) -> bool {
+fn type_request(file_path: String) -> String {
     // Read the file to a string.
     let table = match fs::read_to_string(file_path) {
         Ok(content) => content,
         Err(error) => {
             eprintln!("Error reading file: {}", error);
-            return false;
+            return "".to_string();
         }
     };
 
@@ -38,14 +38,14 @@ fn is_ldd(file_path: String) -> bool {
         Ok(content) => content,
         Err(error) => {
             eprintln!("Error parsing JSON: {}", error);
-            return false;
+            return "".to_string();
         }
     };
 
     // Check if the "action" field is not select.
     match content.get("action") {
-        Some(Value::String(action)) if action != "select" => true,
-        _ => false,
+        Some(Value::String(action))  => action.to_string(),
+        _ => "".to_string(),
     }
 }
 
@@ -150,7 +150,8 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
    // Get the outputted semantic file.
    let mut is_ldd_req = false;
    let mut semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
-    if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())){
+   let type_of_the_request = type_request("./data/transferFile/syntaxic_parsing.json".to_string())
+    if (type_of_the_request.to_lowercase() != "select"){
         is_ldd_req = true;
         let ldd_result = semantic_parser_ldd(syntaxic_parsing_handle);
         //println!("ldd result: {:?}", ldd_result);
@@ -181,7 +182,7 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
     // ------------------ Runner_scheduler ------------------
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
-    if (is_ldd_req) {
+    if (type_of_the_request.to_lowercase() == "create") {
         let res = call_create(&semantic_file);
 
 

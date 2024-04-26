@@ -150,28 +150,21 @@ for (table_name,_table_metadata) in &table_metadata_as_struct {
 
 fn create_row_data(syntaxic_file_content: &SyntaxicParserFileLdd, table_name: &str) -> Option<HashMap<String, String>> {
     let table_columns = syntaxic_file_content.columns.iter()
-        .filter(|col| col.name == table_name)
+        //.filter(|col| col.name == table_name)
         .map(|col| (col.name.clone(), col.datatype.clone(), col.data.clone()))
         .collect::<Vec<_>>();
 
     let mut row_data = HashMap::new();
-
+    //println!()
     for (name, datatype, data) in table_columns {
-        match datatype.as_str() {
-            "INT" => {
-                let value = data.as_ref()?.get(0).cloned()?;
-                let int_value = value.parse::<i32>().ok()?;
-                row_data.insert(name, int_value.to_string());
+        println!("{} {} {:?}\n",name,datatype,data);
+        if let Some(data_vec) = data {
+            if let Some(data_str) = data_vec.get(0).cloned() {
+                row_data.insert(name, data_str);
             }
-            "VARCHAR" => {
-                let value = data.as_ref()?.get(0).cloned()?;
-                row_data.insert(name, value);
-            }
-            // AUTRES TYPES DE DONNEES
-            _ => return None,
         }
     }
-
+    let row_data_clone = row_data.clone();for e in row_data_clone{println!("data row : {} {}", e.0,e.1);}
     Some(row_data)
 }
             
@@ -214,89 +207,154 @@ fn check_types(
     Ok(())
 }
 
+fn check_unicity(table_name: String, constraint : &Constraint, insert_data : &HashMap<String, String>){
+let mut final_req =String::new();;
+
+    let start = format!("{{\"tables\": {{\"{}\":{{\"use_name_table\": \"{}\",\"columns\": [", table_name, table_name);
+    final_req.push_str(&start);
+    for column_name in &constraint.attribute_list {
+
+    let mut attribute_string = format!(
+        "{{
+            \"attribute_name\": \"{}\",
+            \"use_name_attribute\": \"{}\"
+          }}
+          ",column_name, column_name);
+          final_req.push_str(&attribute_string);
+        }
+
+let finish = 
+          "
+        ]
+      }
+    },
+    \"aggregates\": [],
+    \"conditions\": {}
+}";
+final_req.push_str(finish);
+
+
+fs::write("/data/transferFile/unicity_test_request", &final_req).expect("Unable to write file");
+
+
+}
+
+
 fn check_constraints(
     row_data: &HashMap<String, String>,
-    constraints: &Vec<Constraint>,
+    constraints: &Vec<Constraint>,table_name: String
 ) -> Result<(), Box<dyn Error>> {
     for constraint in constraints {
         let mut valid = false;
-        for column_name in &constraint.attribute_list {
-            let r = "NULL".to_string();
-            let value = row_data
-                .get(column_name.as_str())
-                .unwrap_or(&r);
 
-            match &constraint.constraint_type[..] {
-                "NOT NULL" => {
-                    if value == "NULL" {
-                        return Err(Box::from(format!(
-                            "NOT NULL constraint violated for column '{}'",
-                            column_name
-                        )));
-                    }
-                }
-                "UNIQUE" => {
-                    // Check if the value is unique
-                    // ...
-                }
-                "PRIMARY KEY" => {
-                    // Check if the value is not null
-                    if value == "NULL" {
-                        return Err(Box::from(format!(
-                            "PRIMARY KEY constraint violated for column '{}'",
-                            column_name
-                        )));
-                    }
-                }
-                _ => {
-                    // Check other constraints
-                    // ...
+        match &constraint.constraint_type[..] {
+            "NOT NULL" => {
+                for column_name in &constraint.attribute_list {
+                    let r = "NULL".to_string();
+                    let value = row_data
+                        .get(column_name.as_str())
+                        .unwrap_or(&r);
+                if value == "NULL" {
+                    return Err(Box::from(format!(
+                        "NOT NULL constraint violated for column '{}'",
+                        column_name
+                    )));
+                }}
+            }
+            "UNIQUE" => {
+                // check unique
+                for column_name in &constraint.attribute_list {
+                    let r = "NULL".to_string();
+                    let value = row_data
+                        .get(column_name.as_str())
+                        .unwrap_or(&r);
+            }}
+            "PrimaryKey" => {
+                // Check if the value is not null and unique
+                for column_name in &constraint.attribute_list {
+                    let r = "NULL".to_string();
+                    let value = row_data
+                        .get(column_name.as_str())
+                        .unwrap_or(&r);
+                if value == "NULL" {
+                    return Err(Box::from(format!(
+                        "PRIMARY KEY constraint violated for column '{}'",
+                        column_name
+                    )));
                 }
             }
-
-            // If the constraint is valid for this column, set the flag to true
-            valid = true;
+        check_unicity(table_name.clone(), constraint, row_data);
+        }
+            _ => {
+                
+            }
         }
 
+
+
+
+
+            
+            // If the constraint is valid for this column, set the flag to true
+            valid = true;
+        
         // If the constraint is not valid for any column, return an error
         if !valid {
             return Err(Box::from(format!(
                 "Constraint '{}' violated",
                 constraint.constraint_name
             )));
-        }
-    }
+        }}
+    
 
-    Ok(())
-}
+    Ok(())}
+
 
 fn semantic_parser_insert(
     table_metadata: HashMap<String, TableMetadata>,
     syntaxic_file_content: SyntaxicParserFileLdd,
     table_name: String,
 ) -> Result<File, Box<dyn Error>> {
+    println!("We enter the semantic_parser_insert");
     // Check if the table exists
-    let table_meta = table_metadata.get(&table_name).ok_or("Table not found")?;
+    let table_meta = table_metadata.get(&table_name.to_uppercase()).ok_or("Table not found")?;
 
     // Create a new RowData instance based on the provided columns
     let row_data = create_row_data(&syntaxic_file_content, &table_name).ok_or("Primary key not filled")?;
 
     // Check if the primary key is filled in
-    let primary_key_column = table_meta
-        .constraints
-        .iter()
-        .find(|c| c.constraint_type == "PrimaryKey")
-        .and_then(|c| c.attribute_list.get(0))
-        .ok_or("Primary key not filled")?;
-    if !row_data.contains_key(primary_key_column) {
-        return Err(Box::from(format!("Primary key '{}' not filled", primary_key_column)));
+    //let primary_key_columns = table_meta
+    //    .constraints
+    //    .iter()
+    //    .find(|c| c.constraint_type == "PrimaryKey")
+    //    .and_then(|c| c.attribute_list)
+    //    .ok_or("Primary key not filled")?;
+    let row_data_clone = row_data.clone();for e in row_data_clone{println!("data row : {} : {}", e.0,e.1);}
+    for constraint in &table_meta
+    .constraints {
+        if(constraint.constraint_type=="PrimaryKey"){
+
+            for column_primary_key in &constraint.attribute_list {
+
+                if !row_data.contains_key(&column_primary_key.to_uppercase()) {
+                    println!("{:?} {:?}", row_data.get(column_primary_key),row_data.get("POPULATION"));
+                    println!(";{}; ;{};",column_primary_key, "POPULATION");
+                    return Err(Box::from(format!("Primary key '{}' not filled", column_primary_key.to_uppercase())));
+                }
+            }
+        }
+         
+
+
+        
     }
 
+    println!("We check the types");
     // Check that the types are correct
     check_types(&row_data, &table_meta.columns)?;
-
+    println!("We check the constraints");
     // Check that the constraints are valid
-    check_constraints(&row_data, &table_meta.constraints)?;
+    //check_constraints(&row_data, &table_meta.constraints,table_name)?;
 
     // Perform the actual insertion
     // ...

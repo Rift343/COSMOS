@@ -1,20 +1,53 @@
 {
     "table_name": [
         {
-            "table_name": "ALL_COLUMNS",
-            "use_name_table": "ALL_COLUMNS"
-        },
-        {
-            "table_name": "ALL_TABLES",
-            "use_name_table": "ALL_TABLES"
+            "table_name": "personne"
         }
     ],
     "columns": [
         {
-            "use_name_table": "",
-            "attribute_name": "*",
-            "use_name_attribute": ""
+            "name": "ID",
+            "data": [
+                "100"
+            ],
+            "constraints": [
+                ""
+            ],
+            "datatype": ""
+        },
+        {
+            "name": "NOM",
+            "data": [
+                "fff"
+            ],
+            "constraints": [
+                ""
+            ],
+            "datatype": ""
+        },
+        {
+            "name": "PRENOM",
+            "data": [
+                "longue"
+            ],
+            "constraints": [
+                ""
+            ],
+            "datatype": ""
+        },
+        {
+            "name": "AGE",
+            "data": [
+                "555"
+            ],
+            "constraints": [
+                ""
+            ],
+            "datatype": ""
         }
     ],
-    "conditions": "NULL"
+    "status": true,
+    "error": "",
+    "conditions": "NULL",
+    "action": "insert"
 }
