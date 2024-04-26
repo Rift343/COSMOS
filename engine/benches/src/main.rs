@@ -18,9 +18,11 @@ struct Bench{
     ram : u64
 }
 
-fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>){
+fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>,filename : &str){
     //ouverture du reader
-    let mut w1 = Writer::from_path("benches/res/data.csv").expect("Bench Error Open CSV output");
+    let path = "benches/res/".to_string() + filename + ".csv";
+    //"benches/res/data.csv"
+    let mut w1 = Writer::from_path(path).expect("Bench Error Open CSV output");
 
     //ecriture en tete
     w1.write_record(&["Requete; Taille CSV Input; Temps (Microsecondes) ; CPU %; RAM Kilobytes;"]).expect("Bench Error write csv output");
@@ -96,9 +98,7 @@ fn engine_benchmark_custom(request : String) -> Bench{
             sum_ram += p.virtual_memory();
         }
         for thread in threads {
-
             thread.join().expect("Thread Join Issue");
-
         }
     }
 
@@ -181,7 +181,7 @@ fn engine_benchmark_thread(request: String){
     engine(request).expect("Benchmark : Engine Panic");
 }
 fn engine_benchmark(c: &mut Criterion) {
-    let nb_test = 10;
+    let nb_test = 1;
     let db_size= 10000;
     let request = "Select ID From Personne;".to_string();
 
@@ -208,7 +208,6 @@ fn engine_benchmark(c: &mut Criterion) {
     let half_time = time/ 2u32;
 
     while res.len()<nb_test {
-        println!("BOUCLEEEEEEEEE {}", res.len());
         let mut threads = Vec::new();
         let cloned_request = request.clone();
         let now = Instant::now();
@@ -244,8 +243,8 @@ fn engine_benchmark(c: &mut Criterion) {
 
 
 
- */
-    bench_to_csv(request.clone(),db_size,res);
+ */ let mut filename = "data";
+    bench_to_csv(request.clone(),db_size,res,filename);
 
 
 // test
