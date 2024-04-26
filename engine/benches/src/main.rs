@@ -1,7 +1,10 @@
+use std::error::Error;
 use std::fs::File;
 use std::mem::replace;
 use std::thread::{available_parallelism, sleep};
 use engine::engine;
+use rnglib::{Language, RNG};
+use rand::Rng;
 
 use criterion::{
     criterion_group,
@@ -17,7 +20,7 @@ struct Bench{
     cpu : f32,
     ram : u64
 }
-
+//Write bench result in a csv file
 fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>,filename : &str){
     //ouverture du reader
     let path = "benches/res/".to_string() + filename + ".csv";
@@ -44,7 +47,43 @@ fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>,filename : &st
     w1.flush().expect("Bench Error Flush Writer");
     println!("Fin de l'écriture fichier");
 }
+//Append input file
+pub fn generator(nb_line : i32) -> Result<(),Box<dyn Error>>{
+    //ouverture du reader
+    let w1 = Writer::from_path("data/CSV/Personne.csv");
+    //gerer en fonction de comment est lance le module
+    let mut wtr :Writer<File>;
+    //Si le premier path fail, on teste le deuxieme
+    match w1 {
+        Ok(r) => wtr = r,
+        Err(..) => wtr = Writer::from_path("data/CSV/Personne.csv")?
+    }
 
+
+    //definition random name
+    let rng_s = RNG::try_from(&Language::Elven).unwrap();
+    //def rng age
+    let mut rng_age = rand::thread_rng();
+
+    wtr.write_record(&["ID;NOM;PRENOM;AGE;"])?;
+    //ajout données
+    for x in 0..nb_line{
+        //ID
+        let id_string = (x+1).to_string();
+
+        //def random name
+        let first_name = rng_s.generate_name();
+        let last_name = rng_s.generate_name();
+
+        //def random age
+        let age_str= rng_age.gen_range(0..100).to_string();
+
+        //Ecriture dans le fichier
+        wtr.write_record(&[id_string+";"+ &*first_name +";"+ &*last_name +";"+ &*age_str])?;
+        wtr.flush()?;
+    }
+    Ok(())
+}
 
 
 /*-----------------------CRITERION----------------------------*/
@@ -181,70 +220,86 @@ fn engine_benchmark_thread(request: String){
     engine(request).expect("Benchmark : Engine Panic");
 }
 fn engine_benchmark(c: &mut Criterion) {
-    let nb_test = 1;
+    let nb_test = 100;
     let db_size= 10000;
     let request = "Select ID From Personne;".to_string();
 
-    //tab result
+    let mut nb_line = 20000;
+    let max_line =  1000000;
+    let step = 20000;
+    match generator(nb_line){
+        Ok(..) => println!("Init file Ok"),
+        Err(..) => println!("ERROR : init file")
+    };
 
-    let mut res : Vec<Bench> = Vec::new();
-    let mut cpu_v = 0f32;
-    let mut ram_v :u64 = 0;
-    //TEST ICI
-    //init
-    let mut sys = System::new_all();
-    //refresh before bench
-    sys.refresh_all();
-    sys.refresh_all();
+    //warmup
 
-    //let nb_cpu = sys.cpus().iter().count() as f32;
-
-    // start timer
-    let now = Instant::now();
-
-    //test
-    engine(request.clone()).expect("Erreur engine");
-    let time = now.elapsed().as_nanos() as u32;
-    let half_time = time/ 2u32;
-
-    while res.len()<nb_test {
-        let mut threads = Vec::new();
+    for _i in 0..100{
         let cloned_request = request.clone();
-        let now = Instant::now();
-        threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
-        sleep(Duration::new(0,half_time));
-        sys.refresh_all();
-        for p in sys.processes_by_name("src-"){
-            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
-            cpu_v = p.cpu_usage();
-            ram_v = p.virtual_memory();
-        }
-        for thread in threads {
-
-            thread.join().expect("Thread Join Issue");
-
-        }
-        let time = now.elapsed().as_micros() as f64;
-        let ben : Bench = Bench {
-            temps: time,
-            cpu: cpu_v,
-            ram: ram_v,
-        };
-
-            res.push(ben);
+        engine(cloned_request).expect("ERROR : Warmup Panic");
     }
 
+    //tab result
+    while (nb_line < max_line) {
+        let mut res: Vec<Bench> = Vec::new();
+        let mut cpu_v = 0f32;
+        let mut ram_v: u64 = 0;
+        //TEST ICI
+        //init
+        let mut sys = System::new_all();
+        //refresh before bench
+        sys.refresh_all();
+        sys.refresh_all();
+
+        //let nb_cpu = sys.cpus().iter().count() as f32;
+
+        // start timer
+        let now = Instant::now();
+
+        //test
+        engine(request.clone()).expect("Erreur engine");
+        let time = now.elapsed().as_nanos() as u32;
+        let half_time = time / 4u32;
+
+        while res.len() < nb_test {
+            let mut threads = Vec::new();
+            let cloned_request = request.clone();
+            let now = Instant::now();
+            threads.push(std::thread::spawn(move || engine_benchmark_thread(cloned_request)));
+            sleep(Duration::new(0, half_time));
+            sys.refresh_all();
+            for p in sys.processes_by_name("src-") {
+                println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(), p.virtual_memory());
+                cpu_v = p.cpu_usage();
+                ram_v = p.virtual_memory();
+            }
+            for thread in threads {
+                thread.join().expect("Thread Join Issue");
+            }
+            let time = now.elapsed().as_micros() as f64;
+            let ben: Bench = Bench {
+                temps: time,
+                cpu: cpu_v,
+                ram: ram_v,
+            };
+
+            res.push(ben);
+        }
 
 
-/*
+        /*
     for _i in 0..=nb_test{
         res.push(engine_benchmark_custom(request.clone()));
     }
 
 
 
- */ let mut filename = "data";
-    bench_to_csv(request.clone(),db_size,res,filename);
+ */
+
+        let mut filename = "data".to_owned() + &*nb_line.to_string();
+        bench_to_csv(request.clone(), db_size, res, &*filename);
+        nb_line += step;
+    }
 
 
 // test
