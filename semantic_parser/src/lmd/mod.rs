@@ -151,7 +151,12 @@ fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>,
     }
 
     for (key, value) in &t.tables {
-        if value.columns.len() != 1 {
+        println!("Attributes : {:?}", &t.tables);
+        println!("Attributes : {:?}", value);
+
+
+        // &t.aggregates.len()
+        if (value.columns.len()) != 1 {
             return Err(Box::from(format!("Subquery used with multiple attributes selected (Not implemented) ({} requested)\n", t.tables.len())));
         }
 
@@ -184,9 +189,15 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
     let mut subquery_hashmap: HashMap<String, SemanticParserFile> = HashMap::new();
     let mut subquery_checking: Vec<(String, Check, r#where::SubQHashMapAllowType)> = vec![];
 
-    let (_, _, where_clause_as_struct): (isize, isize, LogicalAllowType) = handle_where(&syntaxic_file_content_as_struct.where_clause.conditions, &syntaxic_file_content_as_struct.where_clause.linkers, 0, syntaxic_file_content_as_struct.where_clause.linkers.len() as isize - 1, &table_metadata_as_struct, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name, &mut requested_subqueries, &mut subquery_checking)?;
+    let where_clause_as_struct: Option<LogicalAllowType>;
 
-    println!("\n\nSubqueries requiring checking : {:?} !\n\n", subquery_checking);
+    if (syntaxic_file_content_as_struct.where_clause.conditions.len() != 0) {
+        let (_, _, t1): (isize, isize, LogicalAllowType) = handle_where(&syntaxic_file_content_as_struct.where_clause.conditions, &syntaxic_file_content_as_struct.where_clause.linkers, 0, syntaxic_file_content_as_struct.where_clause.linkers.len() as isize - 1, &table_metadata_as_struct, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name, &mut requested_subqueries, &mut subquery_checking)?;
+        where_clause_as_struct = Some(t1);
+    }
+    else {
+        where_clause_as_struct = None;
+    }
 
     for (key, value) in requested_subqueries {
         subquery_hashmap.insert(key, parse_syntaxic_struct(&value, table_metadata_as_struct)?);

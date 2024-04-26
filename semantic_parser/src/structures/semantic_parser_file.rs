@@ -181,6 +181,6 @@ pub struct LogicalNot {
 pub struct SemanticParserFile {
     pub tables: HashMap<String, TableHashmap>,
     pub aggregates: Vec<AggregateHashmap>,
-    pub conditions: LogicalAllowType,
+    pub conditions: Option<LogicalAllowType>,
     pub subquery_hashmap: HashMap<String, SemanticParserFile>
 }

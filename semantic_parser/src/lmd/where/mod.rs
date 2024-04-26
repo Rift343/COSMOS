@@ -4,16 +4,14 @@ use std::error::Error;
 use std::rc::Rc;
 use rand::random;
 use crate::lmd::semantic_parser;
+use crate::lmd::r#where;
+use crate::structures::table_metadata;
 
 use crate::structures::semantic_parser_file;
 
 use crate::metadata::check_if_attribute_is_valid;
-use crate::structures::semantic_parser_file::{Attribute, Checker, ConditionAllowType, Constant, DatalistAllowType, Logical, LogicalAllowType, LogicalNot, SubQuery};
-use crate::structures::semantic_parser_file::ConditionAllowType::{Attr, Const, SubQ};
-use crate::structures::semantic_parser_file::LogicalAllowType::{Cond, Logi, Not};
+use crate::structures::semantic_parser_file::{Attribute};
 
-use crate::structures::syntaxic_parser_file::{TableNameCouple, Condition, ConditionsAllowType, SyntaxicParserFile, CheckerLeftAllowType};
-use crate::structures::table_metadata::TableMetadata;
 
 use crate::structures::syntaxic_parser_file;
 
@@ -29,7 +27,7 @@ pub enum Check {
     SubQ(String),
 }
 
-fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>) -> Result<(String, ConditionAllowType), Box<dyn Error>> {
+fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>) -> Result<(String, semantic_parser_file::ConditionAllowType), Box<dyn Error>> {
     let table_name = check_if_attribute_is_valid(table_metadata_as_struct, &given_attribute, &"".to_string(), renamed_table_name_map, selected_table_list)?;
 
     let mut attribute_type = {
@@ -50,7 +48,7 @@ fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMa
     Ok(
         (
             attribute_type,
-            Attr(
+            semantic_parser_file::ConditionAllowType::Attr(
                 Attribute {
                     etype: String::from("attribute"),
                     use_name_table: table_name,
@@ -61,10 +59,10 @@ fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMa
     )
 }
 
-fn transform_to_const(given_attribute: &String) -> Result<ConditionAllowType, Box<dyn Error>> {
+fn transform_to_const(given_attribute: &String) -> Result<semantic_parser_file::ConditionAllowType, Box<dyn Error>> {
     Ok(
-        Const(
-            Constant {
+        semantic_parser_file::ConditionAllowType::Const(
+            semantic_parser_file::Constant {
                 etype: String::from("constant"),
                 value: given_attribute.clone(),
             }
@@ -73,7 +71,7 @@ fn transform_to_const(given_attribute: &String) -> Result<ConditionAllowType, Bo
 }
 
 fn get_type_of_object(given_object: &String) -> String {
-    if given_object.starts_with('"') {
+    if (given_object.starts_with('"') || given_object.starts_with("'")) {
         return String::from("VARCHAR");
     }
     if given_object.parse::<usize>().is_ok() {
@@ -85,10 +83,10 @@ fn get_type_of_object(given_object: &String) -> String {
     return String::from("ATTR");
 }
 
-fn transform_to_condition_allow_type<'a>(given_object: &'a syntaxic_parser_file::ConditionAllowType, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>) -> Result<(String, ConditionAllowType), Box<dyn Error>> {
+fn transform_to_condition_allow_type<'a>(given_object: &'a syntaxic_parser_file::ConditionAllowType, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>) -> Result<(String, semantic_parser_file::ConditionAllowType), Box<dyn Error>> {
     match given_object {
         syntaxic_parser_file::ConditionAllowType::Str(given_attr_or_const) => {
-            if given_attr_or_const.contains('"') {
+            if (given_attr_or_const.contains('"') || given_attr_or_const.contains("'")) {
                 return Ok((get_type_of_object(&given_attr_or_const), transform_to_const(&given_attr_or_const)?));
             } else {
                 if given_attr_or_const.parse::<usize>().is_ok() {
@@ -113,8 +111,8 @@ fn transform_to_condition_allow_type<'a>(given_object: &'a syntaxic_parser_file:
             return Ok(
                 (
                     "".to_string(),
-                    SubQ(
-                        SubQuery {
+                    semantic_parser_file::ConditionAllowType::SubQ(
+                        semantic_parser_file::SubQuery {
                             etype: "subquery".to_string(),
                             query: id,
                         }
@@ -125,7 +123,7 @@ fn transform_to_condition_allow_type<'a>(given_object: &'a syntaxic_parser_file:
     }
 }
 
-fn transform_to_cond<'a>(given_condition: &'a Condition, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, SubQHashMapAllowType)>) -> Result<LogicalAllowType, Box<dyn Error>> {
+fn transform_to_cond<'a>(given_condition: &'a syntaxic_parser_file::Condition, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, r#where::SubQHashMapAllowType)>) -> Result<semantic_parser_file::LogicalAllowType, Box<dyn Error>> {
     let (left_datatype, left) = transform_to_condition_allow_type(&given_condition.left, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap)?;
     let (right_datatype, right) = transform_to_condition_allow_type(&given_condition.right, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap)?;
 
@@ -135,14 +133,14 @@ fn transform_to_cond<'a>(given_condition: &'a Condition, table_metadata_as_struc
     let mut right_subquery_id: Option<String> = None;
 
     match &left {
-        SubQ(left_subquery) => {
+        semantic_parser_file::ConditionAllowType::SubQ(left_subquery) => {
             left_subquery_id = Some(left_subquery.query.clone());
         }
         _ => { () }
     }
 
     match &right {
-        SubQ(right_subquery) => {
+        semantic_parser_file::ConditionAllowType::SubQ(right_subquery) => {
             right_subquery_id = Some(right_subquery.query.clone());
         }
         _ => { () }
@@ -192,34 +190,40 @@ fn transform_to_cond<'a>(given_condition: &'a Condition, table_metadata_as_struc
     }
 
     Ok(
-        Cond(
+        semantic_parser_file::LogicalAllowType::Cond(
             temp
         )
     )
 }
 
-fn transform_to_logi(linker: &String, left: LogicalAllowType, right: LogicalAllowType) -> LogicalAllowType {
-    Logi(
-        Box::from(Logical {
-            etype: "logical".to_string(),
-            operator: linker.clone(),
-            left,
-            right,
-        })
+fn transform_to_logi(linker: &String, left: semantic_parser_file::LogicalAllowType, right: semantic_parser_file::LogicalAllowType) -> semantic_parser_file::LogicalAllowType {
+    semantic_parser_file::LogicalAllowType::Logi(
+        Box::from(
+            semantic_parser_file::Logical {
+                etype: "logical".to_string(),
+                operator: linker.clone(),
+                left,
+                right,
+            }
+        )
     )
 }
 
-fn transform_to_not(linker: &String, left: LogicalAllowType) -> LogicalAllowType {
-    Not(Box::from(LogicalNot {
-        etype: "logical".to_string(),
-        operator: linker.clone(),
-        left,
-    }))
+fn transform_to_not(linker: &String, left: semantic_parser_file::LogicalAllowType) -> semantic_parser_file::LogicalAllowType {
+    semantic_parser_file::LogicalAllowType::Not(
+        Box::from(
+            semantic_parser_file::LogicalNot {
+                etype: "logical".to_string(),
+                operator: linker.clone(),
+                left,
+            }
+        )
+    )
 }
 
-fn transform_to_checker_left_type<'a>(left_object: &'a syntaxic_parser_file::CheckerLeftAllowType, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>) -> Result<(String, semantic_parser_file::CheckerLeftAllowType), Box<dyn Error>> {
+fn transform_to_checker_left_type<'a>(left_object: &'a syntaxic_parser_file::CheckerLeftAllowType, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>) -> Result<(String, semantic_parser_file::CheckerLeftAllowType), Box<dyn Error>> {
     match left_object {
-        CheckerLeftAllowType::Str(value) => {
+        syntaxic_parser_file::CheckerLeftAllowType::Str(value) => {
             let datatype = get_type_of_object(value);
 
             if datatype == String::from("ATTR") {
@@ -255,7 +259,7 @@ fn transform_to_checker_left_type<'a>(left_object: &'a syntaxic_parser_file::Che
                     (
                         datatype,
                         semantic_parser_file::CheckerLeftAllowType::Const(
-                            Constant {
+                            semantic_parser_file::Constant {
                                 etype: String::from("constant"),
                                 value: value.clone(),
                             }
@@ -289,7 +293,7 @@ fn transform_to_checker_left_type<'a>(left_object: &'a syntaxic_parser_file::Che
     }
 }
 
-fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::CheckerRightAllowType, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>) -> Result<(String, semantic_parser_file::CheckerRightAllowType), Box<dyn Error>> {
+fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::CheckerRightAllowType, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>) -> Result<(String, semantic_parser_file::CheckerRightAllowType), Box<dyn Error>> {
     match right_object {
         syntaxic_parser_file::CheckerRightAllowType::DataLi(objects_list) => {
             // technically allowable ? But we can't infer datatype if list is empty so non-accepted use case
@@ -312,7 +316,7 @@ fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::C
                 }
             };
 
-            let mut values: Vec<DatalistAllowType> = Vec::new();
+            let mut values: Vec<semantic_parser_file::DatalistAllowType> = Vec::new();
 
             for element in objects_list {
                 let element_datatype = get_type_of_object(element);
@@ -336,7 +340,7 @@ fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::C
                     }
 
                     values.push(
-                        DatalistAllowType::Attr(
+                        semantic_parser_file::DatalistAllowType::Attr(
                             Attribute {
                                 etype: String::from("attribute"),
                                 use_name_table: table_name,
@@ -350,8 +354,8 @@ fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::C
                     }
 
                     values.push(
-                        DatalistAllowType::Const(
-                            Constant {
+                        semantic_parser_file::DatalistAllowType::Const(
+                            semantic_parser_file::Constant {
                                 etype: String::from("constant"),
                                 value: element.clone(),
                             }
@@ -393,7 +397,7 @@ fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::C
     }
 }
 
-fn transform_to_checker<'a>(given_checker: &'a syntaxic_parser_file::Checker, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, SubQHashMapAllowType)>) -> Result<LogicalAllowType, Box<dyn Error>> {
+fn transform_to_checker<'a>(given_checker: &'a syntaxic_parser_file::Checker, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, r#where::SubQHashMapAllowType)>) -> Result<semantic_parser_file::LogicalAllowType, Box<dyn Error>> {
     let (left_datatype, left) = transform_to_checker_left_type(&given_checker.left, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap)?;
     let (right_datatype, right) = transform_to_checker_right_type(&given_checker.right, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap)?;
 
@@ -427,7 +431,7 @@ fn transform_to_checker<'a>(given_checker: &'a syntaxic_parser_file::Checker, ta
     }
 
     let temp =
-        Rc::new(RefCell::new(Checker {
+        Rc::new(RefCell::new(semantic_parser_file::Checker {
         etype: "checker".to_string(),
         check_type: "IN".to_string(),
         datatype,
@@ -459,22 +463,22 @@ fn transform_to_checker<'a>(given_checker: &'a syntaxic_parser_file::Checker, ta
     }
 
     Ok(
-        LogicalAllowType::Check(
+        semantic_parser_file::LogicalAllowType::Check(
             temp
         )
     )
 }
 
-pub fn handle_where<'a>(condition_list: &'a Vec<ConditionsAllowType>, linker_list: &Vec<String>, start: isize, end: isize, table_metadata_as_struct: &HashMap<String, TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, SubQHashMapAllowType)>) -> Result<(isize, isize, LogicalAllowType), Box<dyn Error>> {
+pub fn handle_where<'a>(condition_list: &'a Vec<syntaxic_parser_file::ConditionsAllowType>, linker_list: &Vec<String>, start: isize, end: isize, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>, subquery_hasmap: &mut HashMap<String, &'a syntaxic_parser_file::SyntaxicParserFile>, subquery_checking: &mut Vec<(String, Check, r#where::SubQHashMapAllowType)>) -> Result<(isize, isize, semantic_parser_file::LogicalAllowType), Box<dyn Error>> {
     if linker_list.len() == 0 {
         let temp = match &condition_list[0] {
-            ConditionsAllowType::Cond(left_cond) => {
+            syntaxic_parser_file::ConditionsAllowType::Cond(left_cond) => {
                 transform_to_cond(left_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
-            ConditionsAllowType::SubCond(c) => {
+            syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                 handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
             }
-            ConditionsAllowType::Check(check) => {
+            syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                 transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
         };
@@ -486,25 +490,25 @@ pub fn handle_where<'a>(condition_list: &'a Vec<ConditionsAllowType>, linker_lis
     if end == start {
         return if (linker_list[start as usize] == "OR") || (linker_list[start as usize] == "AND") {
             let left = match &condition_list[start as usize] {
-                ConditionsAllowType::Cond(left_cond) => {
+                syntaxic_parser_file::ConditionsAllowType::Cond(left_cond) => {
                     transform_to_cond(left_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
-                ConditionsAllowType::SubCond(c) => {
+                syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                     handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
                 }
-                ConditionsAllowType::Check(check) => {
+                syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                     transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
             };
 
             let right = match &condition_list[start as usize + 1] {
-                ConditionsAllowType::Cond(right_cond) => {
+                syntaxic_parser_file::ConditionsAllowType::Cond(right_cond) => {
                     transform_to_cond(right_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
-                ConditionsAllowType::SubCond(c) => {
+                syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                     handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
                 }
-                ConditionsAllowType::Check(check) => {
+                syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                     transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
             };
@@ -514,13 +518,13 @@ pub fn handle_where<'a>(condition_list: &'a Vec<ConditionsAllowType>, linker_lis
             Ok((start, start + 1, res))
         } else {
             let left = match &condition_list[start as usize] {
-                ConditionsAllowType::Cond(left_cond) => {
+                syntaxic_parser_file::ConditionsAllowType::Cond(left_cond) => {
                     transform_to_cond(left_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
-                ConditionsAllowType::SubCond(c) => {
+                syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                     handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
                 }
-                ConditionsAllowType::Check(check) => {
+                syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                     transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
                 }
             };
@@ -546,20 +550,20 @@ pub fn handle_where<'a>(condition_list: &'a Vec<ConditionsAllowType>, linker_lis
 
     let mut start_end_range: (isize, isize) = (min_index, min_index + 1);
 
-    let left: LogicalAllowType;
-    let right: LogicalAllowType;
+    let left: semantic_parser_file::LogicalAllowType;
+    let right: semantic_parser_file::LogicalAllowType;
 
     if min_index > start {
         (start_end_range.0, _, left) = handle_where(condition_list, linker_list, start, min_index - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?;
     } else {
         left = match &condition_list[min_index as usize] {
-            ConditionsAllowType::Cond(left_cond) => {
+            syntaxic_parser_file::ConditionsAllowType::Cond(left_cond) => {
                 transform_to_cond(left_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
-            ConditionsAllowType::SubCond(c) => {
+            syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                 handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
             }
-            ConditionsAllowType::Check(check) => {
+            syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                 transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
         };
@@ -569,13 +573,13 @@ pub fn handle_where<'a>(condition_list: &'a Vec<ConditionsAllowType>, linker_lis
         (_, start_end_range.1, right) = handle_where(condition_list, linker_list, min_index + 1, end, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?;
     } else {
         right = match &condition_list[min_index as usize + 1] {
-            ConditionsAllowType::Cond(right_cond) => {
+            syntaxic_parser_file::ConditionsAllowType::Cond(right_cond) => {
                 transform_to_cond(right_cond, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
-            ConditionsAllowType::SubCond(c) => {
+            syntaxic_parser_file::ConditionsAllowType::SubCond(c) => {
                 handle_where(&c.conditions, &c.linkers, 0, c.linkers.len() as isize - 1, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?.2
             }
-            ConditionsAllowType::Check(check) => {
+            syntaxic_parser_file::ConditionsAllowType::Check(check) => {
                 transform_to_checker(check, table_metadata_as_struct, renamed_table_name_map, selected_table_list, subquery_hasmap, subquery_checking)?
             }
         };
