@@ -5,7 +5,7 @@ use std::error::Error;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
-
+use runner_scheduler::relation_insert::relation_insert;
 use serde_json::to_string;
 use crate::structures::syntaxic_parser_file_ldd::SyntaxicParserFileLdd;
 
@@ -355,10 +355,16 @@ fn semantic_parser_insert(
     println!("We check the constraints");
     // Check that the constraints are valid
     //check_constraints(&row_data, &table_meta.constraints,table_name)?;
-
-    // Perform the actual insertion
-    // ...
-
+    let mut datas = Vec::new();
+    for col in &table_meta.columns {
+        if let Some(data) = row_data.get(&col.column_name) {
+            datas.push(data.clone());
+        }
+    }
+    
+    let res = relation_insert(&table_name.to_uppercase(), &datas);
+    
+    println!("{:?}",res);
     let json_string = match to_string(&table_metadata) {
         Ok(result) => result,
         Err(error) => return Err(Box::from(format!("Unable to serialize struct to JSON: {}\n", error)))

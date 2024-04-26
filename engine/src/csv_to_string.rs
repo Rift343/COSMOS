@@ -148,11 +148,11 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
    //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
    // Get the outputted semantic file.
-   let mut is_ldd_req = false;
+   
    let mut semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
-   let type_of_the_request = type_request("./data/transferFile/syntaxic_parsing.json".to_string())
+   let type_of_the_request = type_request("./data/transferFile/syntaxic_parsing.json".to_string());
     if (type_of_the_request.to_lowercase() != "select"){
-        is_ldd_req = true;
+        
         let ldd_result = semantic_parser_ldd(syntaxic_parsing_handle);
         //println!("ldd result: {:?}", ldd_result);
         semantic_parser_res = ldd_result;
@@ -189,6 +189,10 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
 
 
 
+    }
+    if (type_of_the_request.to_lowercase() == "insert"){
+
+        return Ok("Ok".to_string());
     }
     let csv_file_returned = scheduler(&semantic_file);
     match csv_file_returned {//First match on the result of the runner_scheduler.

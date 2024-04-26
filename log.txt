@@ -92,3 +92,33 @@ INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
 
 INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
 
+    if (type_of_the_request.to_lowercase() == "create") {
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+NSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+NSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+

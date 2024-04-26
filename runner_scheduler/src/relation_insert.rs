@@ -8,7 +8,7 @@ use crate::operator::CSVFile;
 #[allow(unused_must_use)]
 #[allow(unused)]
 
-pub(crate) fn relation_insert(table_name:&String,value_list :&Vec<String>)->Result<i8,Box<dyn Error>>
+pub fn relation_insert(table_name:&String,value_list :&Vec<String>)->Result<i8,Box<dyn Error>>
 { 
     let mut vec = Vec::new();
     vec.push(value_list.to_vec());
