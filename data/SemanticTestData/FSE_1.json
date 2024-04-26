@@ -1,1 +1,250 @@
-{"tables":{"PERSONNE":{"use_name_table":"P","columns":[{"attribute_name":"ID","use_name_attribute":"ID"},{"attribute_name":"PRENOM","use_name_attribute":"\"des prenoms\""}]}},"aggregates":[],"conditions":null}
+{
+	"tables": {
+		"PERSONNE": {
+			"use_name_table": "P",
+			"columns": [
+				{
+					"attribute_name": "ID",
+					"use_name_attribute": "heheID"
+				}
+			]
+		}
+	},
+	"aggregates": [],
+	"conditions": {
+		"etype": "logical",
+		"operator": "OR",
+		"left": {
+			"etype": "logical",
+			"operator": "AND",
+			"left": {
+				"etype": "logical",
+				"operator": "AND",
+				"left": {
+					"etype": "condition",
+					"condition": ">",
+					"datatype": "VARCHAR",
+					"left": {
+						"etype": "attribute",
+						"use_name_table": "PERSONNE",
+						"attribute_name": "PRENOM"
+					},
+					"right": {
+						"etype": "attribute",
+						"use_name_table": "PERSONNE",
+						"attribute_name": "PRENOM"
+					}
+				},
+				"right": {
+					"etype": "condition",
+					"condition": "<",
+					"datatype": "VARCHAR",
+					"left": {
+						"etype": "subquery",
+						"query": "1448857772"
+					},
+					"right": {
+						"etype": "attribute",
+						"use_name_table": "PERSONNE",
+						"attribute_name": "NOM"
+					}
+				}
+			},
+			"right": {
+				"etype": "logical",
+				"operator": "OR",
+				"left": {
+					"etype": "logical",
+					"operator": "AND",
+					"left": {
+						"etype": "condition",
+						"condition": ">",
+						"datatype": "INT",
+						"left": {
+							"etype": "attribute",
+							"use_name_table": "PERSONNE",
+							"attribute_name": "ID"
+						},
+						"right": {
+							"etype": "constant",
+							"value": "888888888"
+						}
+					},
+					"right": {
+						"etype": "logical",
+						"operator": "NOT",
+						"left": {
+							"etype": "condition",
+							"condition": "<",
+							"datatype": "INT",
+							"left": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "ID"
+							},
+							"right": {
+								"etype": "constant",
+								"value": "99999999"
+							}
+						}
+					}
+				},
+				"right": {
+					"etype": "condition",
+					"condition": "__",
+					"datatype": "VARCHAR",
+					"left": {
+						"etype": "attribute",
+						"use_name_table": "PERSONNE",
+						"attribute_name": "NOM"
+					},
+					"right": {
+						"etype": "constant",
+						"value": "\"weeeeeeeeeee\""
+					}
+				}
+			}
+		},
+		"right": {
+			"etype": "condition",
+			"condition": "__",
+			"datatype": "INT",
+			"left": {
+				"etype": "attribute",
+				"use_name_table": "PERSONNE",
+				"attribute_name": "ID"
+			},
+			"right": {
+				"etype": "constant",
+				"value": "0"
+			}
+		}
+	},
+	"subquery_hashmap": {
+		"1448857772": {
+			"tables": {
+				"PERSONNE": {
+					"use_name_table": "P",
+					"columns": [
+						{
+							"attribute_name": "NOM",
+							"use_name_attribute": "heheID"
+						}
+					]
+				}
+			},
+			"aggregates": [],
+			"conditions": {
+				"etype": "logical",
+				"operator": "OR",
+				"left": {
+					"etype": "logical",
+					"operator": "AND",
+					"left": {
+						"etype": "logical",
+						"operator": "AND",
+						"left": {
+							"etype": "condition",
+							"condition": ">",
+							"datatype": "VARCHAR",
+							"left": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "PRENOM"
+							},
+							"right": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "PRENOM"
+							}
+						},
+						"right": {
+							"etype": "condition",
+							"condition": "<",
+							"datatype": "VARCHAR",
+							"left": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "NOM"
+							},
+							"right": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "NOM"
+							}
+						}
+					},
+					"right": {
+						"etype": "logical",
+						"operator": "OR",
+						"left": {
+							"etype": "logical",
+							"operator": "AND",
+							"left": {
+								"etype": "condition",
+								"condition": ">",
+								"datatype": "INT",
+								"left": {
+									"etype": "attribute",
+									"use_name_table": "PERSONNE",
+									"attribute_name": "ID"
+								},
+								"right": {
+									"etype": "constant",
+									"value": "888888888"
+								}
+							},
+							"right": {
+								"etype": "logical",
+								"operator": "NOT",
+								"left": {
+									"etype": "condition",
+									"condition": "<",
+									"datatype": "INT",
+									"left": {
+										"etype": "attribute",
+										"use_name_table": "PERSONNE",
+										"attribute_name": "ID"
+									},
+									"right": {
+										"etype": "constant",
+										"value": "99999999"
+									}
+								}
+							}
+						},
+						"right": {
+							"etype": "condition",
+							"condition": "__",
+							"datatype": "VARCHAR",
+							"left": {
+								"etype": "attribute",
+								"use_name_table": "PERSONNE",
+								"attribute_name": "NOM"
+							},
+							"right": {
+								"etype": "constant",
+								"value": "\"weeeeeeeeeee\""
+							}
+						}
+					}
+				},
+				"right": {
+					"etype": "condition",
+					"condition": "__",
+					"datatype": "INT",
+					"left": {
+						"etype": "attribute",
+						"use_name_table": "PERSONNE",
+						"attribute_name": "ID"
+					},
+					"right": {
+						"etype": "constant",
+						"value": "0"
+					}
+				}
+			},
+			"subquery_hashmap": {}
+		}
+	}
+}
