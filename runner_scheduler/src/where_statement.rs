@@ -1,4 +1,4 @@
-use std::{collections::HashMap, thread::JoinHandle};
+use std::{collections::{hash_map, HashMap}, thread::JoinHandle};
 
 use json::JsonValue;
 
@@ -28,7 +28,11 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : 
     {
         //println!("ok");
         match where_value["check_type"].to_string().as_str() {
-            "IN" => todo!(),
+            "IN" => {
+                let left = convert_json_to_where_element(&where_value["left"],thread_hashmap);
+                let right =
+                todo!();
+            },
             "EXIST" => todo!(),
             _ => todo!(),
             
@@ -80,7 +84,7 @@ pub fn convert_json_to_where_element (value:&JsonValue,thread_hashmap : &mut Has
     }
 }
 
-pub fn convert_json_to_vec_string(value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
+pub fn convert_json_to_vec_string(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
 {
     match value["etype"].to_string().as_str() {
         "datalist"=>todo!(),
@@ -90,9 +94,63 @@ pub fn convert_json_to_vec_string(value:&JsonValue,thread_hashmap :&mut HashMap<
     }
 }
 
-pub fn convert_json_to_vec_vec_string(value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
+pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)->HashMap<Vec<String>, i8>
 {
-    
+    match value["etype"].to_string().as_str() {
+        "datalist"=>{
+            let mut res_hashmap:HashMap<Vec<String>, i8> = HashMap::new();
+
+            let mut index_hash:HashMap<String, usize> = HashMap::new();
+
+            for i in 0..a1.descriptor[0].len()
+            {
+                index_hash.insert(a1.descriptor[0][i].to_string().clone(), i);//get hashmap of the index ==> easy to get the index of a columns after
+            }
+
+            for i in 1..a1.descriptor.len()
+            {
+                let mut v1 = Vec::new();
+                for y in 0..value["value"].len()
+                {
+                    let json_value = value["value"][y].clone();
+                    if json_value["etype"].to_string() == "attribute".to_string()
+                    {
+                        let get_val = match index_hash.get(&json_value["value"].to_string())  {
+                            Some(x) => x,
+                            None => todo!(),
+                        };
+                        v1.push(a1.descriptor[i][*get_val].clone())
+                    }
+                    else 
+                    {
+                        v1.push(json_value["value"].to_string());    
+                    }
+                }
+                res_hashmap.insert(v1, 1);
+                
+            }
+            res_hashmap 
+        },
+        "subquery"=>{
+            let thread_handle = thread_hashmap.remove(&value["query".to_string()].to_string());//remove the JoinHandle of the hashmap
+            let res = match thread_handle {
+                Some(x)=> x,
+                None => todo!(),
+                };
+
+            let res = match res.join() {//join the thread
+                Ok(e) => e,
+                Err(_) => panic!("Thread error"),
+                };
+            let mut returned_hash:HashMap<Vec<String>, i8> = HashMap::new();
+            for i in 1..res.descriptor.len()
+            {
+                returned_hash.insert(res.descriptor[i].clone(), 1);
+            }
+            return returned_hash;
+            },
+        _=>todo!(),
+    }
 }
 
 
