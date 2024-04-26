@@ -103,7 +103,6 @@ pub fn convert_json_to_vec_vec_string(value:&JsonValue,thread_hashmap :&mut Hash
 mod tests {
     use std::fs::File;
     use std::io::Read;
-    use std::os::windows::thread;
 
     use crate::operator::open_relation;
 
