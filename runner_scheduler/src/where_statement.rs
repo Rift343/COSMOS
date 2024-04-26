@@ -30,7 +30,7 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : 
         match where_value["check_type"].to_string().as_str() {
             "IN" => {
                 let left = convert_json_to_where_element(&where_value["left"],thread_hashmap);
-                let right =
+                let right = convert_json_to_hashmap(a1, &where_value["right"], thread_hashmap);
                 todo!();
             },
             "EXIST" => todo!(),
