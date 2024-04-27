@@ -146,7 +146,7 @@ pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap 
             let mut returned_hash:HashMap<String, i8> = HashMap::new();
             for i in 1..res.descriptor.len()
             {
-                returned_hash.insert(res.descriptor[i][0].clone(), 1);
+                returned_hash.insert(res.descriptor[i][0].clone(), 1);//in this case the subquery have form (select count(...) from...) or (select id from ...) so we just keep the value of the first column
             }
             return returned_hash;
             },

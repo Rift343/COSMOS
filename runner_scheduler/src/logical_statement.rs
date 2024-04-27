@@ -7,7 +7,7 @@ use crate::{operator::CSVFile, where_statement::where_statement};
 #[doc = "Match between AND et OR."]
 pub fn logical_execution(a1:& mut CSVFile,logical_value:&JsonValue,thread_hashmap : &mut HashMap<String,JoinHandle<CSVFile>>) -> CSVFile
 {
-    match logical_value["operator"].to_string().as_str() {
+    match logical_value["operator"].to_string().as_str() {//match the operator. For each operator possible we have a functino
         "AND" => return and_execution(a1, &logical_value["right"], &logical_value["left"],thread_hashmap),
         "OR" => return or_execution(a1, &logical_value["right"], &logical_value["left"],thread_hashmap),
         "NOT" => return not_execution(a1, &logical_value["right"], &logical_value["left"],thread_hashmap),
