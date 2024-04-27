@@ -41,7 +41,8 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : 
     }
     else  
     {
-        todo!()
+        todo!()//case if something is wrong in the semantic file. If you go here verify were you call this function
+               //or check of the semantic file is good
     }
 }
 
@@ -85,7 +86,7 @@ pub fn convert_json_to_where_element (value:&JsonValue,thread_hashmap : &mut Has
     }
 }
 
-pub fn convert_json_to_vec_string(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)
+pub fn convert_json_to_vec_string(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)//why I write this function, good question
 {
     match value["etype"].to_string().as_str() {
         "datalist"=>todo!(),
@@ -127,7 +128,7 @@ pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap 
                         v1.push(json_value["value"].to_string());    
                     }
                 }
-                res_hashmap.insert(v1[0].clone(), 1);
+                res_hashmap.insert(v1[0].clone(), 1);//we have a hashmap of all the value in the columns where_element.where_value
                 
             }
             res_hashmap 
@@ -147,6 +148,7 @@ pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap 
             for i in 1..res.descriptor.len()
             {
                 returned_hash.insert(res.descriptor[i][0].clone(), 1);//in this case the subquery have form (select count(...) from...) or (select id from ...) so we just keep the value of the first column
+
             }
             return returned_hash;
             },
