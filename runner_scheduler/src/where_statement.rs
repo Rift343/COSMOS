@@ -31,8 +31,8 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : 
             "IN" => {
                 let left: WhereElement = convert_json_to_where_element(&where_value["left"],thread_hashmap);
                 let right: HashMap<String, i8> = convert_json_to_hashmap(a1, &where_value["right"], thread_hashmap);
-                
-                todo!();
+                a1.include(&right, &left);
+                return a1.clone();
             },
             "EXIST" => todo!(),
             _ => todo!(),
