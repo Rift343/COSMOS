@@ -29,8 +29,9 @@ pub fn where_statement(a1:& mut CSVFile,where_value:&JsonValue,thread_hashmap : 
         //println!("ok");
         match where_value["check_type"].to_string().as_str() {
             "IN" => {
-                let left = convert_json_to_where_element(&where_value["left"],thread_hashmap);
-                let right = convert_json_to_hashmap(a1, &where_value["right"], thread_hashmap);
+                let left: WhereElement = convert_json_to_where_element(&where_value["left"],thread_hashmap);
+                let right: HashMap<String, i8> = convert_json_to_hashmap(a1, &where_value["right"], thread_hashmap);
+                
                 todo!();
             },
             "EXIST" => todo!(),
@@ -94,11 +95,11 @@ pub fn convert_json_to_vec_string(a1:& mut CSVFile,value:&JsonValue,thread_hashm
     }
 }
 
-pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)->HashMap<Vec<String>, i8>
+pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap :&mut HashMap<String,JoinHandle<CSVFile>>)->HashMap<String, i8>
 {
     match value["etype"].to_string().as_str() {
         "datalist"=>{
-            let mut res_hashmap:HashMap<Vec<String>, i8> = HashMap::new();
+            let mut res_hashmap:HashMap<String, i8> = HashMap::new();
 
             let mut index_hash:HashMap<String, usize> = HashMap::new();
 
@@ -126,7 +127,7 @@ pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap 
                         v1.push(json_value["value"].to_string());    
                     }
                 }
-                res_hashmap.insert(v1, 1);
+                res_hashmap.insert(v1[0].clone(), 1);
                 
             }
             res_hashmap 
@@ -142,10 +143,10 @@ pub fn convert_json_to_hashmap(a1:& mut CSVFile,value:&JsonValue,thread_hashmap 
                 Ok(e) => e,
                 Err(_) => panic!("Thread error"),
                 };
-            let mut returned_hash:HashMap<Vec<String>, i8> = HashMap::new();
+            let mut returned_hash:HashMap<String, i8> = HashMap::new();
             for i in 1..res.descriptor.len()
             {
-                returned_hash.insert(res.descriptor[i].clone(), 1);
+                returned_hash.insert(res.descriptor[i][0].clone(), 1);
             }
             return returned_hash;
             },
