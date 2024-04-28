@@ -169,7 +169,7 @@ pub fn engine(request : String) ->Result<std::string::String, Box<(dyn std::erro
        Ok(contenu) => semantic_file = contenu,
        Err(err) => {
            println!("{}",err.to_string());
-           return Ok("Erreur semantic parser".to_string());
+           return Ok("Erreur semantic parser : ".to_string()+&err.to_string());
        }
    }
 

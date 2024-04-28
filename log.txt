@@ -122,3 +122,7 @@ INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
 
 INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
 
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+
+INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);
+

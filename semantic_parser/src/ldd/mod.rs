@@ -390,8 +390,8 @@ fn semantic_parser_insert(
         return Err(Box::from(format!("Unable to seek from start : {}\n", error)));}
         //return Err(Box::from(&("Error, Unable to seek from start".to_string() + error_str))) to get rid of type str_err
     };
-    println!("fin create");
-    return Ok(synt_parsing_file);
+    println!("fin insert");
+    return Err(Box::from(format!("Successfully inserted\n")));
 }
 
 
