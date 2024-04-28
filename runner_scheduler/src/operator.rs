@@ -1785,11 +1785,24 @@ pub fn projection(&mut self,list_attribute:Vec<String>){
     for i in 1..self.descriptor.len()
     {
         let mut intermidiary_vec = Vec::new();
+        let mut bool=true;
         for y in 0..lst_index.len()
         {
-            intermidiary_vec.push(self.descriptor[i][*lst_index[y]].clone());
+            if *lst_index[y]<self.descriptor[i].len()
+            {
+                intermidiary_vec.push(self.descriptor[i][*lst_index[y]].clone());
+            }
+            else 
+            {
+                bool = false;
+                break;    
+            }
         }
-        res_vec.push(intermidiary_vec);
+        if bool == true
+        {
+            res_vec.push(intermidiary_vec);
+        }
+        
 
     }
 
