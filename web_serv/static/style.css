@@ -141,7 +141,7 @@ body {
     font-family: monospace;
     font-size: 16px;
     font-weight: 700;
-    resize: vertical;
+    resize: none;
     overflow: auto;
     background-color: #1f2022;
     color: #fff;
