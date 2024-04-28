@@ -121,13 +121,15 @@ def lmd_parser(query):
 
 
 def ldd_parser(query):
-        print("test")
+        """
+        this function handles the syntax of LDD requests
+        it takes a string as an input and use a textx grammar to verify syntax and extract fields of interest
+        
+        """
         sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
         try:
-            print("enter try")
             # Analyse SQL query
             model = sql_meta.model_from_str(query)
-            print("model good")
             # If the syntax is correct, create the dict structure in which the elements of the query will be stored
             result = {
                 "table_name": [],
@@ -152,7 +154,6 @@ def ldd_parser(query):
                     }
                     print("we define the column : ", column)
                     columns.append(column)
-                print("we define the result")
                 result["table_name"].append({"table_name": table_name})
                 result["columns"] = columns
                 result["action"] = "create"
@@ -169,7 +170,6 @@ def ldd_parser(query):
                 result["columns"] = [{"name": column,"data": [str(value)], "constraints" : [""], "datatype" : ""} for column,value in zip(columns,values)]
                 result["conditions"] = "NULL"
                 result["action"] = "insert"
-                print("we define the result")
             json_result = json.dumps(result, indent=4)
             return json_result
 

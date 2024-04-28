@@ -46,10 +46,34 @@
           "attribute_name": "ID"
         },
         "right": {
-          "etype": "constant",
-          "value": "5"
+          "etype": "subquery",
+          "query": "R1"
         }
       }
     }
+    },
+    "subquery_hashmap" : 
+    {
+        "R1":{
+            "tables": {
+          
+              "PersonneTest": {
+                "use_name_table": "personne",
+                "columns": [ ]
+              }
+            },
+              "aggregates": [
+                {
+                  "use_name_table": "personne",
+                  "attribute_name": "ID",
+                  "use_name_attribute": "COUNT(ID)",
+                  "aggregate_type": "COUNT"
+                }
+              ],
+              "conditions": null
+            }
+
+
     }
 }
+
