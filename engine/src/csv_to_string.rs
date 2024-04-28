@@ -25,13 +25,13 @@ pub fn engine_main(file_name : String) ->  Result<String, Box<dyn std::error::Er
     return result;
 }*/
 
-fn is_ldd(file_path: String) -> bool {
+fn type_request(file_path: String) -> String {
     // Read the file to a string.
     let table = match fs::read_to_string(file_path) {
         Ok(content) => content,
         Err(error) => {
             eprintln!("Error reading file: {}", error);
-            return false;
+            return "".to_string();
         }
     };
 
@@ -40,14 +40,14 @@ fn is_ldd(file_path: String) -> bool {
         Ok(content) => content,
         Err(error) => {
             eprintln!("Error parsing JSON: {}", error);
-            return false;
+            return "".to_string();
         }
     };
 
     // Check if the "action" field is not select.
     match content.get("action") {
-        Some(Value::String(action)) if action != "select" => true,
-        _ => false,
+        Some(Value::String(action))  => action.to_string(),
+        _ => "".to_string(),
     }
 }
 
@@ -154,12 +154,13 @@ pub fn engine(
     //let syntaxic_file_name = "data/SemanticTestData/FS_1.json".to_string();
     //let syntaxic_file = File::options().read(true).open(syntaxic_file_name).expect("ENGINE :\tError occurred whilst attempting to open syntaxic file input");
 
-    // Get the outputted semantic file.
-    let mut is_ldd_req = false;
-    let mut semantic_parser_res: Result<File, Box<dyn Error>> =
-        Err("semantic parser not initialized".into());
-    if (is_ldd("./data/transferFile/syntaxic_parsing.json".to_string())) {
-        is_ldd_req = true;
+
+   // Get the outputted semantic file.
+   
+   let mut semantic_parser_res: Result<File, Box<dyn Error>> = Err("semantic parser not initialized".into());
+   let type_of_the_request = type_request("./data/transferFile/syntaxic_parsing.json".to_string());
+    if (type_of_the_request.to_lowercase() != "select"){
+        
         let ldd_result = semantic_parser_ldd(syntaxic_parsing_handle);
         //println!("ldd result: {:?}", ldd_result);
         semantic_parser_res = ldd_result;
@@ -168,17 +169,20 @@ pub fn engine(
         semantic_parser_res = lmd_result;
     }
 
-    let semantic_file: File;
+   
 
-    match semantic_parser_res {
-        Ok(contenu) => semantic_file = contenu,
-        Err(err) => {
-            println!("{}", err.to_string());
-            return Ok("Erreur semantic parser : ".to_string()+&err.to_string());
-        }
-    }
+   let semantic_file : File;
+   
+   match semantic_parser_res {
+       Ok(contenu) => semantic_file = contenu,
+       Err(err) => {
+           println!("{}",err.to_string());
+           return Ok("Erreur semantic parser : ".to_string()+&err.to_string());
+       }
+   }
 
-    // -----------------------------------------------------
+   // -----------------------------------------------------
+
     // ------------------ Semantic Parser ------------------
     // ------------------------ End ------------------------
     // -----------------------------------------------------
@@ -187,35 +191,33 @@ pub fn engine(
     // ------------------ Runner_scheduler ------------------
     // ----------------------- Start -----------------------
     // -----------------------------------------------------
-    if (is_ldd_req) {
 
-                let res = call_create(&semantic_file);
-                match res {
-                    Ok(_) => return Ok("table created".to_string()),
-                    Err(err) => {
-                        println!("{}", err.to_string());
-                        return Ok("Erreur runner schedulder".to_string()+&err.to_string());
-                    }
-                };
-            
+    if (type_of_the_request.to_lowercase() == "create") {
+        let res = call_create(&semantic_file);
 
-    } else {
-        let csv_file_returned = scheduler(&semantic_file);
-        match csv_file_returned {
-            //First match on the result of the runner_scheduler.
-            Ok(content) => {
-                let printable_string: Result<String, Box<dyn Error>>;
-                printable_string = csv_to_string(&content);
-                match printable_string {
-                    //Seconde math when the result string from the CSV File
-                    Ok(content) => {
-                        //println!("{}",content);
-                        return Ok(content);
-                    }
 
-                    Err(e) => {
-                        println!(
-                            "
+
+
+
+    }
+    if (type_of_the_request.to_lowercase() == "insert"){
+
+        return Ok("Ok".to_string());
+    }
+    let csv_file_returned = scheduler(&semantic_file);
+    match csv_file_returned {//First match on the result of the runner_scheduler.
+        Ok(content) => {
+            let printable_string : Result<String, Box<dyn Error>>;
+            printable_string=csv_to_string(&content);
+            match printable_string {//Seconde math when the result string from the CSV File
+                Ok(content) => {
+                    //println!("{}",content);
+                    return Ok(content);
+                },
+
+
+                Err(e) => {
+                    println!("
                     -----------------------------------------------------
                     ---------------------Engine--------------------------
                     ---------------------Error 1--------------------------
