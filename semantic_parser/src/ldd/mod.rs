@@ -1,6 +1,6 @@
 
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fs;
 use std::fs::File;
@@ -169,6 +169,23 @@ fn create_row_data(syntaxic_file_content: &SyntaxicParserFileLdd, table_name: &s
 }
             
 
+fn check_column_names(
+    row_data: &HashMap<String, String>,
+    columns: &Vec<ColumnNameTypeCouple>,
+) -> Result<(), Box<dyn Error>> {
+    let column_names: HashSet<String> = columns.iter().map(|col| col.column_name.clone()).collect();
+
+    for key in row_data.keys() {
+        if !column_names.contains(key) {
+            return Err(Box::from(format!(
+                "Column name '{}' not found in table",
+                key
+            )));
+        }
+    }
+
+    Ok(())
+}
 
 fn check_types(
     row_data: &HashMap<String, String>,
@@ -352,6 +369,8 @@ fn semantic_parser_insert(
     println!("We check the types");
     // Check that the types are correct
     check_types(&row_data, &table_meta.columns)?;
+    //check that all columns exists
+    check_column_names(&row_data, &table_meta.columns)?;
     println!("We check the constraints");
     // Check that the constraints are valid
     //check_constraints(&row_data, &table_meta.constraints,table_name)?;

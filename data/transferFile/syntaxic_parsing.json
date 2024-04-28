@@ -16,9 +16,9 @@
             "datatype": ""
         },
         {
-            "name": "NOM",
+            "name": "AGE",
             "data": [
-                "fff"
+                "5"
             ],
             "constraints": [
                 ""
@@ -36,9 +36,9 @@
             "datatype": ""
         },
         {
-            "name": "AGE",
+            "name": "NOM",
             "data": [
-                "555"
+                "fff"
             ],
             "constraints": [
                 ""
