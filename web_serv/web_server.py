@@ -71,7 +71,7 @@ def handle_message():
         # Réception de la réponse du serveur Rust
         response = receive_response(server_socket)
 
-    return jsonify({"Response": response})
+    return jsonify({"response": response})
 
 
 if __name__ == '__main__':
