@@ -105,23 +105,42 @@ pub fn handle_select(syntaxic_file_content_as_struct: &SyntaxicParserFile, table
                 (split_attribute_name[0].to_string(), split_attribute_name[1].to_string())
             };
 
-            let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
+            if attribute_name != "*" {
+                let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
 
-            if use_name_table == "" {
-                use_name_table = table_name.clone();
+                if use_name_table == "" {
+                    use_name_table = table_name.clone();
+                }
+
+                let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap();
+
+                let temp_aggregate_struct = AggregateHashmap {
+                    use_name_table,
+                    use_name_attribute,
+                    aggregate_type,
+                    attribute_type: table_metadata_column_vec.get_type_of_attribute(&attribute_name)?,
+                    attribute_name,
+                };
+
+                semantic_parser_aggregates.push(temp_aggregate_struct);
             }
 
-            let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap();
+            else {
+                if aggregate_type != "COUNT" {
+                    return Err(Box::from(format!("'*' operator used with incompatible aggregate type : {}", aggregate_type)));
+                }
 
-            let temp_aggregate_struct = AggregateHashmap {
-                use_name_table,
-                use_name_attribute,
-                aggregate_type,
-                attribute_type: table_metadata_column_vec.get_type_of_attribute(&attribute_name)?,
-                attribute_name,
-            };
+                let temp_aggregate_struct = AggregateHashmap {
+                    use_name_table,
+                    use_name_attribute,
+                    aggregate_type,
+                    attribute_type: "INT".to_string(),
+                    attribute_name,
+                };
 
-            semantic_parser_aggregates.push(temp_aggregate_struct);
+                semantic_parser_aggregates.push(temp_aggregate_struct);
+            }
+
         } else {
             // attr or table.attr
             let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
@@ -171,7 +190,7 @@ fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>,
 
         attribute_datatype.truncate(7);
 
-        return Ok(attribute_datatype)
+        return Ok(attribute_datatype);
     }
 
     unreachable!()
@@ -194,8 +213,7 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
     if (syntaxic_file_content_as_struct.where_clause.conditions.len() != 0) {
         let (_, _, t1): (isize, isize, LogicalAllowType) = handle_where(&syntaxic_file_content_as_struct.where_clause.conditions, &syntaxic_file_content_as_struct.where_clause.linkers, 0, syntaxic_file_content_as_struct.where_clause.linkers.len() as isize - 1, &table_metadata_as_struct, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name, &mut requested_subqueries, &mut subquery_checking)?;
         where_clause_as_struct = Some(t1);
-    }
-    else {
+    } else {
         where_clause_as_struct = None;
     }
 
