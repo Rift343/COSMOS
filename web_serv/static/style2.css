@@ -16,12 +16,12 @@
     width: 100%;
     text-align: center;
     background-color: rgb(137, 226, 211);
-    color : rgb(0, 0, 0);
+    color : rgb(255, 255, 255);
 }
 
 #mid {
     background-color: #f7f7f7;
-    color : rgb(0, 0, 0);
+    color : rgb(255, 255, 255);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -35,13 +35,8 @@
 
 #switchlight{
     text-align: right;
-    background-color: rgb(0, 0, 0);
 }
 
-.switch{
-    background-color: rgb(0, 0, 0);
-    color : rgb(255, 255, 255);
-}
 
 .nom {
     position: fixed;
@@ -74,11 +69,11 @@
 .menu > li {
     font-family: "Unbounded", "Jersey";
     float: left;
-    color: #cad5e7;
+    color: #000000;
     width: 190px;
     height: 40px;
     line-height: 40px;
-    background: #3a3d42;
+    background: #fafbfb;
     cursor: pointer;
     font-size: 20px;
     padding-left: 5px;
@@ -89,9 +84,9 @@
 .sousMenu li {
     font-family: "Unbounded", "Jersey";
     font-size: 17px;
-    background: #3a3d42;
+    background: #fefefe;
     padding: 8px 0;
-    color: #cad5e7;
+    color: #000000;
     border-bottom: 1px solid #353535;
     padding-left: 5px;
     transform: scale(0);
@@ -110,7 +105,7 @@
 }
 
 body {
-    background-color: #1f2022;
+    background-color: #fafbff;
     padding-top: 70px;
     display: flex;
     flex-direction: column;
@@ -120,8 +115,8 @@ body {
 .query-line {
     display: flex;
     align-items: center;
-    background-color: #1f2022;
-    color: #fff;
+    background-color: #776565;
+    color: #000000;
     padding: 20px;
     font-family: monospace;
     border-radius: 20px;
@@ -150,8 +145,8 @@ body {
     font-weight: 700;
     resize: none;
     overflow: auto;
-    background-color: #1f2022;
-    color: #fff;
+    background-color: #eceff3;
+    color: #020202;
     min-height: auto;
 }
   
@@ -171,7 +166,7 @@ body {
 }
 
 #message::placeholder {
-    color: #fff;
+    color: #080808;
     opacity: 0.5;
 }
 
