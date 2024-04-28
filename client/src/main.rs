@@ -72,22 +72,25 @@ fn main() -> std::io::Result<()> {
     let mut input = String::new();
     std::io::stdin().read_line(&mut input)?;
 
-    let hostname = if input.trim() == "y" {
+    let mut ip_str = "".to_string();
+    let _hostname = if input.trim() == "y" {
         // Read the user input for the hostname if they want to change it
         println!("Enter the hostname:");
         let mut hostname = String::new();
         std::io::stdin().read_line(&mut hostname)?;
-        hostname.trim().to_string()
+        hostname.trim().to_string();
+        // Resolve the address and connect to the server (here we verify if the hostname provided is correct and we can connect to it)
+        let ips: Vec<std::net::IpAddr> = lookup_host(&hostname).unwrap();
+        println!("IPs for {}: {:?}", hostname, ips);
+        let ip = ips[0];
+        ip_str = ip.to_string();
     } else {
         // Otherwise, use the default hostname
-        "pavieroutaboul.fr".to_string()
+        let ip = "127.0.0.1".to_string();
+        ip_str = ip.to_string();
     };
 
-    // Resolve the address and connect to the server (here we verify if the hostname provided is correct and we can connect to it)
-    let ips: Vec<std::net::IpAddr> = lookup_host(&hostname).unwrap();
-    println!("IPs for {}: {:?}", hostname, ips);
-    let ip = ips[0];
-    let ip_str = ip.to_string();
+    
     let addr = format!("{}:8880", ip_str);
 
     // We connect to the server

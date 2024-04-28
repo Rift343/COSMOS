@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    box-sizing: border-box;
+}
+
+#top {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgb(137, 226, 211);
+    color : rgb(0, 0, 0);
+}
+
+#mid {
+    background-color: #f7f7f7;
+    color : rgb(0, 0, 0);
+    font-family: 'Poppins', sans-serif;
+}
+
+#bot {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgb(137, 226, 211);
+}
+
+
+
+
+.nom {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 100%;
+    font-family: "Unbounded", "Jersey";
+    font-size: 40px;
+    letter-spacing: 0.4px;
+    word-spacing: 0.6px;
+    display: inline-block;
+    background: linear-gradient(to bottom, rgb(192, 9, 9), rgb(128, 25, 187));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    text-decoration: none;
+    font-style: normal;
+    font-variant: normal;
+    text-transform: none;
+}
+
+.menu {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 170px;
+    height: 40px;
+}
+.menu > li {
+    font-family: "Unbounded", "Jersey";
+    float: left;
+    color: #cad5e7;
+    width: 190px;
+    height: 40px;
+    line-height: 40px;
+    background: #3a3d42;
+    cursor: pointer;
+    font-size: 20px;
+    padding-left: 5px;
+}
+.sousMenu {
+    transform: scale(0);
+}
+.sousMenu li {
+    font-family: "Unbounded", "Jersey";
+    font-size: 17px;
+    background: #3a3d42;
+    padding: 8px 0;
+    color: #cad5e7;
+    border-bottom: 1px solid #353535;
+    padding-left: 5px;
+    transform: scale(0);
+}
+.sousMenu li:last-child {
+    border-bottom: 0;
+}
+.sousMenu li:hover {
+    background: #53565c;
+}
+.menu > li:hover .sousMenu li {
+    transform: scale(1);
+}
+.menu > li:hover .sousMenu {
+    transform: scale(1);
+}
+
+body {
+    background-color: #1f2022;
+    padding-top: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+  
+.query-line {
+    display: flex;
+    align-items: center;
+    background-color: #1f2022;
+    color: #fff;
+    padding: 20px;
+    font-family: monospace;
+    border-radius: 20px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 75%;
+}
+  
+#messageForm {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    width: 100%;
+}
+  
+#message {
+    width: 100%;
+    margin: 0;
+    padding: 12px 20px;
+    height: 45px;
+    box-sizing: border-box;
+    border: 2px solid #b9b9b9;
+    border-radius: 20px;
+    font-family: monospace;
+    font-size: 16px;
+    font-weight: 700;
+    resize: vertical;
+    overflow: auto;
+    background-color: #1f2022;
+    color: #fff;
+    min-height: auto;
+}
+  
+
+#response {
+    margin: 20px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: monospace;
+}
+
+
+#message:focus {
+    outline: none;
+}
+
+#message::placeholder {
+    color: #fff;
+    opacity: 0.5;
+}
+
+  

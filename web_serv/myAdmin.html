@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COSMOS</title>
+</head>
+<body onload="loadTables()">
+    <div class="nom">COSMOS</div>
+    <ul class="menu">
+        <li>
+            Invité
+            <ul class="sousMenu">
+                <li><a href="/">Accueil</a></li>
+                <li><a href="myAdmin">cosmosMyAdmin</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div id="response"></div>
+    <div id="table-panel">
+        <h3>Tables:</h3>
+        <div id="table-list"></div>
+    </div>
+
+    <script>
+
+        function loadTables() {
+            sendMessage("select * from ALL_TABLES;");
+        }
+
+        function displayTables(tableNames) {
+            const tableList = document.getElementById("table-list");
+            tableList.innerHTML = "";
+            tableNames.forEach(tableName => {
+                const tableItem = document.createElement("div");
+                tableItem.textContent = tableName;
+                tableItem.addEventListener("click", function() {
+                    sendMessage(`select * from "${tableName};"`);
+                });
+                tableList.appendChild(tableItem);
+            });
+        }
+
+        function sendMessage(message) {
+            console.log("message : "+message);
+            fetch("http://127.0.0.1/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("response").innerText = data.error;
+                } else {
+                    const tableData = parseTableData(data.response);
+                    if (tableData) {
+                        displayTable(tableData);
+                    } else {
+                        displayTables(data.response.split("\n"));
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function parseTableData(data) {
+            const rows = data.trim().split("\n");
+            const header = rows[0].split(";");
+            const tableData = [header];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].split(";");
+                if (row.length > 1) {
+                    tableData.push(row);
+                }
+            }
+
+            return tableData;
+        }
+
+
+        function displayTable(tableData) {
+            const table = document.createElement("table");
+
+            // Create table header
+            const headerRow = document.createElement("tr");
+            tableData[0].forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Create table body
+            const tableBody = document.createElement("tbody");
+            for (let i = 1; i < tableData.length; i++) {
+                const tableRow = document.createElement("tr");
+                tableData[i].forEach(cell => {
+                    const tableCell = document.createElement("td");
+                    tableCell.textContent = cell;
+                    tableRow.appendChild(tableCell);
+                });
+                tableBody.appendChild(tableRow);
+            }
+            table.appendChild(tableBody);
+
+            document.getElementById("response").innerHTML = "";
+            document.getElementById("response").appendChild(table);
+        }
+
+    </script>
+</body>
+</html

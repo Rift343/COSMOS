@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import socket
+import re
 
 app = Flask(__name__)
-CORS(app) #On inclus ça car de base les protocoles http n'autorisent plus les requêtes cross-origin (Same Origin Policy)
-
+cors = CORS(app, resources={r"/*": {"origins": "*"}}) #On inclus ça car de base les protocoles http n'autorisent plus les requêtes cross-origin (Same Origin Policy)
+#CORS(app)
 
 def send_query(server_socket, query):
     # Convert query to bytes
@@ -34,17 +35,32 @@ def receive_response(server_socket):
     response = response_bytes.decode('utf-8')
     return response
 
+def escape_sql_string(value):
+    return re.sub(r"[\0\n\r\'\"\b]", lambda x: f"\\{x.group(0)}", value)
+
 
 @app.route('/')
 def serve_html():
     return send_file('index.html')
 
+@app.route('/myAdmin')
+def myAdmin():
+    return send_file('myAdmin.html')
+
+BLOCKED_KEYWORDS = ['create', 'insert', 'update', 'delete', 'drop', 'truncate', 'POST', 'PUT', 'Read', 'GET', 'HEAD', 'copy', 'modify', 'return', 'PUT', 'PATCH', 'replace', 'rename']
+
 @app.route('/submit', methods=['POST'])
 def handle_message():
     data = request.get_json()
-    message = data['message']
-    print("Message reçu:", message)
-    
+    message = data['message'].lower()
+    message = escape_sql_string(message)
+    print("Message received:", message)
+
+    # Check if the message contains any blocked keywords
+    for keyword in BLOCKED_KEYWORDS:
+        if keyword in message:
+            return jsonify({"error": f"Operation '{keyword}' is not allowed."}), 403
+
     # Connexion au serveur Rust
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.connect(('127.0.0.1', 8880))
@@ -55,8 +71,8 @@ def handle_message():
         # Réception de la réponse du serveur Rust
         response = receive_response(server_socket)
 
-    return jsonify({"response": response})
+    return jsonify({"Response": response})
 
 
 if __name__ == '__main__':
-    app.run(host= '51.75.26.110', port=80, debug=True)
+    app.run(host= '127.0.0.1', port=8000, debug=True)
