@@ -1754,8 +1754,49 @@ pub fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub fn projection(&mut self,list_attribute:Vec<String>){
-    //println!("{:?}",self.to_string());
+    //println!("{}",self.to_string());
     //println!("{:?}",list_attribute);
+
+    let mut hash_attribute = HashMap::new();
+
+    for i in 0..self.descriptor[0].len()
+    {
+       // println!("{:?}",self.descriptor[0][i]);
+        hash_attribute.insert(self.descriptor[0][i].clone(), i);
+    }
+
+    let mut res_vec: Vec<Vec<String>> = Vec::new();
+    res_vec.push(list_attribute.clone());
+    let mut lst_index = Vec::new();
+    for i in 0..list_attribute.len()
+    {
+        if hash_attribute.contains_key(&list_attribute[i])
+        {
+            //println!("{}", list_attribute[i]);
+            //println!("{:?}", hash_attribute);
+            let x = match hash_attribute.get(&list_attribute[i]) {
+                Some(x) => x,
+                None => todo!()
+            };
+            lst_index.push(x);
+        }
+    }
+    //println!("{:?}",lst_index);
+    for i in 1..self.descriptor.len()
+    {
+        let mut intermidiary_vec = Vec::new();
+        for y in 0..lst_index.len()
+        {
+            intermidiary_vec.push(self.descriptor[i][*lst_index[y]].clone());
+        }
+        res_vec.push(intermidiary_vec);
+
+    }
+
+    self.descriptor = res_vec;
+
+    
+    /* 
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){
             transpose.push(Vec::new());
@@ -1790,7 +1831,7 @@ pub fn projection(&mut self,list_attribute:Vec<String>){
             }
         }
         //println!("{:?}",transpose);
-        self.descriptor = transpose.to_vec();
+        self.descriptor = transpose.to_vec();*/
     }
 #[doc = "Method for the cartesian product. Need another CSVFile in input and the self object take the cartesian product between self and another_csv\n
 Complexity of O(n²)"]
