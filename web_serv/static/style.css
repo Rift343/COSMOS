@@ -109,12 +109,18 @@
     transform: scale(1);
 }
 
+html, body {
+    height: 95%;
+}
+
 body {
     background-color: #1f2022;
     padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    margin: 0;
 }
   
 .query-line {
@@ -202,4 +208,19 @@ body {
     background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
     color: #0066cc;
     border: solid 2px #0066cc;
+}
+
+.logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; /* Ajuster la hauteur selon vos besoins */
+    background-color: #1f2022; /* Couleur de fond de la section */
+    position: absolute;
+    bottom: 50px;
+}
+  
+.logos img {
+    height: 150px; /* Ajuster la hauteur des logos selon vos besoins */
+    margin: 0 10px; /* Ajouter une marge entre les logos */
 }

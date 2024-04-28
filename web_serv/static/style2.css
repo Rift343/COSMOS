@@ -104,12 +104,17 @@
     transform: scale(1);
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #ebefff;
     padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
 }
   
 .query-line {
@@ -195,4 +200,19 @@ body {
     background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
     color: #0066cc;
     border: solid 2px #0066cc;
+}
+
+.logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100px; /* Ajuster la hauteur selon vos besoins */
+    background-color: #ebefff; /* Couleur de fond de la section */
+    bottom: 50px;
+}
+  
+.logos img {
+    height: 150px; /* Ajuster la hauteur des logos selon vos besoins */
+    margin: 0 10px; /* Ajouter une marge entre les logos */
 }

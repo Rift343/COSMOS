@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, render_template, url_for
 from flask_cors import CORS
 import socket
 import re
@@ -41,11 +41,11 @@ def escape_sql_string(value):
 
 @app.route('/')
 def serve_html():
-    return send_file('index.html')
+    return render_template('index.html')
 
 @app.route('/myAdmin')
 def myAdmin():
-    return send_file('myAdmin.html')
+    return render_template('myAdmin.html')
 
 BLOCKED_KEYWORDS = ['create', 'insert', 'update', 'delete', 'drop', 'truncate', 'POST', 'PUT', 'Read', 'GET', 'HEAD', 'copy', 'modify', 'return', 'PUT', 'PATCH', 'replace', 'rename']
 
