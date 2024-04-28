@@ -232,13 +232,16 @@ fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>,
     unreachable!()
 }
 
-fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, table_metadata_as_struct: &HashMap<String, TableMetadata>) -> Result<SemanticParserFile, Box<dyn Error>> {
+fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, table_metadata_as_struct: &HashMap<String, TableMetadata>) -> Result<(SemanticParserFile, HashMap<String, String>), Box<dyn Error>> {
     let mut renamed_table_name_map: HashMap<String, String> = HashMap::new();
+    let mut subqueries_renamed_table_name_map: HashMap<String, HashMap<String, String>> = HashMap::new();
 
     let mut semantic_parser_table_hashmap: HashMap<String, TableHashmap> = match_verify_table_to_renamed(&syntaxic_file_content_as_struct, &table_metadata_as_struct, &mut renamed_table_name_map)?;
     let mut semantic_parser_aggregates: Vec<AggregateHashmap> = vec![];
 
     handle_select(&syntaxic_file_content_as_struct, &table_metadata_as_struct, &renamed_table_name_map, &mut semantic_parser_table_hashmap, &mut semantic_parser_aggregates)?;
+
+    println!("Renamed after select : {:?}", renamed_table_name_map);
 
     let mut requested_subqueries: HashMap<String, &SyntaxicParserFile> = HashMap::new();
     let mut subquery_hashmap: HashMap<String, SemanticParserFile> = HashMap::new();
@@ -254,17 +257,19 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
     }
 
     for (key, value) in requested_subqueries {
-        subquery_hashmap.insert(key, parse_syntaxic_struct(&value, table_metadata_as_struct)?);
+        let (subquery_semantic_parser_file, subquery_renamed_table_name_map) = parse_syntaxic_struct(&value, table_metadata_as_struct)?;
+        subquery_hashmap.insert(key.clone(), subquery_semantic_parser_file);
+        subqueries_renamed_table_name_map.insert(key, subquery_renamed_table_name_map);
     }
 
     for (subquery_id, matched_against, to_edit_condition) in subquery_checking {
-        let left_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&subquery_id).unwrap(), &renamed_table_name_map)?;
+        let left_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&subquery_id).unwrap(), &subqueries_renamed_table_name_map.get(&subquery_id).unwrap())?;
 
         let right_datatype: String;
 
         match matched_against {
             Check::SubQ(right_sub_id) => {
-                right_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&right_sub_id).unwrap(), &renamed_table_name_map)?
+                right_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&right_sub_id).unwrap(), &subqueries_renamed_table_name_map.get(&subquery_id).unwrap())?
             }
             Check::Val(right_type) => {
                 right_datatype = right_type
@@ -293,7 +298,7 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
         subquery_hashmap,
     };
 
-    Ok(semantic_parser_file_as_struct)
+    Ok((semantic_parser_file_as_struct, renamed_table_name_map))
 }
 
 /// # Main function of the semantic parsing module
@@ -331,7 +336,7 @@ pub fn semantic_parser(mut syntaxic_file: File) -> Result<File, Box<dyn Error>> 
 
     let table_metadata_as_struct: HashMap<String, TableMetadata> = get_metadata("data/SemanticTestData/FM_1.json".to_string());
 
-    let semantic_parser_file_as_struct = parse_syntaxic_struct(&syntaxic_file_content_as_struct, &table_metadata_as_struct)?;
+    let (semantic_parser_file_as_struct, _) = parse_syntaxic_struct(&syntaxic_file_content_as_struct, &table_metadata_as_struct)?;
 
     let output_semantic_file_as_str = serde_json::to_string(&semantic_parser_file_as_struct).expect("Error whilst serialising semantic file struct.");
 

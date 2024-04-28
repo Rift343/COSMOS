@@ -30,8 +30,21 @@ pub enum Check {
 fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>) -> Result<(String, semantic_parser_file::ConditionAllowType), Box<dyn Error>> {
     let table_name = check_if_attribute_is_valid(table_metadata_as_struct, &given_attribute, &"".to_string(), renamed_table_name_map, selected_table_list)?;
 
+    let use_name_table = {
+        let mut res = "".to_string();
+
+        for (key, value) in renamed_table_name_map {
+            if value == &table_name {
+                res = key.clone();
+                break;
+            }
+        }
+
+        res
+    };
+
     let mut attribute_type = {
-        match table_metadata_as_struct.get(&table_name) {
+        match table_metadata_as_struct.get(&use_name_table) {
             None => {
                 return Err(Box::from(format!("Unknown error : {} not found in metadata despite validation. (transform_to_attr)\n", table_name)));
             }
@@ -51,7 +64,7 @@ fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMa
             semantic_parser_file::ConditionAllowType::Attr(
                 Attribute {
                     etype: String::from("attribute"),
-                    use_name_table: table_name,
+                    use_name_table,
                     attribute_name: given_attribute.clone(),
                 }
             )
@@ -252,9 +265,7 @@ fn transform_to_checker_left_type<'a>(left_object: &'a syntaxic_parser_file::Che
                         )
                     )
                 )
-            }
-
-            else {
+            } else {
                 Ok(
                     (
                         datatype,
@@ -368,9 +379,9 @@ fn transform_to_checker_right_type<'a>(right_object: &'a syntaxic_parser_file::C
                 (
                     datatype,
                     semantic_parser_file::CheckerRightAllowType::DataLi(semantic_parser_file::DataList {
-                etype: "datalist".to_string(),
-                value: values,
-            })))
+                        etype: "datalist".to_string(),
+                        value: values,
+                    })))
         }
 
         syntaxic_parser_file::CheckerRightAllowType::SubQuery(given_subquery) => {
@@ -432,12 +443,12 @@ fn transform_to_checker<'a>(given_checker: &'a syntaxic_parser_file::Checker, ta
 
     let temp =
         Rc::new(RefCell::new(semantic_parser_file::Checker {
-        etype: "checker".to_string(),
-        check_type: "IN".to_string(),
-        datatype,
-        left,
-        right
-    }));
+            etype: "checker".to_string(),
+            check_type: "IN".to_string(),
+            datatype,
+            left,
+            right,
+        }));
 
     match left_subquery_id {
         Some(left_id) => {
@@ -484,7 +495,6 @@ pub fn handle_where<'a>(condition_list: &'a Vec<syntaxic_parser_file::Conditions
         };
 
         return Ok((0, 0, temp));
-
     }
 
     if end == start {
