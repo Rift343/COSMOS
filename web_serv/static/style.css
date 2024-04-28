@@ -53,7 +53,7 @@
     letter-spacing: 0.4px;
     word-spacing: 0.6px;
     display: inline-block;
-    background: linear-gradient(to bottom, rgb(192, 9, 9), rgb(128, 25, 187));
+    background: linear-gradient(to bottom, #c00909, #8019bb);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -162,6 +162,7 @@ body {
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    color: #fff;
     font-family: monospace;
 }
 
@@ -175,4 +176,30 @@ body {
     opacity: 0.5;
 }
 
-  
+ 
+.btn{
+    font-family: "Unbounded", "Jersey";
+    font-weight: 100;
+    font-size: 14px;
+    color: #fff;
+    background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
+    padding: 10px 20px;
+    border: solid #0066cc 2px;
+    box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
+    border-radius: 25px;
+    transition : 0ms;
+    transform: translateY(0);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+}
+
+.btn:hover{
+    transition : 0ms;
+    padding: 10px 22px;
+    transform : translateY(-0px);
+    background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
+    color: #0066cc;
+    border: solid 2px #0066cc;
+}

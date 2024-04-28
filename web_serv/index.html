@@ -2,34 +2,12 @@
 <html lang="en">
     <link rel="stylesheet" href="static/style.css" id="mycss">
 
-    <script>
-        let env_style = 0;
-        function switchstyle()
-        {
-            if (env_style == 0)
-            {
-                document.getElementById("mycss").setAttribute("href", "static/style2.css");
-                env_style = 1;
-                console.log("style2 loaded");
-            }
-            else
-            {
-                document.getElementById("mycss").setAttribute("href", "static/style.css");
-                env_style = 0;
-                console.log("style1 loaded");
-            }
-
-        }
-
-    </script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COSMOS</title>
 
-    <div id =switchlight>
-        <button class="switch" type="button" onclick="switchstyle()">Switch Style</button>
-    </div>
+    <button class="btn" onclick="switchstyle()">Light/Black mode</button>
 
 </head>
 <body>
@@ -53,6 +31,7 @@
     
 
     <script>
+
         const message = document.getElementById("message");
             message.addEventListener("input", function() {
                 const lineHeight = 21;
@@ -67,6 +46,24 @@
             var message = document.getElementById("message").value;
             sendMessage(message);
         });
+
+        let env_style = 0;
+        function switchstyle()
+        {
+            if (env_style == 0)
+            {
+                document.getElementById("mycss").setAttribute("href", "static/style2.css");
+                env_style = 1;
+                console.log("style2 loaded");
+            }
+            else
+            {
+                document.getElementById("mycss").setAttribute("href", "static/style.css");
+                env_style = 0;
+                console.log("style1 loaded");
+            }
+
+        }
 
         function handleKeyPress(event) {
             if (event.keyCode === 13) {

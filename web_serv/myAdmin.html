@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/style.css"  id="mycss">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COSMOS</title>
+
+        <button class="btn" onclick="switchstyle()">Light/Black mode</button>
 </head>
 <body onload="loadTables()">
     <div class="nom">COSMOS</div>
@@ -24,6 +26,24 @@
     </div>
 
     <script>
+
+        let env_style = 0;
+        function switchstyle()
+        {
+            if (env_style == 0)
+            {
+                document.getElementById("mycss").setAttribute("href", "static/style2.css");
+                env_style = 1;
+                console.log("style2 loaded");
+            }
+            else
+            {
+                document.getElementById("mycss").setAttribute("href", "static/style.css");
+                env_style = 0;
+                console.log("style1 loaded");
+            }
+
+        }
 
         function loadTables() {
             sendMessage("select * from ALL_TABLES;");
