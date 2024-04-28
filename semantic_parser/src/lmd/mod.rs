@@ -164,7 +164,8 @@ pub fn handle_select(syntaxic_file_content_as_struct: &SyntaxicParserFile, table
     Ok(())
 }
 
-fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>, t: &SemanticParserFile) -> Result<String, Box<dyn Error>> {
+fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>, t: &SemanticParserFile, renamed_table_name_map: &HashMap<String, String>) -> Result<String, Box<dyn Error>> {
+    // TODO : Get attributes of all tables
     if t.tables.len() != 1 {
         return Err(Box::from(format!("Subquery used with multiple tables selected ({} requested)\n", t.tables.len())));
     }
@@ -175,22 +176,57 @@ fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>,
 
 
         // &t.aggregates.len()
-        if (value.columns.len()) != 1 {
+        if (value.columns.len() + &t.aggregates.len()) != 1 {
             return Err(Box::from(format!("Subquery used with multiple attributes selected (Not implemented) ({} requested)\n", t.tables.len())));
         }
 
-        let mut attribute_datatype = match table_metadata_as_struct.get(key) {
-            Some(found_table) => {
-                found_table
-            }
-            None => {
-                return Err(Box::from("Unknown error : get_query_datatype : Table not found\n"));
-            }
-        }.get_type_of_attribute(&value.columns[0].attribute_name)?;
+        if value.columns.len() == 1 {
+            let mut attribute_datatype = match table_metadata_as_struct.get(key) {
+                Some(found_table) => {
+                    found_table
+                }
+                None => {
+                    return Err(Box::from("Unknown error : get_query_datatype : Table not found\n"));
+                }
+            }.get_type_of_attribute(&value.columns[0].attribute_name)?;
 
-        attribute_datatype.truncate(7);
+            attribute_datatype.truncate(7);
 
-        return Ok(attribute_datatype);
+            return Ok(attribute_datatype);
+        }
+
+        else {
+            let actual_table_name = match renamed_table_name_map.get(&t.aggregates[0].use_name_table) {
+                None => {
+                    println!("{:?}", renamed_table_name_map);
+                    if &t.aggregates[0].attribute_name != "*" {
+                        return Err(Box::from(format!("Unknown error : get_query_datatype : aggregates : Renamed table not found : {}\n", &t.aggregates[0].use_name_table)));
+                    }
+                    ""
+                }
+                Some(table_name) => {
+                    table_name
+                }
+            };
+
+            if actual_table_name != "" {
+                let mut attribute_datatype = match table_metadata_as_struct.get(actual_table_name) {
+                    Some(found_table) => {
+                        found_table
+                    }
+                    None => {
+                        return Err(Box::from("Unknown error : get_query_datatype : aggregates : Table not found\n"));
+                    }
+                }.get_type_of_attribute(&t.aggregates[0].attribute_name)?;
+
+                attribute_datatype.truncate(7);
+
+                return Ok(attribute_datatype);
+            }
+            else {
+                return Ok("INT".to_string())
+            }
+        }
     }
 
     unreachable!()
@@ -222,13 +258,13 @@ fn parse_syntaxic_struct(syntaxic_file_content_as_struct: &SyntaxicParserFile, t
     }
 
     for (subquery_id, matched_against, to_edit_condition) in subquery_checking {
-        let left_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&subquery_id).unwrap())?;
+        let left_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&subquery_id).unwrap(), &renamed_table_name_map)?;
 
         let right_datatype: String;
 
         match matched_against {
             Check::SubQ(right_sub_id) => {
-                right_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&right_sub_id).unwrap())?
+                right_datatype = get_query_datatype(table_metadata_as_struct, subquery_hashmap.get(&right_sub_id).unwrap(), &renamed_table_name_map)?
             }
             Check::Val(right_type) => {
                 right_datatype = right_type
