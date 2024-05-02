@@ -229,62 +229,62 @@ def handle_in_condition(in_condition_path):
 
 
 def ldd_parser(query):
-    """
-    this function handles the syntax of LDD requests
-    it takes a string as an input and use a textx grammar to verify syntax and extract fields of interest
+        """
+        this function handles the syntax of LDD requests
+        it takes a string as an input and use a textx grammar to verify syntax and extract fields of interest
+        
+        """
+        sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
+        try:
+            # Analyse SQL query
+            model = sql_meta.model_from_str(query)
+            # If the syntax is correct, create the dict structure in which the elements of the query will be stored
+            result = {
+                "table_name": [],
+                "columns": [],
+                "status": True,
+                "error": ""
+            }
+            print("result initialized")
+            # Handle CREATE TABLE statement
+            if model.__class__.__name__ == "CreateStatement":
+                print("we enter the create statement")
+                table_name = model.tableName
+                columns = []
+                print("we define the table name and columns array")
+                for column_def in model.columnDefinitions.columnDefinition:
+                    #print(vars(column_def.columnConstraints))
+                    #print(column_def.columnConstraints.columnConstraint)
+                    column = {
+                        "name": column_def.columnName,
+                        "datatype": query[column_def.columnType._tx_position:column_def.columnType._tx_position_end],
+                        "constraints": [constraint for constraint in column_def.columnConstraints.columnConstraint] if column_def.columnConstraints else []
+                    }
+                    print("we define the column : ", column)
+                    columns.append(column)
+                result["table_name"].append({"table_name": table_name})
+                result["columns"] = columns
+                result["action"] = "create"
+            else:
+                print("we enter the insert statement")
+                table_name = model.tableName
+                print("we define the table name :", table_name)
+                columns = [column.upper() for column in model.columnNames.columnName]
+                print("we define the columns :", columns)
+                values = [value for value in model.values.value]
+                print("we define the values :", values)
 
-    """
-    sql_meta = textx.metamodel_from_file("syntaxic_parser/textX_grammar/textx_for_LDD.tx", ignore_case = True)
-    try:
-        # Analyse SQL query
-        model = sql_meta.model_from_str(query)
-        # If the syntax is correct, create the dict structure in which the elements of the query will be stored
-        result = {
-            "table_name": [],
-            "columns": [],
-            "status": True,
-            "error": ""
-        }
-        # Handle CREATE TABLE statement
-        if model.__class__.__name__ == "CreateStatement":
-            print("we enter the create statement")
-            table_name = model.tableName
-            columns = []
-            print("we define the table name and columns array")
-            for column_def in model.columnDefinitions.columnDefinition:
-                #print(vars(column_def.columnConstraints))
-                #print(column_def.columnConstraints.columnConstraint)
-                column = {
-                    "name": column_def.columnName,
-                    "datatype": query[column_def.columnType._tx_position:column_def.columnType._tx_position_end],
-                    "constraints": [constraint for constraint in column_def.columnConstraints.columnConstraint] if column_def.columnConstraints else []
-                }
-                print("we define the column : ", column)
-                columns.append(column)
-            result["table_name"].append({"table_name": table_name})
-            result["columns"] = columns
-            result["action"] = "create"
-        else:
-            print("we enter the insert statement")
-            table_name = model.tableName
-            print("we define the table name :", table_name)
-            columns = [column.upper() for column in model.columnNames.columnName]
-            print("we define the columns :", columns)
-            values = [value for value in model.values.value]
-            print("we define the values :", values)
+                result["table_name"].append({"table_name": table_name})
+                result["columns"] = [{"name": column,"data": [str(value)], "constraints" : [""], "datatype" : ""} for column,value in zip(columns,values)]
+                result["conditions"] = "NULL"
+                result["action"] = "insert"
+            json_result = json.dumps(result, indent=4)
+            return json_result
 
-            result["table_name"].append({"table_name": table_name})
-            result["columns"] = [{"attribute_name": column,"data": value} for column,value in zip(columns,values)]
-            result["conditions"] = "NULL"
-            result["action"] = "insert"
-        json_result = json.dumps(result, indent=4)
-        return json_result
-
-    except textx.exceptions.TextXSyntaxError as e:
-        # If textx doesn't recognize the syntax
-        error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
-        return error
-
+        except textx.exceptions.TextXSyntaxError as e:
+            # If textx doesn't recognize the syntax
+            error = f"Syntax Error line {e.line}, row {e.col}: {e.message}"
+            return error
 
 
 def is_valid_sql(query):
@@ -292,6 +292,7 @@ def is_valid_sql(query):
     if query[0:6].upper() == "SELECT":
         return lmd_parser(query)
     else:
+        print("it is an LDD request")
         return ldd_parser(query)
 
 
@@ -300,3 +301,5 @@ def is_valid_sql(query):
 if __name__ == "__main__":
     print(is_valid_sql("CREATE TABLE communal (population INT PRIMARY KEY, superficie INT, duree_de_vie VARCHAR(255));"))
     print(is_valid_sql("INSERT INTO communal (population, superficie, duree_de_vie) VALUES (1000, 2000, 'longue');"))
+    #INSERT INTO PERSONNE ("ID", "NOM", "PRENOM", "AGE") VALUES (15,"dd","ddg",999);
+    #INSERT INTO personne (id, nom, prenom, age) VALUES (100, 'fff', 'longue',555);

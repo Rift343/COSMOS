@@ -31,6 +31,45 @@ pub struct CSVFile{
 
 impl CSVFile {
 
+
+pub fn include(&mut self,left: &HashMap<String, i8>,right:&WhereElement)
+{
+    if right.boolean_value == false//we have a const
+    {
+        if !left.contains_key(&right.where_value)//if the value is not in the hashmap
+        {
+            let vec = self.descriptor[0].clone();
+            let mut new_value :Vec<Vec<String>> = Vec::new();
+            new_value.push(vec);
+            self.descriptor=new_value;//the new value is a new Vec<Vec<String>> with only the first line(name of attribute).
+        }   
+    }
+    else //if we have an attribute
+    {
+        let mut index=0;//search the index of the attribute
+        for i in 0..self.descriptor[0].len()//maybe change for a while
+        {
+            if self.descriptor[0][i] == right.where_value
+            {
+                index = i;
+                break;
+            }
+        }
+
+        let vec = self.descriptor[0].clone();
+        let mut new_value :Vec<Vec<String>> = Vec::new();
+        new_value.push(vec);
+        for y in 1..self.descriptor.len()//for each line we check if the value contain in index is in the hashmap
+        {
+            if left.contains_key(&self.descriptor[y][index])//if the value is contain in the hashmap 
+            {
+                new_value.push(self.descriptor[y].clone());//we clone value in the new value of the descriptor 
+            }
+        }
+    }
+}
+
+
 #[doc = "Method to check if a list of attribute are not in list of value. Change the self value"]
 pub fn exclude(&mut self,mut to_chek: Vec<Vec<String>>)
 {
@@ -39,15 +78,15 @@ pub fn exclude(&mut self,mut to_chek: Vec<Vec<String>>)
     let mut test_hashmap: HashMap<Vec<String>, i8> = HashMap::new();
     for i in 0..to_chek.len()
     {
-        test_hashmap.insert(to_chek[i].clone(), 1);
+        test_hashmap.insert(to_chek[i].clone(), 1);//copy the value of to_chek in a hashmap. Search a key in an hashmap is O(1)
     }
-    drop(to_chek);
+    drop(to_chek);//drop to check because we don't use it after
 
-    for i in 1..self.descriptor.len()
+    for i in 1..self.descriptor.len()//for each line
     {
-        if !(test_hashmap.contains_key(&self.descriptor[i]))
+        if !(test_hashmap.contains_key(&self.descriptor[i]))//if is not in the hashamp
         {
-            res_vec.push(self.descriptor[i].clone());
+            res_vec.push(self.descriptor[i].clone());//we keep it
         }
     }
     
@@ -78,7 +117,12 @@ pub fn predicat_interpretation (&mut self, operation : String, type_expression: 
 
 
 #[doc = "Methode use for the interpretation of a boolean statement. Need one constant value, the operator (=,<>...) and the type (INT,FLOAT,CHAR)
-In a first place we need to match the operation then the type.Finaly whe check the condition line by line. If possible the cast operation was done before the for statement"]
+In a first place we need to match the operation then the type.Finaly whe check the condition line by line. If possible the cast operation was done before the for statement
+Algo:
+1. Match the operation (we need to adapt the operation because we have a syntaxic value and not a semantic value)
+2.match the type (We need to compare string with string and int with int)
+3. check the condition for all value in self.descriptor
+"]
 pub fn predicat_interpretation_with_one_const (&mut self, operation : String, type_expression: String, element_1 : String,element_2:WhereElement) 
 {
     //println!("1");
@@ -1710,8 +1754,62 @@ pub fn to_string(&self) -> String{
 
 #[doc = r"The projection operator, the method select the columns write in list_attribute. To do this, the projection need to inverse the ligne and columns, that operation cost O(n²). This for a final complexity of O(3n²+2n)"]
 pub fn projection(&mut self,list_attribute:Vec<String>){
-    //println!("{:?}",self.to_string());
+    //println!("{}",self.to_string());
     //println!("{:?}",list_attribute);
+
+    let mut hash_attribute = HashMap::new();
+
+    for i in 0..self.descriptor[0].len()
+    {
+       // println!("{:?}",self.descriptor[0][i]);
+        hash_attribute.insert(self.descriptor[0][i].clone(), i);
+    }
+
+    let mut res_vec: Vec<Vec<String>> = Vec::new();
+    res_vec.push(list_attribute.clone());
+    let mut lst_index = Vec::new();
+    for i in 0..list_attribute.len()
+    {
+        if hash_attribute.contains_key(&list_attribute[i])
+        {
+            //println!("{}", list_attribute[i]);
+            //println!("{:?}", hash_attribute);
+            let x = match hash_attribute.get(&list_attribute[i]) {
+                Some(x) => x,
+                None => todo!()
+            };
+            lst_index.push(x);
+        }
+    }
+    //println!("{:?}",lst_index);
+    for i in 1..self.descriptor.len()
+    {
+        let mut intermidiary_vec = Vec::new();
+        let mut bool=true;
+        for y in 0..lst_index.len()
+        {
+            if *lst_index[y]<self.descriptor[i].len()
+            {
+                intermidiary_vec.push(self.descriptor[i][*lst_index[y]].clone());
+            }
+            else 
+            {
+                bool = false;
+                break;    
+            }
+        }
+        if bool == true
+        {
+            res_vec.push(intermidiary_vec);
+        }
+        
+
+    }
+
+    self.descriptor = res_vec;
+
+    
+    /* 
         let mut transpose: Vec<Vec<String>> = Vec::new();
         for i in 0..self.descriptor[0].len(){
             transpose.push(Vec::new());
@@ -1746,7 +1844,7 @@ pub fn projection(&mut self,list_attribute:Vec<String>){
             }
         }
         //println!("{:?}",transpose);
-        self.descriptor = transpose.to_vec();
+        self.descriptor = transpose.to_vec();*/
     }
 #[doc = "Method for the cartesian product. Need another CSVFile in input and the self object take the cartesian product between self and another_csv\n
 Complexity of O(n²)"]
