@@ -35,10 +35,12 @@ fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>,filename : &st
     let s = "; ";
     let mut res_cpu;
     let mut res_ram;
+    let mut taille = db_size;
     for i in 0..=res.len()-1{
         res_cpu = (res[i].cpu).round().to_string();
         res_ram = (res[i].ram /1e6 as u64).to_string();
-        w1.write_record(&[requete.clone().to_string() + &*" ".to_string() + &*db_size.clone().to_string()+ s + &*res[i].temps.round().to_string() + s + &*res_cpu+ s + &*res_ram + s]).expect("Bench Error Write Data");
+        w1.write_record(&[requete.clone().to_string() + &*" ".to_string() + &*taille.clone().to_string()+ s + &*res[i].temps.round().to_string() + s + &*res_cpu+ s + &*res_ram + s]).expect("Bench Error Write Data");
+        taille += 20;
     }
     let taille =(res.len() +1).to_string();
     w1.write_record(&[" Average :; ;=MOYENNE(C2:C".to_owned() + &*taille +") ;=MOYENNE(D2:D"+ &*taille +");=MOYENNE(E2:E"+ &*taille +");"]).expect("Bench Error write csv output");
@@ -220,13 +222,22 @@ fn engine_benchmark_thread(request: String){
     engine(request).expect("Benchmark : Engine Panic");
 }
 fn engine_benchmark(c: &mut Criterion) {
-    let nb_test = 100;
-    let db_size= 10000;
+    let nb_test = 10;
+    let db_size= 1000000;
     let request = "Select ID From Personne;".to_string();
 
-    let mut nb_line = 20000;
-    let max_line =  1000000;
-    let step = 20000;
+    let mut nb_line = 20000; //20000
+    let nb_line_init = nb_line;
+    let max_line =  5000000;
+    let mut step = 20000;
+
+    let mut avg_bench : Vec<Bench> = Vec::new();
+
+    let mut sum_time: f64 = 0f64;
+    let mut sum_cpu : f32 = 0f32;
+    let mut sum_ram : u64 = 0;
+
+
     match generator(nb_line){
         Ok(..) => println!("Init file Ok"),
         Err(..) => println!("ERROR : init file")
@@ -240,7 +251,8 @@ fn engine_benchmark(c: &mut Criterion) {
     }
 
     //tab result
-    while (nb_line < max_line) {
+    while (nb_line <= max_line) {
+        println!("---------------Taille en cours : {} -------------------", nb_line);
         let mut res: Vec<Bench> = Vec::new();
         let mut cpu_v = 0f32;
         let mut ram_v: u64 = 0;
@@ -276,7 +288,14 @@ fn engine_benchmark(c: &mut Criterion) {
             for thread in threads {
                 thread.join().expect("Thread Join Issue");
             }
-            let time = now.elapsed().as_micros() as f64;
+            let time = now.elapsed().as_millis() as f64;
+
+            //Pour l'average
+            sum_cpu += cpu_v;
+            sum_ram += ram_v;
+            sum_time += time;
+
+
             let ben: Bench = Bench {
                 temps: time,
                 cpu: cpu_v,
@@ -297,9 +316,24 @@ fn engine_benchmark(c: &mut Criterion) {
  */
 
         let mut filename = "data".to_owned() + &*nb_line.to_string();
-        bench_to_csv(request.clone(), db_size, res, &*filename);
+        //bench_to_csv(request.clone(), db_size, res, &*filename);
+        if(nb_line == 1000000){
+            step = 1000000;
+        }
         nb_line += step;
+        generator(nb_line).expect("ERROR : Panic generator");
+
+        let avg : Bench = Bench{
+            temps : sum_time/nb_test as f64,
+            cpu : sum_cpu/nb_test as f32,
+            ram : sum_ram/nb_test as u64
+        };
+        avg_bench.push(avg);
+        sum_time = 0f64;
+        sum_cpu = 0f32;
+        sum_ram = 0;
     }
+    bench_to_csv(request.clone(), nb_line_init/1000,avg_bench,"Average");
 
 
 // test
