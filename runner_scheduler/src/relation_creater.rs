@@ -26,13 +26,13 @@ pub(crate) fn relation_creater(table_name:&String,attribute_list :&Vec<String>)-
     let mut vector: Vec<String> = Vec::new();
     vector.push(table_name.to_string());
     let meta_table = "ALL_TABLES".to_string();
-    relation_insert(&meta_table, &vector);
+    relation_insert(&meta_table, &vector).expect("error");
     for i in 0..attribute_list.len()
     {
         let mut insert_vec = Vec::new();
         insert_vec.push(table_name.to_string());
         insert_vec.push(attribute_list[i].clone());
-        relation_insert(&"ALL_COLUMNS".to_string(), &insert_vec);
+        relation_insert(&"ALL_COLUMNS".to_string(), &insert_vec).expect("error");
         drop(insert_vec);
     }
     Ok(0)
