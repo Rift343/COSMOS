@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="static/style.css" id="mycss">
+    <link rel="stylesheet" href="static/styleClair.css" id="mycss">
 
 <head>
     <meta charset="UTF-8">
@@ -59,13 +59,13 @@
         {
             if (env_style == 0)
             {
-                document.getElementById("mycss").setAttribute("href", "static/style2.css");
+                document.getElementById("mycss").setAttribute("href", "static/styleSombre.css");
                 env_style = 1;
                 console.log("style2 loaded");
             }
             else
             {
-                document.getElementById("mycss").setAttribute("href", "static/style.css");
+                document.getElementById("mycss").setAttribute("href", "static/styleClair.css");
                 env_style = 0;
                 console.log("style1 loaded");
             }
@@ -92,11 +92,27 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("response").innerText = data.response;
+                afficherTableau(data.response);
+                //document.getElementById("response").innerText = data.response;
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+        }
+
+        function afficherTableau(response) {
+            const lignes = response.split("\n");
+            let tableau = '<table border="1">';
+            for (let i = 0; i < lignes.length; i++) {
+                const colonnes = lignes[i].split(";");
+                tableau += '<tr>';
+                for (let j = 0; j < colonnes.length; j++) {
+                    tableau += '<td>' + colonnes[j] + '</td>';
+                }
+                tableau += '</tr>';
+            }
+            tableau += '</table>';
+            document.getElementById('response').innerHTML = tableau;
         }
     </script>
 </body>

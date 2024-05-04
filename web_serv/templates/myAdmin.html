@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="static/style.css"  id="mycss">
+    <link rel="stylesheet" href="static/styleClair.css"  id="mycss">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COSMOS</title>
 
@@ -21,7 +21,7 @@
     </ul>
     <div id="response"></div>
     <div id="table-panel">
-        <h3>Tables:</h3>
+        <h3>Liste des tables :</h3>
         <div id="table-list"></div>
     </div>
 
@@ -41,17 +41,16 @@
         {
             if (env_style == 0)
             {
-                document.getElementById("mycss").setAttribute("href", "static/style2.css");
+                document.getElementById("mycss").setAttribute("href", "static/styleSombre.css");
                 env_style = 1;
                 console.log("style2 loaded");
             }
             else
             {
-                document.getElementById("mycss").setAttribute("href", "static/style.css");
+                document.getElementById("mycss").setAttribute("href", "static/styleClair.css");
                 env_style = 0;
                 console.log("style1 loaded");
             }
-
         }
 
         function loadTables() {
@@ -61,15 +60,17 @@
         function displayTables(tableNames) {
             const tableList = document.getElementById("table-list");
             tableList.innerHTML = "";
-            tableNames.forEach(tableName => {
-                const tableItem = document.createElement("div");
+            tableNames.slice(1).forEach(tableName => {
+                const tableItem = document.createElement("text");
+                tableItem.classList.add("table-button");
                 tableItem.textContent = tableName;
                 tableItem.addEventListener("click", function() {
-                    sendMessage(`select * from "${tableName};"`);
+                    sendMessage(`select * from ${tableName};`);
                 });
                 tableList.appendChild(tableItem);
             });
         }
+
 
         function sendMessage(message) {
             console.log("message : "+message);
@@ -86,11 +87,20 @@
                 if (data.error) {
                     document.getElementById("response").innerText = data.error;
                 } else {
-                    const tableData = parseTableData(data.response);
-                    if (tableData) {
-                        displayTable(tableData);
+                    console.log(data.response);
+                    if (data.response.startsWith("ALL_TABLES.TABLE_NAME")) {
+                        const tableData = parseTableData(data.response);
+                        if (tableData) {
+                            displayTables(tableData);
+                        } else {
+                            displayTables(data.response.split("\n"));
+                        }
                     } else {
-                        displayTables(data.response.split("\n"));
+                        if (data.response) {
+                            afficherTableau(data.response);
+                        } else {
+                            document.getElementById("response").innerText = data.response;
+                        }
                     }
                 }
             })
@@ -100,12 +110,16 @@
         }
 
         function parseTableData(data) {
+            console.log(data.trim());
             const rows = data.trim().split("\n");
-            const header = rows[0].split(";");
-            const tableData = [header];
+            console.log(rows[0]);
+            console.log(rows[1]);
+            console.log(rows[2]);
+            const tableData = [];
 
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i].split(";");
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                console.log(row);
                 if (row.length > 1) {
                     tableData.push(row);
                 }
@@ -114,20 +128,35 @@
             return tableData;
         }
 
+        function afficherTableau(response) {
+            const lignes = response.split("\n");
+            let tableau = '<table border="1">';
+            for (let i = 0; i < lignes.length; i++) {
+                const colonnes = lignes[i].split(";");
+                tableau += '<tr>';
+                for (let j = 0; j < colonnes.length; j++) {
+                    tableau += '<td>' + colonnes[j] + '</td>';
+                }
+                tableau += '</tr>';
+            }
+            tableau += '</table>';
+            document.getElementById('response').innerHTML = tableau;
+        }
+
+
+
 
         function displayTable(tableData) {
             const table = document.createElement("table");
 
-            // Create table header
             const headerRow = document.createElement("tr");
             tableData[0].forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                headerRow.appendChild(th);
+                const headerCell = document.createElement("th");
+                headerCell.textContent = header;
+                headerRow.appendChild(headerCell);
             });
             table.appendChild(headerRow);
 
-            // Create table body
             const tableBody = document.createElement("tbody");
             for (let i = 1; i < tableData.length; i++) {
                 const tableRow = document.createElement("tr");

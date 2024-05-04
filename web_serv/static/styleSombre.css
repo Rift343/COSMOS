@@ -16,12 +16,12 @@
     width: 100%;
     text-align: center;
     background-color: rgb(137, 226, 211);
-    color : rgb(255, 255, 255);
+    color : rgb(0, 0, 0);
 }
 
 #mid {
     background-color: #f7f7f7;
-    color : rgb(255, 255, 255);
+    color : rgb(0, 0, 0);
     font-family: 'Poppins', sans-serif;
 }
 
@@ -35,8 +35,13 @@
 
 #switchlight{
     text-align: right;
+    background-color: rgb(0, 0, 0);
 }
 
+.switch{
+    background-color: rgb(0, 0, 0);
+    color : rgb(255, 255, 255);
+}
 
 .nom {
     position: fixed;
@@ -48,7 +53,7 @@
     letter-spacing: 0.4px;
     word-spacing: 0.6px;
     display: inline-block;
-    background: linear-gradient(to bottom, #c00909, #8019bb);
+    background: linear-gradient(to bottom, #eb0b0b, #8019bb);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -69,11 +74,11 @@
 .menu > li {
     font-family: "Unbounded", "Jersey";
     float: left;
-    color: #000000;
+    color: #cad5e7;
     width: 190px;
     height: 40px;
     line-height: 40px;
-    background: #eceff3;
+    background: #3a3d42;
     cursor: pointer;
     font-size: 20px;
     padding-left: 5px;
@@ -84,9 +89,9 @@
 .sousMenu li {
     font-family: "Unbounded", "Jersey";
     font-size: 17px;
-    background: #eceff3;
+    background: #3a3d42;
     padding: 8px 0;
-    color: #000000;
+    color: #cad5e7;
     border-bottom: 1px solid #353535;
     padding-left: 5px;
     transform: scale(0);
@@ -105,22 +110,24 @@
 }
 
 html, body {
-    height: 100%;
+    height: 95%;
 }
 
 body {
-    background-color: #ebefff;
+    background-color: #1f2022;
     padding-top: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 100vh;
+    margin: 0;
 }
   
 .query-line {
     display: flex;
     align-items: center;
-    color: #000000;
+    background-color: #1f2022;
+    color: #fff;
     padding: 20px;
     font-family: monospace;
     border-radius: 20px;
@@ -149,8 +156,8 @@ body {
     font-weight: 700;
     resize: none;
     overflow: auto;
-    background-color: #eceff3;
-    color: #020202;
+    background-color: #1f2022;
+    color: #fff;
     min-height: auto;
 }
   
@@ -161,6 +168,7 @@ body {
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    color: #fff;
     font-family: monospace;
 }
 
@@ -170,17 +178,17 @@ body {
 }
 
 #message::placeholder {
-    color: #080808;
+    color: #fff;
     opacity: 0.5;
 }
 
-  
+ 
 .btn{
     font-family: "Unbounded", "Jersey";
     font-weight: 100;
     font-size: 14px;
     color: #fff;
-    background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
+    background: linear-gradient(90deg, #eb0b0b 0%, #8019bb 100%);
     padding: 10px 20px;
     border: solid #0066cc 2px;
     box-shadow: rgb(0, 0, 0) 0px 0px 0px 0px;
@@ -197,7 +205,7 @@ body {
     transition : 0ms;
     padding: 10px 22px;
     transform : translateY(-0px);
-    background: linear-gradient(90deg, #c00909 0%, #8019bb 100%);
+    background: linear-gradient(90deg, #eb0b0b 0%, #8019bb 100%);
     color: #0066cc;
     border: solid 2px #0066cc;
 }
@@ -206,13 +214,61 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100px; 
+    background-color: #1f2022;
     position: absolute;
-    height: 100px; /* Ajuster la hauteur selon vos besoins */
-    background-color: #ebefff; /* Couleur de fond de la section */
     bottom: 50px;
 }
   
 .logos img {
-    height: 150px; /* Ajuster la hauteur des logos selon vos besoins */
-    margin: 0 10px; /* Ajouter une marge entre les logos */
+    height: 100px;
+    margin: 0 10px;
+}
+
+#table-panel {
+    max-width: 250px;
+    padding: 15px;
+    padding-top: 5px;
+    padding-bottom: 30px;
+    position: absolute;
+    color: #fff;
+    left: 25px;
+    top: 150px;
+    width: 250px;
+    border-width: 3px;
+    border-style: solid;
+    border-left: 0;
+    border-top: 0;
+    border-bottom: 0;
+    border-image: linear-gradient(to bottom, #eb0b0b, #8019bb) 1 100%;
+}
+
+.table-button {
+    display: block;
+    border: none;
+    margin-top: 5px;
+}
+
+.table-button:hover {
+    color: #2255bb;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #f2f2f2;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #1f2022;
+    font-weight: bold;
+}
+tr:nth-child(even) {
+    background-color: #543268;
+}
+tr:nth-child(odd) {
+    background-color: #663131;
 }
