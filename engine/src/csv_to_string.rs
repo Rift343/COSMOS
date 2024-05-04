@@ -47,7 +47,7 @@ fn type_request(file_path: String) -> String {
     // Check if the "action" field is not select.
     match content.get("action") {
         Some(Value::String(action))  => action.to_string(),
-        _ => "".to_string(),
+        _ => "select".to_string(),
     }
 }
 

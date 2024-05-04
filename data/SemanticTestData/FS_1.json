@@ -2,38 +2,144 @@
   "table_name": [
     {
       "table_name": "PERSONNE",
-      "use_name_table": "Piuuuu"
-    },
-    {
-      "table_name": "PERSONNECLONEE",
-      "use_name_table": "Personne"
+      "use_name_table": "P"
     }
   ],
   "columns": [
     {
-      "use_name_table": "Piuuuu",
+      "use_name_table": "",
       "attribute_name": "ID",
-      "use_name_attribute": "Not an ID"
-    },
-    {
-      "use_name_table": "Piuuuu",
-      "attribute_name": "NOM",
-      "use_name_attribute": "AAAAAAAH"
-    },
-    {
-      "use_name_table":  "Piuuuu",
-      "attribute_name": "COUNT,ID",
-      "use_name_attribute": "COUNT(ID)"
-    },
-    {
-      "use_name_table":  "",
-      "attribute_name": "SUM,ID",
-      "use_name_attribute": "SUM(ID)"
-    },
-    {
-      "use_name_table": "Personne",
-      "attribute_name": "*",
-      "use_name_attribute": "Not an ID"
+      "use_name_attribute": "heheID"
     }
-  ]
+  ],
+  "where_clause": {
+    "conditions": [
+      {
+        "left": "PRENOM",
+        "op": ">",
+        "right": "PRENOM"
+      },
+      {
+        "left": {
+          "table_name": [
+            {
+              "table_name": "PERSONNE",
+              "use_name_table": "P"
+            }
+          ],
+          "columns": [
+            {
+              "use_name_table": "",
+              "attribute_name": "NOM",
+              "use_name_attribute": "heheID"
+            }
+          ],
+          "where_clause": {
+            "conditions": [
+              {
+                "left": "PRENOM",
+                "op": ">",
+                "right": "PRENOM"
+              },
+              {
+                "left": "NOM",
+                "op": "<",
+                "right": "NOM"
+              },
+              {
+                "conditions": [
+                  {
+                    "left": "ID",
+                    "op": ">",
+                    "right": "888888888"
+                  },
+                  {
+                    "left": "ID",
+                    "op": "<",
+                    "right": "99999999"
+                  },
+                  {
+                    "left": "NOM",
+                    "op": "<>",
+                    "right": "PRENOM"
+                  },
+                  {
+                    "left": "NOM",
+                    "op": "__",
+                    "right": "\"weeeeeeeeeee\""
+                  }
+                ],
+                "linkers": [
+                  "AND",
+                  "NOT",
+                  "OR"
+                ]
+              },
+              {
+                "left": "ID",
+                "op": "__",
+                "right": "0"
+              }
+            ],
+            "linkers": [
+              "AND",
+              "AND",
+              "OR"
+            ]
+          }
+        },
+        "op": "<",
+        "right": "NOM"
+      },
+      {
+        "conditions": [
+          {
+            "left": "ID",
+            "op": ">",
+            "right": "888888888"
+          },
+          {
+            "left": "ID",
+            "op": "<",
+            "right": "99999999"
+          },
+          {
+            "left": "NOM",
+            "op": "<>",
+            "right": "PRENOM"
+          },
+          {
+            "left": "NOM",
+            "op": "__",
+            "right": "\"weeeeeeeeeee\""
+          }
+        ],
+        "linkers": [
+          "AND",
+          "NOT",
+          "OR"
+        ]
+      },
+      {
+        "left": "ID",
+        "op": "__",
+        "right": "0"
+      },
+      {
+        "left": "ID",
+        "op": "IN",
+        "right": [
+          "9",
+          "8",
+          "0"
+        ]
+      }
+    ],
+    "linkers": [
+      "AND",
+      "AND",
+      "OR",
+      "OR"
+    ]
+  }
 }
