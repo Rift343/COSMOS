@@ -114,7 +114,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
 }
   
 .query-line {
@@ -162,6 +162,7 @@ body {
     border-radius: 5px;
     font-size: 16px;
     font-family: monospace;
+    flex-grow: 1;
 }
 
 
@@ -206,10 +207,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
     height: 100px; 
     background-color: #ebefff; 
-    bottom: 50px;
+    margin-top: auto;
+    margin-bottom: 20px;
 }
   
 .logos img {
