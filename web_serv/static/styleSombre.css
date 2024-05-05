@@ -119,8 +119,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
 }
   
 .query-line {
@@ -170,6 +169,7 @@ body {
     font-size: 16px;
     color: #fff;
     font-family: monospace;
+    flex-grow: 1;
 }
 
 
@@ -216,8 +216,8 @@ body {
     align-items: center;
     height: 100px; 
     background-color: #1f2022;
-    position: absolute;
-    bottom: 50px;
+    margin-top: auto;
+    margin-bottom: 20px;
 }
   
 .logos img {
