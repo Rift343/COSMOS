@@ -1759,19 +1759,26 @@ pub fn projection(&mut self,list_attribute:Vec<String>){
 
     let mut hash_attribute = HashMap::new();
 
+    let mut let2 = Vec::new();
     for i in 0..self.descriptor[0].len()
     {
-       // println!("{:?}",self.descriptor[0][i]);
-        hash_attribute.insert(self.descriptor[0][i].clone(), i);
+        //println!("{:?}",self.descriptor[0][i]);
+        //println!("{}",i);
+        if !(hash_attribute.contains_key(&self.descriptor[0][i].clone()))
+        {
+            hash_attribute.insert(self.descriptor[0][i].clone(), i);
+            
+        }
     }
 
     let mut res_vec: Vec<Vec<String>> = Vec::new();
-    res_vec.push(list_attribute.clone());
+   
     let mut lst_index = Vec::new();
     for i in 0..list_attribute.len()
     {
         if hash_attribute.contains_key(&list_attribute[i])
         {
+            let2.push(list_attribute[i].clone());
             //println!("{}", list_attribute[i]);
             //println!("{:?}", hash_attribute);
             let x = match hash_attribute.get(&list_attribute[i]) {
@@ -1781,6 +1788,8 @@ pub fn projection(&mut self,list_attribute:Vec<String>){
             lst_index.push(x);
         }
     }
+
+    res_vec.push(let2.clone());
     //println!("{:?}",lst_index);
     for i in 1..self.descriptor.len()
     {
