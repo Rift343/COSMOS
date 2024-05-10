@@ -17,11 +17,14 @@ Cargo.lock
 */.idea/
 */.vscode/
 
-#test CSV file
-*test.csv
-*Test.csv
-test.csv
+#We ignore the log.txt file as anyone can modify that and it is not relevant to update it
+log.txt
+
 
 #result file
 data/transferFile/result.csv
+
 #data/SemanticTestData/Error.json
+data/SemanticTestData/FSE_1.json
+data/SemanticTestData/FSE_1.json
+data/transferFile/syntaxic_parsing.json
