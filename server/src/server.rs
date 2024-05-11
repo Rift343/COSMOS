@@ -117,9 +117,9 @@ fn handle_connection(mut stream: TcpStream) {
                 // Send the error to the client so that he knows he did something bad
                 if let Err(err) = send_query(&mut stream, &err.to_string()) {
                     println!("Error sending response to client: {}", err);
-                    break;
+                    continue;
                 }
-                return;
+                continue;
             }
         };
 

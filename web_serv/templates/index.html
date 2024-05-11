@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="static/styleClair.css" id="mycss">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COSMOS</title>
+
+    <button class="btn" onclick="switchstyle()">Light/Black mode</button>
+
+</head>
+<body>
+    <div class="nom">COSMOS</div>
+    <ul class="menu">
+        <li>
+            Menu
+            <ul class="sousMenu">
+                <li><a href="/">Accueil</a></li>
+                <li><a href="myAdmin">cosmosMyAdmin</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="query-line">
+        <form id="messageForm" onsubmit="return sendMessage();">
+            <textarea id="message" name="message" rows="1" onkeypress="return handleKeyPress(event);" placeholder="Query" autocomplete="off"></textarea> <!--<input type="text" id="message" name="message" onkeypress="return handleKeyPress(event);" placeholder="Query" autocomplete="off">-->
+        </form>
+    </div>
+    <div id="response"></div>
+
+    <div class="logos">
+        <img src="{{url_for('static', filename='logo_um.png')}}" alt="Université de Montpellier"/>
+        <img src="{{url_for('static', filename='logo_fds.jpg')}}" alt="Faculté des Sciences"/>
+        <img src="{{url_for('static', filename='logo_dptm_info.jpg')}}" alt="Département Informatique"/>
+        <img src="{{url_for('static', filename='logo_cmi.png')}}" alt="Cursus Master en Ingénierie"/>
+    </div>
+    
+
+    
+    <script>
+
+        const message = document.getElementById("message");
+            message.addEventListener("input", function() {
+                const lineHeight = 21;
+                const charLimit = 135;
+                const lines = Math.ceil(this.value.length / charLimit);
+                if (lines == 0){lines = 1}
+                this.style.height = (lines * lineHeight)+24 + "px";
+            });
+
+        document.getElementById("messageForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var message = document.getElementById("message").value;
+            sendMessage(message);
+        });
+
+        let env_style = 0;
+        function switchstyle()
+        {
+            if (env_style == 0)
+            {
+                document.getElementById("mycss").setAttribute("href", "static/styleSombre.css");
+                env_style = 1;
+                console.log("style2 loaded");
+            }
+            else
+            {
+                document.getElementById("mycss").setAttribute("href", "static/styleClair.css");
+                env_style = 0;
+                console.log("style1 loaded");
+            }
+
+        }
+
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) {
+            event.preventDefault();
+            var message = document.getElementById("message").value;
+            sendMessage(message);
+            }
+        }
+
+        function sendMessage(message) {
+            console.log("message : "+message);
+            fetch("http://127.0.0.1:8000/submit", { //51.75.26.110:80
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                afficherTableau(data.response);
+                //document.getElementById("response").innerText = data.response;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function afficherTableau(response) {
+            const lignes = response.split("\n");
+            let tableau = '<table border="1">';
+            for (let i = 0; i < lignes.length; i++) {
+                const colonnes = lignes[i].split(";");
+                tableau += '<tr>';
+                for (let j = 0; j < colonnes.length; j++) {
+                    tableau += '<td>' + colonnes[j] + '</td>';
+                }
+                tableau += '</tr>';
+            }
+            tableau += '</table>';
+            document.getElementById('response').innerHTML = tableau;
+        }
+    </script>
+</body>
+
+
+</html>
+
