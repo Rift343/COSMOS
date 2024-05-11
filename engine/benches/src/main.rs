@@ -52,13 +52,13 @@ fn bench_to_csv(requete : String, db_size : i32, res : Vec<Bench>,filename : &st
 //Append input file
 pub fn generator(nb_line : i32) -> Result<(),Box<dyn Error>>{
     //ouverture du reader
-    let w1 = Writer::from_path("data/CSV/Personne.csv");
+    let w1 = Writer::from_path("data/CSV/PERSONNE.csv");
     //gerer en fonction de comment est lance le module
     let mut wtr :Writer<File>;
     //Si le premier path fail, on teste le deuxieme
     match w1 {
         Ok(r) => wtr = r,
-        Err(..) => wtr = Writer::from_path("data/CSV/Personne.csv")?
+        Err(..) => wtr = Writer::from_path("data/CSV/PERSONNE.csv")?
     }
 
 
@@ -145,51 +145,6 @@ fn engine_benchmark_custom(request : String) -> Bench{
 
 
 
-    //bench
-    //let mut threads = Vec::new();
-
-    //start all threads
-/*
-    for _i in 0..nb_iter{
-        let cloned_request = request.clone();
-        println!("CLONED REQUEST {}",cloned_request);
-        threads.push(std::thread::spawn(move|| engine_benchmark_thread (cloned_request)));
-        sys.refresh_all();
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_all();
-        for p in sys.processes_by_name("src-aa2a"){
-            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
-            sum_cpu += p.cpu_usage();
-        }
-
-    }
-
-
-    println!("*\
-    ------------------------------------\
-    ");
-    for _i in 0..nb_iter{
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_all();
-        std::thread::sleep(sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_all();
-        for p in sys.processes_by_name("src-aa2a"){
-            println!("PID {}:{}: {}:{}", p.pid(), p.name(), p.cpu_usage(),p.virtual_memory());
-            sum_ram += p.virtual_memory();
-        }
-        std::thread::sleep(Duration::new(1,0));
-    }
-
-
-    for thread in threads {
-
-        thread.join().expect("Thread Join Issue");
-
-    }
-
-
-
- */
 
     //end timer
     let mut time = now.elapsed().as_micros() as f64;
@@ -224,7 +179,7 @@ fn engine_benchmark_thread(request: String){
 fn engine_benchmark(c: &mut Criterion) {
     let nb_test = 10;
     let db_size= 1000000;
-    let request = "Select ID From Personne;".to_string();
+    let request = "Select PERSONNE.ID From PERSONNE,PERSONNE2 ; ".to_string();
 
     let mut nb_line = 20000; //20000
     let nb_line_init = nb_line;
@@ -271,7 +226,7 @@ fn engine_benchmark(c: &mut Criterion) {
         //test
         engine(request.clone()).expect("Erreur engine");
         let time = now.elapsed().as_nanos() as u32;
-        let half_time = time / 4u32;
+        let half_time = time / 2u32;
 
         while res.len() < nb_test {
             let mut threads = Vec::new();
@@ -306,15 +261,6 @@ fn engine_benchmark(c: &mut Criterion) {
         }
 
 
-        /*
-    for _i in 0..=nb_test{
-        res.push(engine_benchmark_custom(request.clone()));
-    }
-
-
-
- */
-
         let mut filename = "data".to_owned() + &*nb_line.to_string();
         //bench_to_csv(request.clone(), db_size, res, &*filename);
         if(nb_line == 1000000){
@@ -333,32 +279,15 @@ fn engine_benchmark(c: &mut Criterion) {
         sum_cpu = 0f32;
         sum_ram = 0;
     }
-    bench_to_csv(request.clone(), nb_line_init/1000,avg_bench,"Average");
+    let request2 =  "Select Personne.ID From Personne Personne2;".to_string();
+    bench_to_csv(request2.clone(), nb_line_init/1000,avg_bench,"Average");
 
 
 // test
-    /*
-    let num_calcs : u64 = 1;
-    let num_iters : u64 = 10;
 
-    let available_cores: u64 = available_parallelism().unwrap().get() as u64; // get info how many threads we can use and use half of them
-    let iter_per_core: u64 = num_calcs / available_cores;
-
-    let now = Instant::now();
-    for _i in 0..num_iters {
-        let mut results = Vec::new();
-        let mut threads = Vec::new();
-        threads.push(std::thread::spawn(move|| engine_benchmark_thread ("Select ID From Personne;".to_string())));
-        for thread in threads {
-            results.extend(thread.join());
-        }
-    }
-
-*/
     //criterion
     //engine_benchmark_criterion(c,request.clone());
 }
-
 
 criterion_group!(benches, engine_benchmark);
 criterion_main!(benches);
