@@ -105,11 +105,37 @@ pub fn handle_select(syntaxic_file_content_as_struct: &SyntaxicParserFile, table
                 (split_attribute_name[0].to_string(), split_attribute_name[1].to_string())
             };
 
-            if attribute_name != "*" {
-                let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
+            let (table_name, parsed_attribute_name);
+
+            if attribute_name.contains(".") {
+                (table_name, parsed_attribute_name) = {
+                    let split_attribute_name: Vec<&str> = attribute_name.split(",").collect();
+
+                    (split_attribute_name[0].to_string(), split_attribute_name[1].to_string())
+                };
+            }
+
+            else {
+                (table_name, parsed_attribute_name) = ("".to_string(), attribute_name);
+            }
+
+            if parsed_attribute_name != "*" {
+                let table_name = check_if_attribute_is_valid(&table_metadata_as_struct, &parsed_attribute_name, &use_name_table, &renamed_table_name_map, &syntaxic_file_content_as_struct.table_name)?;
 
                 if use_name_table == "" {
-                    use_name_table = table_name.clone();
+                    // use_name_table = table_name.clone();
+                    use_name_table = {
+                        let mut res = "".to_string();
+
+                        for (key, value) in renamed_table_name_map {
+                            if value == &table_name {
+                                res = key.clone();
+                                break;
+                            }
+                        }
+
+                        res
+                    };
                 }
 
                 let table_metadata_column_vec = &table_metadata_as_struct.get(&table_name).unwrap();
@@ -118,8 +144,8 @@ pub fn handle_select(syntaxic_file_content_as_struct: &SyntaxicParserFile, table
                     use_name_table,
                     use_name_attribute,
                     aggregate_type,
-                    attribute_type: table_metadata_column_vec.get_type_of_attribute(&attribute_name)?,
-                    attribute_name,
+                    attribute_type: table_metadata_column_vec.get_type_of_attribute(&parsed_attribute_name)?,
+                    attribute_name: parsed_attribute_name,
                 };
 
                 semantic_parser_aggregates.push(temp_aggregate_struct);
@@ -135,7 +161,7 @@ pub fn handle_select(syntaxic_file_content_as_struct: &SyntaxicParserFile, table
                     use_name_attribute,
                     aggregate_type,
                     attribute_type: "INT".to_string(),
-                    attribute_name,
+                    attribute_name: parsed_attribute_name,
                 };
 
                 semantic_parser_aggregates.push(temp_aggregate_struct);
@@ -199,6 +225,7 @@ fn get_query_datatype(table_metadata_as_struct: &HashMap<String, TableMetadata>,
             let actual_table_name = match renamed_table_name_map.get(&t.aggregates[0].use_name_table) {
                 None => {
                     println!("{:?}", renamed_table_name_map);
+                    println!("Table name : '{}'", &t.aggregates[0].use_name_table);
                     if &t.aggregates[0].attribute_name != "*" {
                         return Err(Box::from(format!("Unknown error : get_query_datatype : aggregates : Renamed table not found : {}\n", &t.aggregates[0].use_name_table)));
                     }

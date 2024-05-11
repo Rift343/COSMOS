@@ -24,7 +24,7 @@ pub mod generator_mod{
         //def rng age
         let mut rng_age = rand::thread_rng();
 
-        wtr.write_record(&["ID","First_name","Last_name","Age"])?;
+        wtr.write_record(&["ID;NOM;PRENOM;AGE;"])?;
         //ajout données
         for x in 0..nb_line{
             //ID
@@ -38,7 +38,7 @@ pub mod generator_mod{
             let age_str= rng_age.gen_range(0..100).to_string();
 
             //Ecriture dans le fichier
-            wtr.write_record(&[id_string,first_name,last_name,age_str])?;
+            wtr.write_record(&[id_string+";"+ &*first_name +";"+ &*last_name +";"+ &*age_str])?;
             wtr.flush()?;
         }
         Ok(())

@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::rc::Rc;
 use rand::random;
-use crate::lmd::semantic_parser;
 use crate::lmd::r#where;
 use crate::structures::table_metadata;
 
@@ -28,7 +27,22 @@ pub enum Check {
 }
 
 fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMap<String, table_metadata::TableMetadata>, renamed_table_name_map: &HashMap<String, String>, selected_table_list: &Vec<syntaxic_parser_file::TableNameCouple>) -> Result<(String, semantic_parser_file::ConditionAllowType), Box<dyn Error>> {
-    let table_name = check_if_attribute_is_valid(table_metadata_as_struct, &given_attribute, &"".to_string(), renamed_table_name_map, selected_table_list)?;
+    let (mut table_name, attribute_name): (String, String);
+
+    if given_attribute.contains("."){
+        let temp: Vec<&str> = given_attribute.split(".").collect();
+
+        table_name = temp[0].to_string();
+        attribute_name = temp[1].to_string();
+
+        table_name = check_if_attribute_is_valid(table_metadata_as_struct, &attribute_name, &table_name, renamed_table_name_map, selected_table_list)?;
+
+    }
+
+    else {
+        attribute_name = given_attribute.clone();
+        table_name = check_if_attribute_is_valid(table_metadata_as_struct, given_attribute, &"".to_string(), renamed_table_name_map, selected_table_list)?;
+    }
 
     let use_name_table = {
         let mut res = "".to_string();
@@ -43,13 +57,15 @@ fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMa
         res
     };
 
+    println!("use_name_table : {}", use_name_table);
+
     let mut attribute_type = {
-        match table_metadata_as_struct.get(&use_name_table) {
+        match table_metadata_as_struct.get(&table_name) {
             None => {
                 return Err(Box::from(format!("Unknown error : {} not found in metadata despite validation. (transform_to_attr)\n", table_name)));
             }
             Some(table_metadata) => {
-                table_metadata.get_type_of_attribute(given_attribute)?
+                table_metadata.get_type_of_attribute(&attribute_name)?
             }
         }
     };
@@ -65,7 +81,7 @@ fn transform_to_attr(given_attribute: &String, table_metadata_as_struct: &HashMa
                 Attribute {
                     etype: String::from("attribute"),
                     use_name_table,
-                    attribute_name: given_attribute.clone(),
+                    attribute_name,
                 }
             )
         )

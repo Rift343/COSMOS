@@ -1,0 +1,207 @@
+{
+    "hhhhh": {
+        "columns": [
+            {
+                "column_name": "pfsef",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "fsefsfs",
+                "column_type": "INT"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "pfsefPRIMARY KEY",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "pfsef"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "ccccccccccccccccc": {
+        "columns": [
+            {
+                "column_name": "pop",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "super",
+                "column_type": "INT"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "popPRIMARY KEY",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "pop"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "PERSONNE2": {
+        "columns": [
+            {
+                "column_name": "ID2",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "NOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "PRENOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "AGE",
+                "column_type": "INT"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_Personne",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "ID"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "PERSONNE": {
+        "columns": [
+            {
+                "column_name": "ID",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "NOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "PRENOM",
+                "column_type": "VARCHAR(20)"
+            },
+            {
+                "column_name": "AGE",
+                "column_type": "INT"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_Personne",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "ID"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "poljjjgg2": {
+        "columns": [
+            {
+                "column_name": "nom",
+                "column_type": "VARCHAR(50)"
+            },
+            {
+                "column_name": "adherents",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "affinite",
+                "column_type": "VARCHAR(255)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "nomPRIMARY KEY",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "nom",
+                    "affinite"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "communal": {
+        "columns": [
+            {
+                "column_name": "population",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "superficie",
+                "column_type": "INT"
+            },
+            {
+                "column_name": "duree_de_vie",
+                "column_type": "VARCHAR(255)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "populationPRIMARY KEY",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "population"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "ALL_COLUMNS": {
+        "columns": [
+            {
+                "column_name": "TABLE_NAME",
+                "column_type": "VARCHAR(50)"
+            },
+            {
+                "column_name": "COLUMN_NAME",
+                "column_type": "VARCHAR(50)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_ALL_COLUMNS",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "TABLE_NAME","COLUMN_NAME"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    },
+    "ALL_TABLES": {
+        "columns": [
+            {
+                "column_name": "TABLE_NAME",
+                "column_type": "VARCHAR(50)"
+            }
+        ],
+        "constraints": [
+            {
+                "constraint_name": "PK_ALL_TABLE",
+                "constraint_type": "PrimaryKey",
+                "attribute_list": [
+                    "TABLE_NAME"
+                ],
+                "foreign_key": null,
+                "check": null
+            }
+        ]
+    }
+}
